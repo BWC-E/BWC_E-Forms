@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annual Financial Return Form | Bethel Worldwide Corporation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5986 100%);
+            padding: 40px 20px;
+            font-family: 'Crimson Pro', Georgia, serif;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5986 0%, #1e3a5f 100%);
+            padding: 40px;
+            color: white;
+            text-align: center;
+            border-bottom: 4px solid #d4af37;
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        .header h2 {
+            margin: 10px 0 0 0;
+            font-size: 22px;
+            font-weight: 500;
+            opacity: 0.95;
+            letter-spacing: '0.5px';
+        }
+
+        .form-content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #1e3a5f;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 8px;
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus {
+            outline: none;
+            border-color: #2d5986;
+        }
+
+        input.error {
+            border-color: #dc2626;
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 14px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+        .currency-input::before {
+            content: 'US$';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .currency-input input {
+            padding-left: 50px;
+        }
+
+        .financial-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .total-row {
+            background-color: #f3f4f6;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-weight: 600;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 16px;
+            color: #1e3a5f;
+        }
+
+        .total-value {
+            font-size: 18px;
+            color: #1e3a5f;
+            text-align: right;
+            padding-right: 12px;
+        }
+
+        .calculated-info {
+            background-color: #dbeafe;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #1e40af;
+            margin-top: 5px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #2d5986;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1e3a5f;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        .btn-submit {
+            padding: 16px 48px;
+            background-color: #2d5986;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .btn-submit:hover {
+            background-color: #1e3a5f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .note-box {
+            background-color: #fef3c7;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #fbbf24;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background-color: #dbeafe;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #60a5fa;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .submit-note {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer {
+            background-color: #f3f4f6;
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        /* Digital Signature Styles */
+        .signature-container {
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            padding: 20px;
+            background-color: #f9fafb;
+            margin-top: 10px;
+        }
+
+        .signature-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .signature-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 15px;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .signature-tab.active {
+            color: #2d5986;
+            border-bottom-color: #2d5986;
+        }
+
+        .signature-tab:hover {
+            color: #1e3a5f;
+        }
+
+        .signature-panel {
+            display: none;
+        }
+
+        .signature-panel.active {
+            display: block;
+        }
+
+        #signatureCanvas {
+            border: 2px dashed #d1d5db;
+            border-radius: 4px;
+            cursor: crosshair;
+            background: white;
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            touch-action: none;
+        }
+
+        .canvas-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .signature-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .signature-preview.active {
+            display: block;
+        }
+
+        .signature-preview img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .signature-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .signature-preview-header span {
+            font-weight: 600;
+            color: #059669;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2d5986;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .file-upload-label:hover {
+            background-color: #1e3a5f;
+        }
+
+        .agreement-box {
+            background-color: #f0fdf4;
+            border: 2px solid #22c55e;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .agreement-checkbox {
+            display: flex;
+            align-items: start;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .agreement-checkbox input[type="checkbox"] {
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        .agreement-checkbox label {
+            font-weight: normal;
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            .financial-grid,
+            .total-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .form-content {
+                padding: 20px;
+            }
+
+            #signatureCanvas {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Bethel Worldwide Corporation</h1>
+            <h2>Annual Financial Return</h2>
+        </div>
+
+        <!-- Form Content -->
+        <div class="form-content">
+            <form id="financialForm">
+                <!-- Company Information -->
+                <div class="section">
+                    <h3 class="section-title">Company Information</h3>
+                    
+                    <div class="form-group">
+                        <label>Company Name <span class="required">*</span></label>
+                        <input type="text" id="companyName" required>
+                        <span class="error-message" id="error-companyName"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Financial Year Ending <span class="required">*</span></label>
+                        <input type="date" id="financialYearEnd" required>
+                        <span class="error-message" id="error-financialYearEnd"></span>
+                        <div class="calculated-info">📅 This should be the last day of your company's financial year</div>
+                    </div>
+                </div>
+
+                <!-- Balance Sheet / Statement of Financial Position -->
+                <div class="section">
+                    <h3 class="section-title">Balance Sheet / Statement of Financial Position</h3>
+                    
+                    <h4 style="font-size: 18px; color: #2d5986; margin-bottom: 15px; font-weight: 600;">ASSETS</h4>
+                    
+                    <div class="financial-grid">
+                        <label>Cash and cash equivalents</label>
+                        <div class="currency-input">
+                            <input type="number" id="cashEquivalents" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="financial-grid">
+                        <label>Loans and receivables</label>
+                        <div class="currency-input">
+                            <input type="number" id="loansReceivables" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="financial-grid">
+                        <label>Investments and other financial assets</label>
+                        <div class="currency-input">
+                            <input type="number" id="investments" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="financial-grid">
+                        <label>Tangible fixed assets</label>
+                        <div class="currency-input">
+                            <input type="number" id="tangibleAssets" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="financial-grid">
+                        <label>Intangible assets</label>
+                        <div class="currency-input">
+                            <input type="number" id="intangibleAssets" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="financial-grid">
+                        <label>Other assets</label>
+                        <div class="currency-input">
+                            <input type="number" id="otherAssets" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="total-row">
+                        <div class="total-label">TOTAL ASSETS</div>
+                        <div class="total-value" id="totalAssets">US$ 0.00</div>
+                    </div>
+
+                    <h4 style="font-size: 18px; color: #2d5986; margin: 25px 0 15px 0; font-weight: 600;">LIABILITIES</h4>
+                    
+                    <div class="financial-grid">
+                        <label>Accounts payable</label>
+                        <div class="currency-input">
+                            <input type="number" id="accountsPayable" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="financial-grid">
+                        <label>Long-term debts</label>
+                        <div class="currency-input">
+                            <input type="number" id="longTermDebts" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="financial-grid">
+                        <label>Other liabilities</label>
+                        <div class="currency-input">
+                            <input type="number" id="otherLiabilities" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="total-row">
+                        <div class="total-label">TOTAL LIABILITIES</div>
+                        <div class="total-value" id="totalLiabilities">US$ 0.00</div>
+                    </div>
+
+                    <div class="total-row" style="background-color: #e0f2fe; margin-top: 20px;">
+                        <div class="total-label">SHAREHOLDER'S EQUITY</div>
+                        <div class="total-value" id="shareholdersEquity">US$ 0.00</div>
+                    </div>
+                    <div class="calculated-info">💡 Shareholder's Equity = Total Assets - Total Liabilities (calculated automatically)</div>
+                </div>
+
+                <!-- Income Statement -->
+                <div class="section">
+                    <h3 class="section-title">Income Statement</h3>
+                    
+                    <div class="financial-grid">
+                        <label>Revenue <span class="required">*</span></label>
+                        <div class="currency-input">
+                            <input type="number" id="revenue" step="0.01" value="0" required oninput="calculateTotals()">
+                        </div>
+                    </div>
+                    <span class="error-message" id="error-revenue"></span>
+
+                    <div class="financial-grid">
+                        <label>Cost of Sales</label>
+                        <div class="currency-input">
+                            <input type="number" id="costOfSales" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="total-row">
+                        <div class="total-label">GROSS PROFIT</div>
+                        <div class="total-value" id="grossProfit">US$ 0.00</div>
+                    </div>
+                    <div class="calculated-info">💡 Gross Profit = Revenue - Cost of Sales (calculated automatically)</div>
+
+                    <h4 style="font-size: 18px; color: #2d5986; margin: 25px 0 15px 0; font-weight: 600;">EXPENSES</h4>
+
+                    <div class="financial-grid">
+                        <label>Operating expenses</label>
+                        <div class="currency-input">
+                            <input type="number" id="operatingExpenses" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="financial-grid">
+                        <label>Other expenses</label>
+                        <div class="currency-input">
+                            <input type="number" id="otherExpenses" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="financial-grid">
+                        <label>Income tax expense</label>
+                        <div class="currency-input">
+                            <input type="number" id="incomeTaxExpense" step="0.01" value="0" oninput="calculateTotals()">
+                        </div>
+                    </div>
+
+                    <div class="total-row">
+                        <div class="total-label">TOTAL EXPENSES</div>
+                        <div class="total-value" id="totalExpenses">US$ 0.00</div>
+                    </div>
+
+                    <div class="total-row" style="background-color: #e0f2fe; margin-top: 20px;">
+                        <div class="total-label">NET INCOME</div>
+                        <div class="total-value" id="netIncome">US$ 0.00</div>
+                    </div>
+                    <div class="calculated-info">💡 Net Income = Gross Profit - Total Expenses (calculated automatically)</div>
+                </div>
+
+                <!-- Signature Section -->
+                <div class="section">
+                    <h3 class="section-title">Authorization</h3>
+
+                    <div class="info-box">
+                        <strong>For and on behalf of:</strong> <span id="companyNameDisplay">Your Company Name</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Director's Name <span class="required">*</span></label>
+                        <input type="text" id="directorName" required>
+                        <span class="error-message" id="error-directorName"></span>
+                    </div>
+
+                    <!-- Digital Signature Section -->
+                    <div class="form-group">
+                        <label>Director's Digital Signature <span class="required">*</span></label>
+                        <div class="info-box">
+                            <strong>📝 About Digital Signatures:</strong> Your digital signature has the same legal validity as a handwritten signature. You can either draw your signature using your mouse/touchscreen or upload an image of your signature.
+                        </div>
+                        
+                        <div class="signature-container">
+                            <div class="signature-tabs">
+                                <button type="button" class="signature-tab active" onclick="switchSignatureTab('draw')">
+                                    ✍️ Draw Signature
+                                </button>
+                                <button type="button" class="signature-tab" onclick="switchSignatureTab('upload')">
+                                    📤 Upload Image
+                                </button>
+                            </div>
+
+                            <!-- Draw Signature Panel -->
+                            <div id="drawPanel" class="signature-panel active">
+                                <p style="margin-bottom: 10px; color: #666; font-size: 14px;">Draw your signature in the box below:</p>
+                                <canvas id="signatureCanvas" width="500" height="200"></canvas>
+                                <div class="canvas-controls">
+                                    <button type="button" class="btn btn-secondary" onclick="clearSignature()">Clear</button>
+                                    <button type="button" class="btn btn-primary" onclick="saveDrawnSignature()">Save Signature</button>
+                                </div>
+                            </div>
+
+                            <!-- Upload Signature Panel -->
+                            <div id="uploadPanel" class="signature-panel">
+                                <p style="margin-bottom: 10px; color: #666; font-size: 14px;">Upload an image of your signature (PNG, JPG, or JPEG):</p>
+                                <input type="file" id="signatureUpload" accept="image/png,image/jpeg,image/jpg">
+                                <label for="signatureUpload" class="file-upload-label">
+                                    📁 Choose File
+                                </label>
+                                <p style="margin-top: 10px; font-size: 13px; color: #666;">Tip: For best results, use a clear image with a white background.</p>
+                            </div>
+
+                            <!-- Signature Preview -->
+                            <div id="signaturePreview" class="signature-preview">
+                                <div class="signature-preview-header">
+                                    <span>✓ Signature Captured</span>
+                                    <button type="button" class="btn btn-secondary" onclick="clearSavedSignature()" style="padding: 6px 12px; font-size: 14px;">Change</button>
+                                </div>
+                                <img id="signatureImage" src="" alt="Your Signature">
+                            </div>
+                        </div>
+                        <span class="error-message" id="error-signature"></span>
+                    </div>
+
+                    <!-- Agreement Checkbox -->
+                    <div class="agreement-box">
+                        <strong>Electronic Signature Agreement</strong>
+                        <div class="agreement-checkbox">
+                            <input type="checkbox" id="signatureAgreement" required>
+                            <label for="signatureAgreement">
+                                I agree that my digital signature above is the legal equivalent of my manual/handwritten signature and I consent to be legally bound by this electronic signature. <span class="required">*</span>
+                            </label>
+                        </div>
+                        <span class="error-message" id="error-agreement"></span>
+                    </div>
+
+                    <div class="note-box">
+                        <strong>Note:</strong> After downloading the PDF, please return it to Bethel Worldwide Corporation via email.
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="submit-section">
+                    <button type="submit" class="btn-submit">Download Annual Financial Return (PDF)</button>
+                    <p class="submit-note">* Indicates required field</p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; <span id="currentYear"></span> Bethel Worldwide Corporation. All rights reserved.</p>
+            <p>For assistance, please contact your Bethel Worldwide Corporation representative.</p>
+        </div>
+    </div>
+
+    <script>
+        // Set current year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Signature variables
+        let signatureDataURL = null;
+
+        // Canvas setup for drawing signature
+        const canvas = document.getElementById('signatureCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        // Set up canvas
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        // Drawing functions
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            if (e.type === 'mousedown') {
+                lastX = (e.clientX - rect.left) * scaleX;
+                lastY = (e.clientY - rect.top) * scaleY;
+            } else if (e.type === 'touchstart') {
+                e.preventDefault();
+                lastX = (e.touches[0].clientX - rect.left) * scaleX;
+                lastY = (e.touches[0].clientY - rect.top) * scaleY;
+            }
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            let currentX, currentY;
+            
+            if (e.type === 'mousemove') {
+                currentX = (e.clientX - rect.left) * scaleX;
+                currentY = (e.clientY - rect.top) * scaleY;
+            } else if (e.type === 'touchmove') {
+                e.preventDefault();
+                currentX = (e.touches[0].clientX - rect.left) * scaleX;
+                currentY = (e.touches[0].clientY - rect.top) * scaleY;
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(currentX, currentY);
+            ctx.stroke();
+
+            lastX = currentX;
+            lastY = currentY;
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        // Mouse events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        // Touch events
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function saveDrawnSignature() {
+            // Check if canvas is empty
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            let isEmpty = true;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                if (data[i + 3] !== 0) {
+                    isEmpty = false;
+                    break;
+                }
+            }
+            
+            if (isEmpty) {
+                alert('Please draw your signature before saving.');
+                return;
+            }
+            
+            signatureDataURL = canvas.toDataURL();
+            document.getElementById('signatureImage').src = signatureDataURL;
+            document.getElementById('signaturePreview').classList.add('active');
+        }
+
+        function clearSavedSignature() {
+            signatureDataURL = null;
+            document.getElementById('signaturePreview').classList.remove('active');
+            clearSignature();
+        }
+
+        // Upload signature
+        document.getElementById('signatureUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image/(png|jpeg|jpg)')) {
+                alert('Please upload a PNG or JPEG image.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                signatureDataURL = event.target.result;
+                document.getElementById('signatureImage').src = signatureDataURL;
+                document.getElementById('signaturePreview').classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Switch signature tabs
+        function switchSignatureTab(tab) {
+            const tabs = document.querySelectorAll('.signature-tab');
+            const panels = document.querySelectorAll('.signature-panel');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            panels.forEach(p => p.classList.remove('active'));
+            
+            if (tab === 'draw') {
+                tabs[0].classList.add('active');
+                document.getElementById('drawPanel').classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('uploadPanel').classList.add('active');
+            }
+        }
+
+        // Update company name display
+        document.getElementById('companyName').addEventListener('input', function() {
+            const name = this.value || 'Your Company Name';
+            document.getElementById('companyNameDisplay').textContent = name;
+        });
+
+        // Financial calculations
+        function formatCurrency(value) {
+            return 'US$ ' + parseFloat(value).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function calculateTotals() {
+            // Calculate Total Assets
+            const totalAssets = 
+                parseFloat(document.getElementById('cashEquivalents').value || 0) +
+                parseFloat(document.getElementById('loansReceivables').value || 0) +
+                parseFloat(document.getElementById('investments').value || 0) +
+                parseFloat(document.getElementById('tangibleAssets').value || 0) +
+                parseFloat(document.getElementById('intangibleAssets').value || 0) +
+                parseFloat(document.getElementById('otherAssets').value || 0);
+            
+            document.getElementById('totalAssets').textContent = formatCurrency(totalAssets);
+
+            // Calculate Total Liabilities
+            const totalLiabilities = 
+                parseFloat(document.getElementById('accountsPayable').value || 0) +
+                parseFloat(document.getElementById('longTermDebts').value || 0) +
+                parseFloat(document.getElementById('otherLiabilities').value || 0);
+            
+            document.getElementById('totalLiabilities').textContent = formatCurrency(totalLiabilities);
+
+            // Calculate Shareholder's Equity
+            const shareholdersEquity = totalAssets - totalLiabilities;
+            document.getElementById('shareholdersEquity').textContent = formatCurrency(shareholdersEquity);
+
+            // Calculate Gross Profit
+            const revenue = parseFloat(document.getElementById('revenue').value || 0);
+            const costOfSales = parseFloat(document.getElementById('costOfSales').value || 0);
+            const grossProfit = revenue - costOfSales;
+            document.getElementById('grossProfit').textContent = formatCurrency(grossProfit);
+
+            // Calculate Total Expenses
+            const totalExpenses = 
+                parseFloat(document.getElementById('operatingExpenses').value || 0) +
+                parseFloat(document.getElementById('otherExpenses').value || 0) +
+                parseFloat(document.getElementById('incomeTaxExpense').value || 0);
+            
+            document.getElementById('totalExpenses').textContent = formatCurrency(totalExpenses);
+
+            // Calculate Net Income
+            const netIncome = grossProfit - totalExpenses;
+            document.getElementById('netIncome').textContent = formatCurrency(netIncome);
+        }
+
+        // Initialize calculations
+        calculateTotals();
+
+        // Form submission
+        document.getElementById('financialForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+
+            // Validate required fields
+            let isValid = true;
+
+            if (!document.getElementById('companyName').value.trim()) {
+                isValid = false;
+                document.getElementById('error-companyName').textContent = 'Company name is required';
+                document.getElementById('companyName').classList.add('error');
+            }
+
+            if (!document.getElementById('financialYearEnd').value) {
+                isValid = false;
+                document.getElementById('error-financialYearEnd').textContent = 'Financial year end date is required';
+                document.getElementById('financialYearEnd').classList.add('error');
+            }
+
+            if (!document.getElementById('directorName').value.trim()) {
+                isValid = false;
+                document.getElementById('error-directorName').textContent = 'Director name is required';
+                document.getElementById('directorName').classList.add('error');
+            }
+
+            // Validate signature
+            if (!signatureDataURL) {
+                isValid = false;
+                document.getElementById('error-signature').textContent = 'Please provide your digital signature';
+            }
+
+            // Validate agreement checkbox
+            if (!document.getElementById('signatureAgreement').checked) {
+                isValid = false;
+                document.getElementById('error-agreement').textContent = 'You must agree to the electronic signature terms';
+            }
+
+            if (!isValid) {
+                alert('Please fill in all required fields marked with * and provide your digital signature');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
+            // Generate PDF
+            generatePDF();
+        });
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.width;
+            const pageHeight = doc.internal.pageSize.height;
+            const margin = 20;
+            const lineHeight = 7;
+            let yPosition = margin;
+
+            function addText(text, x, y, maxWidth, options = {}) {
+                const lines = doc.splitTextToSize(text, maxWidth);
+                lines.forEach((line, index) => {
+                    if (y + (index * lineHeight) > pageHeight - margin) {
+                        doc.addPage();
+                        y = margin;
+                    }
+                    doc.text(line, x, y + (index * lineHeight), options);
+                });
+                return y + (lines.length * lineHeight);
+            }
+
+            // Header
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            yPosition = addText('ANNUAL FINANCIAL RETURN', margin, yPosition, pageWidth - 2 * margin, { align: 'center' });
+            yPosition += 5;
+            
+            const companyName = document.getElementById('companyName').value;
+            doc.setFontSize(14);
+            yPosition = addText(companyName, margin, yPosition, pageWidth - 2 * margin, { align: 'center' });
+            yPosition += 5;
+
+            doc.setFontSize(12);
+            const yearEnd = document.getElementById('financialYearEnd').value;
+            yPosition = addText(`Financial Information for Year Ending: ${yearEnd}`, margin, yPosition, pageWidth - 2 * margin, { align: 'center' });
+            yPosition += 10;
+
+            // Balance Sheet
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            yPosition = addText('BALANCE SHEET / STATEMENT OF FINANCIAL POSITION', margin, yPosition, pageWidth - 2 * margin);
+            yPosition += 5;
+
+            // Assets
+            doc.setFontSize(11);
+            yPosition = addText('ASSETS', margin, yPosition, pageWidth - 2 * margin);
+            yPosition += 3;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            
+            const assets = [
+                ['Cash and cash equivalents', document.getElementById('cashEquivalents').value],
+                ['Loans and receivables', document.getElementById('loansReceivables').value],
+                ['Investments and other financial assets', document.getElementById('investments').value],
+                ['Tangible fixed assets', document.getElementById('tangibleAssets').value],
+                ['Intangible assets', document.getElementById('intangibleAssets').value],
+                ['Other assets', document.getElementById('otherAssets').value]
+            ];
+
+            assets.forEach(([label, value]) => {
+                yPosition = addText(`${label}:`, margin, yPosition, 120);
+                doc.text(formatCurrency(value), pageWidth - margin, yPosition, { align: 'right' });
+                yPosition += lineHeight;
+            });
+
+            yPosition += 2;
+            doc.setFont(undefined, 'bold');
+            yPosition = addText('TOTAL ASSETS:', margin, yPosition, 120);
+            doc.text(document.getElementById('totalAssets').textContent, pageWidth - margin, yPosition, { align: 'right' });
+            yPosition += 8;
+
+            // Liabilities
+            doc.setFontSize(11);
+            yPosition = addText('LIABILITIES', margin, yPosition, pageWidth - 2 * margin);
+            yPosition += 3;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            
+            const liabilities = [
+                ['Accounts payable', document.getElementById('accountsPayable').value],
+                ['Long-term debts', document.getElementById('longTermDebts').value],
+                ['Other liabilities', document.getElementById('otherLiabilities').value]
+            ];
+
+            liabilities.forEach(([label, value]) => {
+                yPosition = addText(`${label}:`, margin, yPosition, 120);
+                doc.text(formatCurrency(value), pageWidth - margin, yPosition, { align: 'right' });
+                yPosition += lineHeight;
+            });
+
+            yPosition += 2;
+            doc.setFont(undefined, 'bold');
+            yPosition = addText('TOTAL LIABILITIES:', margin, yPosition, 120);
+            doc.text(document.getElementById('totalLiabilities').textContent, pageWidth - margin, yPosition, { align: 'right' });
+            yPosition += 8;
+
+            yPosition = addText("SHAREHOLDER'S EQUITY:", margin, yPosition, 120);
+            doc.text(document.getElementById('shareholdersEquity').textContent, pageWidth - margin, yPosition, { align: 'right' });
+            yPosition += 10;
+
+            // Income Statement
+            doc.setFontSize(12);
+            yPosition = addText('INCOME STATEMENT', margin, yPosition, pageWidth - 2 * margin);
+            yPosition += 5;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            
+            yPosition = addText('REVENUE:', margin, yPosition, 120);
+            doc.text(formatCurrency(document.getElementById('revenue').value), pageWidth - margin, yPosition, { align: 'right' });
+            yPosition += lineHeight;
+
+            yPosition = addText('COST OF SALES:', margin, yPosition, 120);
+            doc.text(formatCurrency(document.getElementById('costOfSales').value), pageWidth - margin, yPosition, { align: 'right' });
+            yPosition += lineHeight;
+
+            yPosition += 2;
+            doc.setFont(undefined, 'bold');
+            yPosition = addText('GROSS PROFIT:', margin, yPosition, 120);
+            doc.text(document.getElementById('grossProfit').textContent, pageWidth - margin, yPosition, { align: 'right' });
+            yPosition += 8;
+
+            doc.setFontSize(11);
+            yPosition = addText('EXPENSES', margin, yPosition, pageWidth - 2 * margin);
+            yPosition += 3;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+
+            const expenses = [
+                ['Operating expenses', document.getElementById('operatingExpenses').value],
+                ['Other expenses', document.getElementById('otherExpenses').value],
+                ['Income tax expense', document.getElementById('incomeTaxExpense').value]
+            ];
+
+            expenses.forEach(([label, value]) => {
+                yPosition = addText(`${label}:`, margin, yPosition, 120);
+                doc.text(formatCurrency(value), pageWidth - margin, yPosition, { align: 'right' });
+                yPosition += lineHeight;
+            });
+
+            yPosition += 2;
+            doc.setFont(undefined, 'bold');
+            yPosition = addText('TOTAL EXPENSES:', margin, yPosition, 120);
+            doc.text(document.getElementById('totalExpenses').textContent, pageWidth - margin, yPosition, { align: 'right' });
+            yPosition += 8;
+
+            yPosition = addText('NET INCOME:', margin, yPosition, 120);
+            doc.text(document.getElementById('netIncome').textContent, pageWidth - margin, yPosition, { align: 'right' });
+            yPosition += 10;
+
+            // Signature section
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            yPosition = addText(`For and on behalf of ${companyName}`, margin, yPosition, pageWidth - 2 * margin);
+            yPosition += 8;
+
+            // Add digital signature image
+            if (signatureDataURL) {
+                if (yPosition + 30 > pageHeight - margin) {
+                    doc.addPage();
+                    yPosition = margin;
+                }
+                doc.addImage(signatureDataURL, 'PNG', margin, yPosition, 60, 20);
+                yPosition += 22;
+            }
+
+            const directorName = document.getElementById('directorName').value;
+            yPosition = addText(directorName, margin, yPosition, pageWidth - 2 * margin);
+            yPosition += 5;
+            yPosition = addText('Director', margin, yPosition, pageWidth - 2 * margin);
+            yPosition += 3;
+            yPosition = addText('(Digitally Signed)', margin, yPosition, pageWidth - 2 * margin);
+
+            // Save PDF
+            const fileName = `Annual_Financial_Return_${companyName.replace(/\s+/g, '_')}_${yearEnd}.pdf`;
+            doc.save(fileName);
+        }
+    </script>
+</body>
+</html>
