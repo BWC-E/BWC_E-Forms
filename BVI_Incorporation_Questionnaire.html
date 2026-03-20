@@ -15,7 +15,7 @@
         .header { background: linear-gradient(135deg, #2d5986 0%, #1e3a5f 100%); padding: 40px; color: white; text-align: center; border-bottom: 4px solid #d4af37; }
         .header h1 { margin: 0 0 10px 0; font-size: 28px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-family: 'Playfair Display', Georgia, serif; }
         .header h2 { margin: 10px 0 0 0; font-size: 20px; font-weight: 500; opacity: 0.95; }
-        .form-content { padding: 40px; }
+        .form-content { padding: 40px; scroll-padding-top: 60px; }
         .section { margin-bottom: 40px; }
         .section-title { font-size: 22px; color: #1e3a5f; margin-bottom: 20px; border-bottom: 2px solid #d4af37; padding-bottom: 8px; font-family: 'Playfair Display', Georgia, serif; text-transform: uppercase; }
         .subsection-title { font-size: 18px; color: #2d5986; margin: 25px 0 15px 0; font-weight: 600; }
@@ -95,6 +95,42 @@
 
         .btn-submit-disabled { opacity: 0.45; cursor: not-allowed; background-color: #6b7280; }
         .btn-submit-disabled:hover { background-color: #6b7280; transform: none; box-shadow: none; }
+        /* ── Floating section nav bar ── */
+        #floatingNav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 1000px;
+            z-index: 1000;
+            background: white;
+            border-bottom: 3px solid #d4af37;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+            padding: 10px 24px;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+        /* Push form content down so the fixed bar doesn't obscure it */
+        body.nav-visible .form-content {
+            padding-top: 64px;
+        }
+        #floatingNav .fnav-btn {
+            background: #2d5986; color: white; border: none;
+            border-radius: 6px; padding: 8px 18px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: background 0.15s; white-space: nowrap;
+        }
+        #floatingNav .fnav-btn:hover { background: #1e3a5f; }
+        #floatingNav .fnav-btn.fnav-next { background: #d4af37; color: #1e3a5f; }
+        #floatingNav .fnav-btn.fnav-next:hover { background: #b8962e; }
+        #floatingNav .fnav-btn.fnav-home { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
+        #floatingNav .fnav-btn.fnav-home:hover { background: #e5e7eb; }
+        #floatingNav .fnav-label { font-size: 13px; color: #6b7280; font-weight: 600; flex: 1; text-align: center; }
 </style>
 </head>
 <body>
@@ -104,6 +140,13 @@
             <h2>BVI Business Company Incorporation Questionnaire</h2>
         </div>
         <div class="form-content">
+            <!-- ── Floating navigation bar (shown when inside a section) ── -->
+            <div id="floatingNav">
+                <button type="button" class="fnav-btn fnav-home" id="fnavHome" onclick="showHub()">&#8592; Menu</button>
+                <button type="button" class="fnav-btn" id="fnavPrev" onclick="">&#8592; Previous</button>
+                <span class="fnav-label" id="fnavLabel"></span>
+                <button type="button" class="fnav-btn fnav-next" id="fnavNext" onclick="">Next &#8594;</button>
+            </div>
             <div style="background-color: #e0f2fe; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                     <div>
@@ -1078,6 +1121,8 @@ function showHub() {
                 const s = document.getElementById('section-' + i);
                 if (s) s.style.display = 'none';
             }
+            document.getElementById('floatingNav').style.display = 'none';
+            document.body.classList.remove('nav-visible');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function showSection(n) {
@@ -1086,7 +1131,26 @@ function showHub() {
                 const s = document.getElementById('section-' + i);
                 if (s) s.style.display = (i === n) ? 'block' : 'none';
             }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Update floating nav
+            const fnav = document.getElementById('floatingNav');
+            fnav.style.display = 'flex';
+            document.body.classList.add('nav-visible');
+            document.getElementById('fnavLabel').textContent = n + ' / 15';
+            const prevBtn = document.getElementById('fnavPrev');
+            const nextBtn = document.getElementById('fnavNext');
+            if (n > 1) {
+                prevBtn.style.visibility = 'visible';
+                prevBtn.onclick = () => showSection(n - 1);
+            } else {
+                prevBtn.style.visibility = 'hidden';
+            }
+            if (n < 15) {
+                nextBtn.style.visibility = 'visible';
+                nextBtn.onclick = () => showSection(n + 1);
+            } else {
+                nextBtn.style.visibility = 'hidden';
+            }
+            setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
         }
 
         window.addEventListener('DOMContentLoaded',()=>{loadFormProgress();if(document.getElementById('taxCompliantCountriesContainer').children.length===0){addTaxCompliantCountry();}addShareholder();addDirector();addBeneficialOwner();wireReadinessListeners();checkFormReadiness();});
