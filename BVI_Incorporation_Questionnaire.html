@@ -811,10 +811,10 @@ Please provide the address from which the company will be operating.
         <div class="footer">
             <p>© <span id="currentYear">2026</span> Bethel Worldwide Corporation. All rights reserved.</p>
             <p>Bethel House, P.O. Box 4749, Road Town, Tortola, British Virgin Islands</p>
-            <p>Phone: (284) 494-0778 | Fax: (284) 494-0781 | Email: <a href="mailto:info@bethelworldwide.com">info@bethelworldwide.com</a></p>
+            <p>Phone: (284) 494-0778 | Fax: (284) 494-0781 | Email: <a href="/cdn-cgi/l/email-protection#cea7a0a8a18eacabbaa6aba2b9a1bca2aab9a7aaabe0ada1a3"><span class="__cf_email__" data-cfemail="224b4c444d624047564a474e554d504e46554b46470c414d4f">[email&#160;protected]</span></a></p>
         </div>
     </div>
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         
         // ════════════════════════════════════════════════════════════════
         // BWC INCORPORATION QUESTIONNAIRE — MAIN SCRIPT
@@ -1060,7 +1060,469 @@ function showHub() {
         // ════════════════════════════════════════════════════════════
         // ── PDF GENERATION
         // ════════════════════════════════════════════════════════════
-function generatePDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF();const pageWidth=doc.internal.pageSize.width;const pageHeight=doc.internal.pageSize.height;const margin=20;const lineHeight=6;let yPosition=margin;function addText(text,x,y,maxWidth){const lines=doc.splitTextToSize(text,maxWidth);lines.forEach((line,index)=>{if(y+(index*lineHeight)>pageHeight-margin){doc.addPage();y=margin;}doc.text(line,x,y+(index*lineHeight));});return y+(lines.length*lineHeight);}doc.setFontSize(16);doc.setFont(undefined,'bold');yPosition=addText('BVI BUSINESS COMPANY INCORPORATION QUESTIONNAIRE',margin,yPosition,pageWidth-2*margin);yPosition+=10;doc.setFontSize(10);doc.setFont(undefined,'normal');yPosition=addText(`Person Completing: ${document.getElementById('personCompleting').value}`,margin,yPosition,pageWidth-2*margin);yPosition=addText(`Email: ${document.getElementById('completingEmail').value}`,margin,yPosition,pageWidth-2*margin);if(document.getElementById('completingPhone').value)yPosition=addText(`Phone: ${document.getElementById('completingPhone').value}`,margin,yPosition,pageWidth-2*margin);yPosition+=8;doc.setFont(undefined,'bold');yPosition=addText('COMPANY NAME',margin,yPosition,pageWidth-2*margin);yPosition+=3;doc.setFont(undefined,'normal');yPosition=addText(`First Choice: ${document.getElementById('companyName1').value}`,margin,yPosition,pageWidth-2*margin);if(document.getElementById('companyName2').value)yPosition=addText(`Second Choice: ${document.getElementById('companyName2').value}`,margin,yPosition,pageWidth-2*margin);if(document.getElementById('companyName3').value)yPosition=addText(`Third Choice: ${document.getElementById('companyName3').value}`,margin,yPosition,pageWidth-2*margin);yPosition+=8;doc.setFont(undefined,'bold');yPosition=addText('COMPANY ADDRESS',margin,yPosition,pageWidth-2*margin);yPosition+=3;doc.setFont(undefined,'normal');if(document.getElementById('companyOpAddress').value)yPosition=addText(`Address: ${document.getElementById('companyOpAddress').value}`,margin,yPosition,pageWidth-2*margin);if(document.getElementById('companyOpStreet').value)yPosition=addText(`Street: ${document.getElementById('companyOpStreet').value}`,margin,yPosition,pageWidth-2*margin);if(document.getElementById('companyOpCity').value)yPosition=addText(`City: ${document.getElementById('companyOpCity').value}`,margin,yPosition,pageWidth-2*margin);if(document.getElementById('companyOpState').value)yPosition=addText(`State/Province: ${document.getElementById('companyOpState').value}`,margin,yPosition,pageWidth-2*margin);if(document.getElementById('companyOpPostal').value)yPosition=addText(`Postal Code: ${document.getElementById('companyOpPostal').value}`,margin,yPosition,pageWidth-2*margin);if(document.getElementById('companyOpCountry').value)yPosition=addText(`Country: ${document.getElementById('companyOpCountry').value}`,margin,yPosition,pageWidth-2*margin);yPosition+=8;doc.setFont(undefined,'bold');yPosition=addText('BUSINESS ACTIVITIES',margin,yPosition,pageWidth-2*margin);yPosition+=3;doc.setFont(undefined,'normal');yPosition=addText(document.getElementById('businessActivities').value,margin,yPosition,pageWidth-2*margin);yPosition+=8;const fileName=`BVI_Incorporation_Questionnaire_${document.getElementById('companyName1').value.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`;doc.save(fileName);}
+function generatePDF(){
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 20;
+    const contentWidth = pageWidth - 2 * margin;
+    const lineHeight = 6;
+    let y = margin;
+
+    // ── helpers ──────────────────────────────────────────────────────────
+    function checkPage(extra) {
+        if (y + (extra || 0) > pageHeight - margin) { doc.addPage(); y = margin; }
+    }
+    function addLines(text, x, maxWidth) {
+        text = String(text == null ? '' : text);
+        const lines = doc.splitTextToSize(text, maxWidth);
+        lines.forEach(line => { checkPage(lineHeight); doc.text(line, x, y); y += lineHeight; });
+    }
+    function sectionHeader(title) {
+        checkPage(16);
+        y += 5;
+        doc.setFontSize(11); doc.setFont(undefined,'bold'); doc.setTextColor(45,89,134);
+        doc.text(title.toUpperCase(), margin, y); y += 2;
+        doc.setDrawColor(212,175,55); doc.setLineWidth(0.6);
+        doc.line(margin, y, pageWidth - margin, y); y += 6;
+        doc.setFontSize(10); doc.setFont(undefined,'normal'); doc.setTextColor(0,0,0);
+    }
+    function subHeader(title) {
+        checkPage(10); y += 2;
+        doc.setFont(undefined,'bold'); doc.setTextColor(30,58,95);
+        doc.text(title, margin, y); y += 6;
+        doc.setFont(undefined,'normal'); doc.setTextColor(0,0,0);
+    }
+    function field(label, value) {
+        if (!value && value !== 0) return;
+        const text = String(value);
+        checkPage(lineHeight);
+        doc.setFont(undefined,'bold');
+        doc.text(label + ': ', margin, y);
+        const lw = doc.getTextWidth(label + ': ');
+        doc.setFont(undefined,'normal');
+        const valLines = doc.splitTextToSize(text, contentWidth - lw);
+        valLines.forEach((line, i) => {
+            if (i > 0) { y += lineHeight; checkPage(lineHeight); }
+            doc.text(line, margin + lw, y);
+        });
+        y += lineHeight;
+    }
+    function radio(name, labelYes, labelNo) {
+        const el = document.querySelector(`input[name="${name}"]:checked`);
+        return el ? (el.value === 'yes' ? (labelYes || 'Yes') : (labelNo || 'No')) : null;
+    }
+    function val(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+    function dataVal(attr, idx, f) {
+        const el = document.querySelector(`[data-${attr}="${idx}"][data-field="${f}"]`);
+        return el ? el.value : '';
+    }
+    function addrStr(parts) { return parts.filter(Boolean).join(', '); }
+
+    // ── COVER ─────────────────────────────────────────────────────────────
+    doc.setFontSize(13); doc.setFont(undefined,'bold'); doc.setTextColor(45,89,134);
+    doc.text('BETHEL WORLDWIDE CORPORATION', pageWidth/2, y, {align:'center'}); y += 8;
+    doc.setFontSize(11);
+    doc.text('BVI Business Company Incorporation Questionnaire', pageWidth/2, y, {align:'center'}); y += 3;
+    doc.setDrawColor(212,175,55); doc.setLineWidth(1);
+    doc.line(margin, y, pageWidth-margin, y); y += 8;
+    doc.setFontSize(10); doc.setFont(undefined,'normal'); doc.setTextColor(0,0,0);
+    field('Date Generated', new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}));
+    y += 2;
+
+    // ── SECTION 1 ─────────────────────────────────────────────────────────
+    sectionHeader('1. Incorporation');
+    field('Person Completing', val('personCompleting'));
+    field('Capacity', val('completingCapacity'));
+    field('Email', val('completingEmail'));
+    const dc1 = val('completingDialCode'), ph1 = val('completingPhone');
+    if (ph1) field('Phone', (dc1 ? dc1+' ' : '') + ph1);
+    const addr1 = addrStr([val('completingAddress'),val('completingStreet'),val('completingCity'),val('completingState'),val('completingPostal'),val('completingCountry')]);
+    if (addr1) field('Address', addr1);
+
+    // ── SECTION 2 ─────────────────────────────────────────────────────────
+    sectionHeader('2. Company Name');
+    field('First Choice',  val('companyName1'));
+    field('Second Choice', val('companyName2'));
+    field('Third Choice',  val('companyName3'));
+
+    // ── SECTION 3 ─────────────────────────────────────────────────────────
+    sectionHeader('3. Intended Company Activities');
+    field('Business Activities', val('businessActivities'));
+    const taxCList = [];
+    taxCompliantCountries.forEach((tc,idx) => {
+        if (tc !== null) {
+            const s = document.querySelector(`select[data-taxcountry="${idx}"][data-field="country"]`);
+            if (s && s.value) taxCList.push(s.value);
+        }
+    });
+    if (taxCList.length) field('Tax Compliant Countries', taxCList.join(', '));
+    const assetCList = [];
+    assetCountries.forEach((ac,idx) => {
+        if (ac !== null) {
+            const s = document.querySelector(`select[data-assetcountry="${idx}"][data-field="country"]`);
+            if (s && s.value) assetCList.push(s.value);
+        }
+    });
+    if (assetCList.length) field('Countries Holding Assets', assetCList.join(', '));
+    let assetsPrinted = false;
+    companyAssets.forEach((a,idx) => {
+        if (a === null) return;
+        const desc = document.querySelector(`input[data-asset="${idx}"][data-field="description"]`);
+        const av   = document.querySelector(`input[data-asset="${idx}"][data-field="value"]`);
+        if (desc && desc.value) {
+            if (!assetsPrinted) { subHeader('Company Assets'); assetsPrinted = true; }
+            field(`Asset ${idx+1}`, desc.value + (av && av.value ? ' — USD '+Number(av.value).toLocaleString() : ''));
+        }
+    });
+
+    // ── SECTION 4 ─────────────────────────────────────────────────────────
+    sectionHeader('4. Company Address');
+    const compAddr = addrStr([val('companyOpAddress'),val('companyOpStreet'),val('companyOpCity'),val('companyOpState'),val('companyOpPostal'),val('companyOpCountry')]);
+    if (compAddr) field('Operating Address', compAddr);
+    else { checkPage(lineHeight); addLines('(Not provided)', margin, contentWidth); y += 2; }
+
+    // ── SECTION 5 ─────────────────────────────────────────────────────────
+    sectionHeader('5. Company Formation Information');
+    const maEl = document.querySelector('input[name="memoArticles"]:checked');
+    if (maEl) field('M&A', maEl.value.charAt(0).toUpperCase()+maEl.value.slice(1));
+    field('Authorized Shares', val('authorizedShares'));
+    field('Par Value', val('parValue'));
+    let scPrinted = false;
+    shareClasses.forEach((sc,idx) => {
+        if (sc === null) return;
+        const cn = document.querySelector(`input[data-shareclass="${idx}"][data-field="className"]`);
+        const ns = document.querySelector(`input[data-shareclass="${idx}"][data-field="numShares"]`);
+        if (cn && cn.value) {
+            if (!scPrinted) { subHeader('Share Classes'); scPrinted = true; }
+            field(`Class ${idx+1}`, cn.value + (ns && ns.value ? ' — '+ns.value+' shares' : ''));
+        }
+    });
+
+    // ── SECTION 6 ─────────────────────────────────────────────────────────
+    sectionHeader('6. Shareholders');
+    let shN = 0;
+    shareholders.forEach((sh,i) => {
+        if (sh === null) return; shN++;
+        subHeader('Shareholder '+shN);
+        field('Full Name',   val(`shareholder_name_${i}`));
+        field('Email',       val(`shareholder_email_${i}`));
+        const nsEl = document.querySelector(`input[data-shareholder="${i}"][data-field="numShares"]`);
+        if (nsEl && nsEl.value) field('Number of Shares', nsEl.value);
+        const shAddr = addrStr([val(`shareholder_address_${i}`),val(`shareholder_street_${i}`),val(`shareholder_city_${i}`),val(`shareholder_state_${i}`),val(`shareholder_postal_${i}`),val(`shareholder_country_${i}`)]);
+        if (shAddr) field('Residential Address', shAddr);
+        field('Nationality',  val(`shareholder_nationality_${i}`));
+        field('Date of Birth',val(`shareholder_dob_${i}`));
+        field('Occupation',   val(`shareholder_occupation_${i}`));
+        field('Passport No',  val(`shareholder_passportNumber_${i}`));
+        field('Passport Expiry', val(`shareholder_passportExpiry_${i}`));
+        field('Passport Country', val(`shareholder_passportCountry_${i}`));
+        const empAddr = addrStr([val(`shareholder_employer_${i}`),val(`shareholder_employerAddress_${i}`),val(`shareholder_employerStreet_${i}`),val(`shareholder_employerCity_${i}`),val(`shareholder_employerState_${i}`),val(`shareholder_employerPostal_${i}`),val(`shareholder_employerCountry_${i}`)]);
+        if (empAddr) field('Employer', empAddr);
+        field('US Citizen/Green Card', radio(`shareholder_usCitizen_${i}`));
+        field('Past US Citizen',       radio(`shareholder_pastUsCitizen_${i}`));
+        field('UK Tax Resident',       radio(`shareholder_ukResident_${i}`));
+        field('UK Tax Domicile',       radio(`shareholder_ukDomicile_${i}`));
+        field('Tax Compliant',         radio(`shareholder_taxCompliant_${i}`));
+        const wt = ['employment','dividends','saleBusiness','saleAsset','inherited','capital','loan','investors','other'];
+        const wl = ['Employment','Dividends','Sale of Business','Sale of Personal Asset','Inherited Wealth','Capital Investment','Loan','Outside Investors','Other'];
+        const wch = wt.filter(t => { const el=document.getElementById(`shareholder_wealth_${t}_${i}`); return el&&el.checked; }).map(t => wl[wt.indexOf(t)]);
+        if (wch.length) field('Source of Wealth', wch.join(', '));
+        field('Wealth Description', val(`shareholder_sourceOfWealth_${i}`));
+    });
+    if (shN === 0) { checkPage(lineHeight); addLines('(No shareholders added)', margin, contentWidth); y += 4; }
+
+    // ── SECTION 7 ─────────────────────────────────────────────────────────
+    sectionHeader('7. Register of Members');
+    const mrEl = document.querySelector('input[name="membersRegister"]:checked');
+    if (mrEl) {
+        field('Location', mrEl.value === 'agent' ? "At Registered Agent's Office" : 'Other Location');
+        if (mrEl.value === 'other') {
+            field('Holder', val('membersRegisterHolder'));
+            field('Email',  val('membersRegisterEmail'));
+            const mrAddr = addrStr([val('membersRegisterAddress'),val('membersRegisterStreet'),val('membersRegisterCity'),val('membersRegisterState'),val('membersRegisterPostal'),val('membersRegisterCountry')]);
+            if (mrAddr) field('Address', mrAddr);
+        }
+    }
+
+    // ── SECTION 8 ─────────────────────────────────────────────────────────
+    sectionHeader('8. Directors');
+    let dirN = 0;
+    directors.forEach((dir,i) => {
+        if (dir === null) return; dirN++;
+        subHeader('Director '+dirN);
+        const dnEl = document.querySelector(`[data-director="${i}"][data-field="name"]`);
+        const deEl = document.querySelector(`[data-director="${i}"][data-field="email"]`);
+        if (dnEl) field('Full Name', dnEl.value);
+        if (deEl) field('Email', deEl.value);
+        const dirAddr = addrStr(['address','street','city','state','postal','country'].map(f => { const el=document.querySelector(`[data-director="${i}"][data-field="${f}"]`); return el?el.value:''; }));
+        if (dirAddr) field('Residential Address', dirAddr);
+        const dirNat = document.querySelector(`select[data-director="${i}"][data-field="nationality"]`);
+        if (dirNat && dirNat.value) field('Nationality', dirNat.value);
+        const dirDob = document.querySelector(`input[data-director="${i}"][data-field="dob"]`);
+        if (dirDob && dirDob.value) field('Date of Birth', dirDob.value);
+        const dirOcc = document.querySelector(`input[data-director="${i}"][data-field="occupation"]`);
+        if (dirOcc && dirOcc.value) field('Occupation', dirOcc.value);
+        const dirPass = document.querySelector(`input[data-director="${i}"][data-field="passportNumber"]`);
+        if (dirPass && dirPass.value) field('Passport No', dirPass.value);
+        const dirPassExp = document.querySelector(`input[data-director="${i}"][data-field="passportExpiry"]`);
+        if (dirPassExp && dirPassExp.value) field('Passport Expiry', dirPassExp.value);
+        const dirPassCt = document.querySelector(`select[data-director="${i}"][data-field="passportCountry"]`);
+        if (dirPassCt && dirPassCt.value) field('Passport Country', dirPassCt.value);
+        const dirEmp = addrStr(['employer','employerAddress','employerStreet','employerCity','employerState','employerPostal','employerCountry'].map(f => { const el=document.querySelector(`[data-director="${i}"][data-field="${f}"]`); return el?el.value:''; }));
+        if (dirEmp) field('Employer', dirEmp);
+    });
+    if (dirN === 0) { checkPage(lineHeight); addLines('(No directors added)', margin, contentWidth); y += 4; }
+
+    // ── SECTION 9 ─────────────────────────────────────────────────────────
+    sectionHeader('9. Register of Directors');
+    const drEl = document.querySelector('input[name="directorsRegister"]:checked');
+    if (drEl) {
+        field('Location', drEl.value === 'agent' ? "At Registered Agent's Office" : 'Other Location');
+        if (drEl.value === 'other') {
+            field('Holder', val('directorsRegisterHolder'));
+            field('Email',  val('directorsRegisterEmail'));
+            const drAddr = addrStr([val('directorsRegisterAddress'),val('directorsRegisterStreet'),val('directorsRegisterCity'),val('directorsRegisterState'),val('directorsRegisterPostal'),val('directorsRegisterCountry')]);
+            if (drAddr) field('Address', drAddr);
+        }
+    }
+
+    // ── SECTION 10 ────────────────────────────────────────────────────────
+    sectionHeader('10. Beneficial Owners');
+    let boN = 0;
+    beneficialOwners.forEach((bo,i) => {
+        if (bo === null) return; boN++;
+        const linked = bo.linkedToShareholder !== undefined;
+        subHeader('Beneficial Owner '+boN+(linked ? ' (linked to Shareholder '+(bo.linkedToShareholder+1)+')' : ''));
+        if (linked) {
+            const si = bo.linkedToShareholder;
+            field('Full Name', val(`shareholder_name_${si}`));
+            field('Email',     val(`shareholder_email_${si}`));
+            const lAddr = addrStr([val(`shareholder_address_${si}`),val(`shareholder_street_${si}`),val(`shareholder_city_${si}`),val(`shareholder_state_${si}`),val(`shareholder_postal_${si}`),val(`shareholder_country_${si}`)]);
+            if (lAddr) field('Address', lAddr);
+            field('Nationality',   val(`shareholder_nationality_${si}`));
+            field('Date of Birth', val(`shareholder_dob_${si}`));
+        } else {
+            const boName = document.querySelector(`[data-beneficialowner="${i}"][data-field="name"]`);
+            const boEmail = document.querySelector(`[data-beneficialowner="${i}"][data-field="email"]`);
+            if (boName)  field('Full Name', boName.value);
+            if (boEmail) field('Email', boEmail.value);
+            const boAddr = addrStr(['address','street','city','state','postal','country'].map(f => { const el=document.querySelector(`[data-beneficialowner="${i}"][data-field="${f}"]`); return el?el.value:''; }));
+            if (boAddr) field('Address', boAddr);
+            const boNat = document.querySelector(`select[data-beneficialowner="${i}"][data-field="nationality"]`);
+            if (boNat && boNat.value) field('Nationality', boNat.value);
+            const boDob = document.querySelector(`input[data-beneficialowner="${i}"][data-field="dob"]`);
+            if (boDob && boDob.value) field('Date of Birth', boDob.value);
+        }
+        const pepEl = document.querySelector(`input[name="bo_pep_${i}"]:checked`);
+        if (pepEl) field('PEP Status', pepEl.value === 'yes' ? 'Yes — Politically Exposed Person' : 'No');
+        const boWt = ['employment','dividends','saleBusiness','saleAsset','inherited','capital','loan','investors','other'];
+        const boWl = ['Employment','Dividends','Sale of Business','Sale of Personal Asset','Inherited Wealth','Capital Investment','Loan','Outside Investors','Other'];
+        const prefix = linked ? `bo_linked_wealth_` : `bo_wealth_`;
+        const idxRef = linked ? bo.linkedToShareholder : i;
+        const boWch = boWt.filter(t => { const el=document.getElementById(`${prefix}${t}_${idxRef}`); return el&&el.checked; }).map(t => boWl[boWt.indexOf(t)]);
+        if (boWch.length) field('Source of Wealth', boWch.join(', '));
+        const sowId = linked ? `bo_linked_sourceOfWealth_${bo.linkedToShareholder}` : null;
+        if (sowId) field('Wealth Description', val(sowId));
+        else {
+            const sowEl = document.querySelector(`textarea[data-beneficialowner="${i}"][data-field="sourceOfWealth"]`);
+            if (sowEl && sowEl.value) field('Wealth Description', sowEl.value);
+        }
+    });
+    if (boN === 0) { checkPage(lineHeight); addLines('(No beneficial owners added)', margin, contentWidth); y += 4; }
+
+    // ── SECTION 11 ────────────────────────────────────────────────────────
+    sectionHeader('11. Certification and Signature');
+    field('Full Name', val('certificationName'));
+    field('Date', val('certificationDate'));
+    if (signatureData) {
+        checkPage(42);
+        subHeader('Electronic Signature');
+        try { doc.addImage(signatureData,'PNG',margin,y,80,30); y += 34; }
+        catch(e) { addLines('[Signature captured electronically]', margin, contentWidth); }
+    }
+
+    // ── SECTION 12 ────────────────────────────────────────────────────────
+    sectionHeader('12. Officers');
+    let offN = 0;
+    secretaries.forEach((s,i) => {
+        if (s === null) return; offN++;
+        const nm = document.querySelector(`[data-secretary="${i}"][data-field="name"]`);
+        const dob = document.querySelector(`input[data-secretary="${i}"][data-field="dob"]`);
+        const nat = document.querySelector(`select[data-secretary="${i}"][data-field="nationality"]`);
+        subHeader('Secretary '+(i+1));
+        if (nm  && nm.value)  field('Name', nm.value);
+        if (nat && nat.value) field('Nationality', nat.value);
+        if (dob && dob.value) field('Date of Birth', dob.value);
+        const secAddr = addrStr(['address','street','city','state','postal','country'].map(f => { const el=document.querySelector(`[data-secretary="${i}"][data-field="${f}"]`); return el?el.value:''; }));
+        if (secAddr) field('Address', secAddr);
+        const secEmail = document.querySelector(`input[data-secretary="${i}"][data-field="email"]`);
+        if (secEmail && secEmail.value) field('Email', secEmail.value);
+    });
+    presidents.forEach((p,i) => {
+        if (p === null) return; offN++;
+        const nm = document.querySelector(`[data-president="${i}"][data-field="name"]`);
+        const dob = document.querySelector(`input[data-president="${i}"][data-field="dob"]`);
+        const nat = document.querySelector(`select[data-president="${i}"][data-field="nationality"]`);
+        subHeader('President '+(i+1));
+        if (nm  && nm.value)  field('Name', nm.value);
+        if (nat && nat.value) field('Nationality', nat.value);
+        if (dob && dob.value) field('Date of Birth', dob.value);
+        const prAddr = addrStr(['address','street','city','state','postal','country'].map(f => { const el=document.querySelector(`[data-president="${i}"][data-field="${f}"]`); return el?el.value:''; }));
+        if (prAddr) field('Address', prAddr);
+        const prEmail = document.querySelector(`input[data-president="${i}"][data-field="email"]`);
+        if (prEmail && prEmail.value) field('Email', prEmail.value);
+    });
+    treasurers.forEach((t,i) => {
+        if (t === null) return; offN++;
+        const nm = document.querySelector(`[data-treasurer="${i}"][data-field="name"]`);
+        const dob = document.querySelector(`input[data-treasurer="${i}"][data-field="dob"]`);
+        const nat = document.querySelector(`select[data-treasurer="${i}"][data-field="nationality"]`);
+        subHeader('Treasurer '+(i+1));
+        if (nm  && nm.value)  field('Name', nm.value);
+        if (nat && nat.value) field('Nationality', nat.value);
+        if (dob && dob.value) field('Date of Birth', dob.value);
+        const trAddr = addrStr(['address','street','city','state','postal','country'].map(f => { const el=document.querySelector(`[data-treasurer="${i}"][data-field="${f}"]`); return el?el.value:''; }));
+        if (trAddr) field('Address', trAddr);
+        const trEmail = document.querySelector(`input[data-treasurer="${i}"][data-field="email"]`);
+        if (trEmail && trEmail.value) field('Email', trEmail.value);
+    });
+    if (offN === 0) { checkPage(lineHeight); addLines('(No officers appointed)', margin, contentWidth); y += 4; }
+
+    // ── SECTION 13 ────────────────────────────────────────────────────────
+    sectionHeader('13. Incorporation Package');
+    subHeader('Service of Documents');
+    field('Name', val('serviceDocName'));
+    field('Organisation', val('serviceDocOrganisation'));
+    const svcAddr = addrStr([val('serviceDocAddress'),val('serviceDocStreet'),val('serviceDocCity'),val('serviceDocState'),val('serviceDocPostal'),val('serviceDocCountry')]);
+    if (svcAddr) field('Address', svcAddr);
+    field('Email', val('serviceDocEmail'));
+    const sdDC = val('serviceDocDialCode'), sdPH = val('serviceDocPhone');
+    if (sdPH) field('Phone', (sdDC?sdDC+' ':'')+sdPH);
+
+    subHeader('Authorised Person(s) to give Instructions');
+    const authSameEl = document.querySelector('input[name="authorisedSamePerson"]:checked');
+    if (authSameEl) {
+        field('Same as Service of Documents', authSameEl.value === 'yes' ? 'Yes' : 'No');
+        if (authSameEl.value === 'no') {
+            field('Name', val('authorisedName'));
+            field('Organisation', val('authorisedOrganisation'));
+            const authAddr = addrStr([val('authorisedAddress'),val('authorisedStreet'),val('authorisedCity'),val('authorisedState'),val('authorisedPostal'),val('authorisedCountry')]);
+            if (authAddr) field('Address', authAddr);
+            field('Email', val('authorisedEmail'));
+        }
+    }
+    additionalAuthorisedPersons.forEach((ap,i) => {
+        if (ap === null) return;
+        const apName = val(`addAuth_name_${i}`);
+        if (apName) {
+            subHeader('Additional Authorised Person '+(i+1));
+            field('Name', apName);
+            field('Organisation', val(`addAuth_org_${i}`));
+            const apAddr = addrStr([val(`addAuth_address_${i}`),val(`addAuth_street_${i}`),val(`addAuth_city_${i}`),val(`addAuth_state_${i}`),val(`addAuth_postal_${i}`),val(`addAuth_country_${i}`)]);
+            if (apAddr) field('Address', apAddr);
+            field('Email', val(`addAuth_email_${i}`));
+        }
+    });
+
+    subHeader('Billing Contact');
+    const billEl = document.querySelector('input[name="billingDifferent"]:checked');
+    if (billEl) {
+        if (billEl.value === 'no') { checkPage(lineHeight); addLines('Same as above', margin, contentWidth); y += lineHeight; }
+        else {
+            field('Name', val('billingName'));
+            field('Organisation', val('billingOrganisation'));
+            const billAddr = addrStr([val('billingAddress'),val('billingStreet'),val('billingCity'),val('billingState'),val('billingPostal'),val('billingCountry')]);
+            if (billAddr) field('Address', billAddr);
+            field('Email', val('billingEmail'));
+        }
+    }
+
+    // ── SECTION 14 ────────────────────────────────────────────────────────
+    sectionHeader('14. Financial and Other Information');
+    const hasBankEl = document.querySelector('input[name="hasBankAccount"]:checked');
+    if (hasBankEl) {
+        field('Has Bank Account', hasBankEl.value === 'yes' ? 'Yes' : 'No');
+        if (hasBankEl.value === 'yes') {
+            field('Bank Name', val('bankName'));
+            const bankAddr = addrStr([val('bankAddress'),val('bankStreet'),val('bankCity'),val('bankState'),val('bankPostal'),val('bankCountry')]);
+            if (bankAddr) field('Bank Address', bankAddr);
+        } else {
+            const reqBk = document.querySelector('input[name="requiresBankAccount"]:checked');
+            if (reqBk) field('Requires Bank Account', reqBk.value === 'yes' ? 'Yes' : 'No');
+        }
+    }
+    const annEl = document.querySelector('input[name="requiresAnnualAccounts"]:checked');
+    if (annEl) {
+        field('Annual Accounts by BWC', annEl.value === 'yes' ? 'Yes' : 'No');
+        if (annEl.value === 'yes') {
+            field('Financial Year End', val('financialYearEnd'));
+        } else {
+            field('Financial Records Holder', val('financialRecordsHolder'));
+            const frAddr = addrStr([val('financialRecordsAddress'),val('financialRecordsStreet'),val('financialRecordsCity'),val('financialRecordsState'),val('financialRecordsPostal'),val('financialRecordsCountry')]);
+            if (frAddr) field('Financial Records Address', frAddr);
+            field('Records Email', val('financialRecordsEmail'));
+        }
+    }
+    field('Special Requirements', val('specialRequirements'));
+
+    // ── SECTION 15 ────────────────────────────────────────────────────────
+    sectionHeader('15. Declaration');
+    field('Company Name', val('declarationCompanyName'));
+    const boSignedEl = document.getElementById('signedByBeneficialOwners');
+    const paSignedEl = document.getElementById('signedByProfessionalAdvisers');
+
+    if (boSignedEl && boSignedEl.checked) {
+        subHeader('Beneficial Owners Declaration');
+        addLines('I/We confirm that to the best of my/our knowledge and belief that the information contained and provided in and with this Incorporation Questionnaire is correct and that we will inform Bethel Worldwide Corporation of any changes thereto.', margin, contentWidth);
+        y += 4;
+        beneficialOwners.forEach((bo,idx) => {
+            if (bo === null) return;
+            const boName = val(`bo_declaration_name_${idx}`);
+            const boDate = val(`bo_declaration_date_${idx}`);
+            const boCanvas = document.getElementById(`bo_declaration_canvas_${idx}`);
+            if (boName || boDate || boCanvas) {
+                checkPage(45);
+                if (boName) field('Name', boName);
+                if (boDate) field('Date', boDate);
+                if (boCanvas) {
+                    try { const sd = boCanvas.toDataURL('image/png'); doc.addImage(sd,'PNG',margin,y,80,25); y += 29; }
+                    catch(e) { addLines('[Signature captured electronically]', margin, contentWidth); }
+                }
+                y += 3;
+            }
+        });
+    }
+
+    if (paSignedEl && paSignedEl.checked) {
+        subHeader("Professional Advisers Declaration");
+        addLines("I/We, the undersigned, acting as professional advisers with full authority of the beneficial owner(s) of the Company, certify and confirm that to the best of my/our knowledge and belief the information in the incorporation questionnaire is correct.", margin, contentWidth);
+        y += 4;
+        const numPA = parseInt(val('numProfessionalAdvisers')) || 0;
+        for (let i = 0; i < numPA; i++) {
+            const paName = val(`pa_declaration_name_${i}`);
+            const paDate = val(`pa_declaration_date_${i}`);
+            const paCanvas = document.getElementById(`pa_declaration_canvas_${i}`);
+            if (paName || paDate || paCanvas) {
+                checkPage(45);
+                if (paName) field('Name', paName);
+                if (paDate) field('Date', paDate);
+                if (paCanvas) {
+                    try { const sd = paCanvas.toDataURL('image/png'); doc.addImage(sd,'PNG',margin,y,80,25); y += 29; }
+                    catch(e) { addLines('[Signature captured electronically]', margin, contentWidth); }
+                }
+                y += 3;
+            }
+        }
+    }
+
+    // ── SAVE ──────────────────────────────────────────────────────────────
+    const safeName = (val('companyName1') || 'Unnamed').replace(/[^a-zA-Z0-9]/g,'_');
+    const dateStr  = new Date().toISOString().split('T')[0];
+    doc.save(`BVI_Incorporation_Questionnaire_${safeName}_${dateStr}.pdf`);
+}
+
     </script>
 
 
