@@ -52,8 +52,9 @@
         .btn-submit:hover { background-color: #1e3a5f; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
         .submit-section { text-align: center; margin-top: 40px; padding-top: 30px; border-top: 3px solid #d4af37; }
         .submit-note { margin-top: 15px; font-size: 14px; color: #666; }
-        .footer { background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 13px; color: #666; border-top: 1px solid #e5e7eb; }
+        .footer { background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 13px; color: #666; border-top: 1px solid #e5e7eb; position: relative; }
         .footer p { margin: 5px 0; }
+        .footer-version { position: absolute; bottom: 10px; right: 16px; font-size: 11px; color: #9ca3af; font-style: italic; }
         @media (max-width: 768px) { .header h1 { font-size: 22px; } .form-content { padding: 20px; } .grid-2, .grid-3 { grid-template-columns: 1fr; } }
     
         /* ── Hub page ── */
@@ -99,15 +100,15 @@
         #floatingNav {
             display: none;
             position: fixed;
-            top: 0;
+            bottom: 0;
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
             max-width: 1000px;
             z-index: 1000;
             background: white;
-            border-bottom: 3px solid #d4af37;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+            border-top: 3px solid #d4af37;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.18);
             padding: 10px 24px;
             flex-direction: row;
             align-items: center;
@@ -115,9 +116,9 @@
             gap: 12px;
             box-sizing: border-box;
         }
-        /* Push form content down so the fixed bar doesn't obscure it */
+        /* Add bottom padding so the fixed bar doesn't obscure content */
         body.nav-visible .form-content {
-            padding-top: 64px;
+            padding-bottom: 64px;
         }
         #floatingNav .fnav-btn {
             background: #2d5986; color: white; border: none;
@@ -858,6 +859,7 @@ Please provide the address from which the company will be operating.
             <p>© <span id="currentYear">2026</span> Bethel Worldwide Corporation. All rights reserved.</p>
             <p>Bethel House, P.O. Box 4749, Road Town, Tortola, British Virgin Islands</p>
             <p>Phone: (284) 494-0778 | Fax: (284) 494-0781 | Email: <a href="/cdn-cgi/l/email-protection#cea7a0a8a18eacabbaa6aba2b9a1bca2aab9a7aaabe0ada1a3"><span class="__cf_email__" data-cfemail="224b4c444d624047564a474e554d504e46554b46470c414d4f">[email&#160;protected]</span></a></p>
+            <span class="footer-version">v1.9</span>
         </div>
     </div>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
@@ -1228,6 +1230,9 @@ function generatePDF(){
     doc.line(margin, y, pageWidth-margin, y); y += 8;
     doc.setFontSize(10); doc.setFont(undefined,'normal'); doc.setTextColor(0,0,0);
     field('Date Generated', new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}));
+    doc.setFontSize(9); doc.setTextColor(150,150,150);
+    doc.text('v1.9', pageWidth - margin, y - lineHeight, {align:'right'});
+    doc.setFontSize(10); doc.setTextColor(0,0,0);
     y += 2;
 
     // ── SECTION 1 ─────────────────────────────────────────────────────────
