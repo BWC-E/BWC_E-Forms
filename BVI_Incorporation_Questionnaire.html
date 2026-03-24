@@ -321,6 +321,9 @@ Please provide the address from which the company will be operating.
                     <div class="info-box">
                         Please provide details of beneficial owner(s) if different from the shareholders and provide the appropriate due diligence as listed below.
                     </div>
+                    <div class="info-box" style="background-color:#fff9e6;border-color:#f59e0b;">
+                        <strong>Note on ordering:</strong> If any shareholder is also a Beneficial Owner, tick the <em>"This shareholder is also a Beneficial Owner"</em> checkbox in Section 6 <strong>before</strong> using the button below. This ensures that shareholder-linked Beneficial Owners are listed first. Use <strong>+ Add Beneficial Owner</strong> below only for Beneficial Owners who are not already recorded as shareholders.
+                    </div>
                     <div id="beneficialOwnersContainer"></div>
                     <button type="button" class="btn btn-primary" onclick="addBeneficialOwner()">+ Add Beneficial Owner</button>
                     <div class="info-box" style="margin-top: 30px; background-color: #fef3c7; border-color: #f59e0b;">
@@ -1068,11 +1071,8 @@ function checkFormReadiness() {
             // Check at least one tax compliant country selected
             if (ready) {
                 let hasTax = false;
-                taxCompliantCountries.forEach((tc, idx) => {
-                    if (tc !== null) {
-                        const sel = document.querySelector(`select[data-taxcountry="${idx}"][data-field="country"]`);
-                        if (sel && sel.value) hasTax = true;
-                    }
+                document.querySelectorAll('select[data-taxcountry][data-field="country"]').forEach(sel => {
+                    if (sel.value) hasTax = true;
                 });
                 if (!hasTax) ready = false;
             }
@@ -1154,7 +1154,7 @@ function showHub() {
         }
 
         window.addEventListener('DOMContentLoaded',()=>{loadFormProgress();if(document.getElementById('taxCompliantCountriesContainer').children.length===0){addTaxCompliantCountry();}addShareholder();addDirector();addBeneficialOwner();wireReadinessListeners();checkFormReadiness();});
-        document.getElementById('incorporationForm').addEventListener('submit',function(e){e.preventDefault();let isValid=true;document.querySelectorAll('.error-message').forEach(el=>el.textContent='');document.querySelectorAll('.error').forEach(el=>el.classList.remove('error'));const requiredFields=['personCompleting','completingCapacity','completingEmail','companyName1','businessActivities','authorizedShares','certificationName','certificationDate'];requiredFields.forEach(field=>{const el=document.getElementById(field);if(!el||!el.value.trim()){isValid=false;const errorEl=document.getElementById(`error-${field}`);if(errorEl)errorEl.textContent='This field is required';if(el)el.classList.add('error');}});if(!signatureData){isValid=false;document.getElementById('error-certificationSignature').textContent='Signature is required';document.getElementById('error-certificationSignature').scrollIntoView({behavior:'smooth',block:'center'});}let hasTaxCountry=false;taxCompliantCountries.forEach((tc,idx)=>{if(tc!==null){const select=document.querySelector(`select[data-taxcountry="${idx}"][data-field="country"]`);if(select&&select.value)hasTaxCountry=true;}});if(!hasTaxCountry){isValid=false;document.getElementById('error-taxCompliantCountries').textContent='Please select at least one tax compliant country';}if(!isValid){alert('Please fill in all required fields marked with *');window.scrollTo({top:0,behavior:'smooth'});return;}generatePDF();});
+        document.getElementById('incorporationForm').addEventListener('submit',function(e){e.preventDefault();let isValid=true;document.querySelectorAll('.error-message').forEach(el=>el.textContent='');document.querySelectorAll('.error').forEach(el=>el.classList.remove('error'));const requiredFields=['personCompleting','completingCapacity','completingEmail','companyName1','businessActivities','authorizedShares','certificationName','certificationDate'];requiredFields.forEach(field=>{const el=document.getElementById(field);if(!el||!el.value.trim()){isValid=false;const errorEl=document.getElementById(`error-${field}`);if(errorEl)errorEl.textContent='This field is required';if(el)el.classList.add('error');}});if(!signatureData){isValid=false;document.getElementById('error-certificationSignature').textContent='Signature is required';document.getElementById('error-certificationSignature').scrollIntoView({behavior:'smooth',block:'center'});}let hasTaxCountry=false;document.querySelectorAll('select[data-taxcountry][data-field="country"]').forEach(select=>{if(select&&select.value)hasTaxCountry=true;});if(!hasTaxCountry){isValid=false;document.getElementById('error-taxCompliantCountries').textContent='Please select at least one tax compliant country';}if(!isValid){alert('Please fill in all required fields marked with *');window.scrollTo({top:0,behavior:'smooth'});return;}generatePDF();});
         
         // ════════════════════════════════════════════════════════════
         // ── PDF GENERATION
