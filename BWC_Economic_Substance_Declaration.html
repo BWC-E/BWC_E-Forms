@@ -673,15 +673,8 @@
                         <span class="error-message" id="error-declarationType"></span>
                     </div>
 
-                    <div class="form-group">
-                        <label>Description of Activities <span class="required">*</span></label>
-                        <textarea id="entityActivities" rows="4" placeholder="Describe the entity's activities during this financial period..." maxlength="2000"></textarea>
-                        <span class="error-message" id="error-entityActivities"></span>
-                    </div>
-
-                    <!-- Fields shown only when Declaration Type = 1 -->
-                    <div id="relevantActivityFields" style="display: none;">
-                        
+                    <!-- Reporting Currency & Gross Income — shown only when Declaration Type = 1 -->
+                    <div id="currencyIncomeFields" style="display: none;">
                         <div class="grid-2">
                             <div class="form-group">
                                 <label>Reporting Currency <span class="required">*</span></label>
@@ -849,16 +842,32 @@
                                 <span class="error-message" id="error-reportingCurrency"></span>
                             </div>
                             <div class="form-group">
-                                <label>Total Amount Gross Income <span class="required">*</span></label>
+                                <label>Total Annual Gross Income <span class="required">*</span></label>
                                 <input type="text" id="totalGrossIncome" placeholder="Enter amount" maxlength="50">
                                 <span class="error-message" id="error-totalGrossIncome"></span>
                             </div>
                         </div>
+                    </div>
 
+
+                    <!-- Fields shown only when Declaration Type = 1 -->
+                    <div id="relevantActivityFields" style="display: none;">
+                        
                         <!-- Relevant Activities Section -->
                         <div class="subsection-title">Additional / Update Relevant Activity</div>
                         <div id="relevantActivitiesContainer"></div>
                         <button type="button" class="btn btn-primary" onclick="addRelevantActivity()">+ Add Another Relevant Activity</button>
+
+                        <div class="form-group" style="margin-top: 25px;">
+                            <label>Supporting Comments</label>
+                            <textarea id="relevantActivityComments" rows="4" placeholder="Enter any supporting comments here..."></textarea>
+                        </div>
+                        <div class="info-box">
+                            <strong>Note:</strong> Please provide supporting documents as appropriate / necessary.
+                        </div>
+
+                        <!-- Sections hidden for Holding Business -->
+                        <div id="nonHoldingBusinessSections">
 
                         <!-- Gross Income Section -->
                         <div class="subsection-title" style="margin-top: 30px;">Gross Income</div>
@@ -1409,13 +1418,10 @@
                         <div id="cigaContainer"></div>
                         <button type="button" class="btn btn-primary" onclick="addCIGA()">+ Add Another CIGA</button>
 
+                        </div><!-- end nonHoldingBusinessSections -->
+
                     </div>
 
-                    <!-- Supporting Comments (always visible) -->
-                    <div class="form-group" style="margin-top: 30px;">
-                        <label>Supporting Comments</label>
-                        <textarea id="supportingComments" rows="4" placeholder="Please provide any supporting comments..." maxlength="2000"></textarea>
-                    </div>
 
                     <!-- Supporting Documents -->
                     <div class="subsection-title" style="margin-top: 30px;">Supporting Documents</div>
@@ -1426,12 +1432,8 @@
                     <button type="button" class="btn btn-primary" onclick="addSupportingDocument()">+ Add Another File Reference</button>
                 </div>
 
-                <!-- Supporting Documents and Remarks -->
+                <!-- Remarks -->
                 <div class="section">
-                    <div class="info-box" style="background-color:#fff9e6;border-color:#f59e0b;">
-                        <p style="margin:0;"><strong>📎 Supporting Documents:</strong> Please attach any supporting documents to your email sharing the completed form with Bethel Worldwide Corporation.</p>
-                    </div>
-
                     <div class="form-group">
                         <label>Remarks</label>
                         <textarea id="remarks" rows="4" placeholder="Enter any additional remarks..." maxlength="1000"></textarea>
@@ -1552,6 +1554,19 @@
             });
         }
 
+        // Populate currency dropdowns (clones options from the main reportingCurrency select)
+        function populateCurrencyDropdown(selectElement) {
+            const source = document.getElementById('reportingCurrency');
+            if (!source) return;
+            Array.from(source.options).forEach(opt => {
+                if (opt.value === '') return; // skip the blank placeholder
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.textContent;
+                selectElement.appendChild(option);
+            });
+        }
+
         // Initialize country dropdowns on page load
         document.addEventListener('DOMContentLoaded', function() {
             populateCountryDropdown(document.getElementById('businessCountry'));
@@ -1611,6 +1626,12 @@
                 <div class="form-group">
                     <label>Date of Birth <span class="required">*</span></label>
                     <input type="date" data-bo="${index}" data-field="dob">
+                </div>
+                <div class="form-group">
+                    <label>Nationality <span class="required">*</span></label>
+                    <select data-bo="${index}" data-field="nationality">
+                        <option value="">Select Nationality</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>BO Type <span class="required">*</span></label>
@@ -1697,7 +1718,9 @@
             const countrySelect = div.querySelector(`select[data-bo="${index}"][data-field="country"]`);
             const taxResidenceSelect = div.querySelector(`select[data-bo="${index}"][data-field="taxResidence"]`);
             
+            const nationalitySelect = div.querySelector(`select[data-bo="${index}"][data-field="nationality"]`);
             populateCountryDropdown(taxIdCountrySelect);
+            populateCountryDropdown(nationalitySelect);
             populateCountryDropdown(countrySelect);
             populateCountryDropdown(taxResidenceSelect);
         }
@@ -1726,9 +1749,11 @@
         function toggleDeclarationFields() {
             const declarationType = document.getElementById('declarationType').value;
             const relevantActivityFields = document.getElementById('relevantActivityFields');
+            const currencyIncomeFields = document.getElementById('currencyIncomeFields');
             const requiredAttachmentsNote = document.getElementById('requiredAttachmentsNote');
             
             if (declarationType === '1') {
+                currencyIncomeFields.style.display = 'block';
                 relevantActivityFields.style.display = 'block';
                 requiredAttachmentsNote.style.display = 'block';
                 // Add first relevant activity by default if none exist
@@ -1751,6 +1776,7 @@
                     addSupportingDocument();
                 }
             } else {
+                currencyIncomeFields.style.display = 'none';
                 relevantActivityFields.style.display = 'none';
                 requiredAttachmentsNote.style.display = 'none';
             }
@@ -1811,41 +1837,132 @@
                     </div>
                 </div>
                 <div id="holdingBusinessFields_${index}" style="display: none;">
+                    <div class="subsection-title">Gross Income</div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Reporting Currency <span class="required">*</span></label>
+                            <select data-ra="${index}" data-field="holdingCurrency">
+                                <option value="">Select Currency</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Gross Income in relation to the Relevant Activity <span class="required">*</span></label>
+                            <input type="text" data-ra="${index}" data-field="holdingGrossIncome" placeholder="Enter amount">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Type of Gross Income <span class="required">*</span></label>
+                        <input type="text" data-ra="${index}" data-field="holdingIncomeType" placeholder="Enter description">
+                    </div>
                     <div class="subsection-title">Pure Equity Holding Entity</div>
                     <div class="form-group">
                         <label>Does the entity actively manage its equity participation? <span class="required">*</span></label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <input type="radio" name="activelyManage_${index}" value="YES">
+                                <input type="radio" name="activelyManage_${index}" value="YES" onchange="toggleActivelyManageExplanation(${index})">
                                 <span>YES</span>
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="activelyManage_${index}" value="NO">
+                                <input type="radio" name="activelyManage_${index}" value="NO" onchange="toggleActivelyManageExplanation(${index})">
                                 <span>NO</span>
                             </label>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Does the entity comply with its statutory obligations under the BVI Business Companies Act, 2004 or the Limited Partnership Act, 2017 (whichever is relevant)? <span class="required">*</span></label>
-                        <div class="radio-group">
-                            <label class="radio-label">
-                                <input type="radio" name="statutoryCompliance_${index}" value="YES">
-                                <span>YES</span>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="statutoryCompliance_${index}" value="NO">
-                                <span>NO</span>
-                            </label>
+                    <div id="activelyManageExplanation_${index}" style="display: none;">
+                        <div class="form-group">
+                            <label>Please explain how the entity actively manages its equity participation <span class="required">*</span></label>
+                            <textarea data-ra="${index}" data-field="activelyManageExplanation" rows="4" placeholder="Please provide details..."></textarea>
                         </div>
+                        <div class="info-box">
+                            <strong>Note:</strong> Please provide supporting documents as appropriate / necessary to evidence how the entity actively manages its equity participation.
+                        </div>
+                        <div class="subsection-title">Expenditure</div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Reporting Currency <span class="required">*</span></label>
+                                <select id="holdingExpCurrencyYes_${index}">
+                                    <option value="">Select Currency</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Total Expenditure <span class="required">*</span></label>
+                                <input type="text" data-ra="${index}" data-field="holdingTotalExpYes" placeholder="Enter amount">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>BVI Expenditure <span class="required">*</span></label>
+                            <input type="text" data-ra="${index}" data-field="holdingBviExpYes" placeholder="Enter amount">
+                        </div>
+                        <div class="subsection-title">Employees</div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Total Employees <span class="required">*</span></label>
+                                <input type="text" data-ra="${index}" data-field="holdingTotalEmp" placeholder="Enter number">
+                            </div>
+                            <div class="form-group">
+                                <label>BVI Employees <span class="required">*</span></label>
+                                <input type="text" data-ra="${index}" data-field="holdingBviEmp" placeholder="Enter number">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Employees engaged in activity <span class="required">*</span></label>
+                            <input type="text" data-ra="${index}" data-field="holdingEmpActivity" placeholder="Enter number">
+                        </div>
+                        <div class="subsection-title">Premises <span class="required">*</span></div>
+                        <div id="holdingPremisesContainer_${index}_yes"></div>
+                        <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="addHoldingPremise(${index}, 'yes')">+ Add Another Premises</button>
+                    </div>
+                    <div id="statutoryComplianceField_${index}" style="display: none;">
+                        <div class="form-group">
+                            <label>Does the entity comply with its statutory obligations under the BVI Business Companies Act, 2004 or the Limited Partnership Act, 2017 (whichever is relevant)? <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="statutoryCompliance_${index}" value="YES">
+                                    <span>YES</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="statutoryCompliance_${index}" value="NO">
+                                    <span>NO</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="subsection-title">Expenditure</div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Reporting Currency <span class="required">*</span></label>
+                                <select id="holdingExpCurrencyNo_${index}">
+                                    <option value="">Select Currency</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Total Expenditure <span class="required">*</span></label>
+                                <input type="text" data-ra="${index}" data-field="holdingTotalExpNo" placeholder="Enter amount">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>BVI Expenditure <span class="required">*</span></label>
+                            <input type="text" data-ra="${index}" data-field="holdingBviExpNo" placeholder="Enter amount">
+                        </div>
+                        <div class="subsection-title">Premises <span class="required">*</span></div>
+                        <div id="holdingPremisesContainer_${index}_no"></div>
+                        <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="addHoldingPremise(${index}, 'no')">+ Add Another Premises</button>
                     </div>
                 </div>
             `;
             container.appendChild(div);
+            // Populate holding business currency dropdowns for this RA
+            const holdingCurrencySelect = div.querySelector(`select[data-ra="${index}"][data-field="holdingCurrency"]`);
+            if (holdingCurrencySelect) populateCurrencyDropdown(holdingCurrencySelect);
+            const holdingExpCurrYes = document.getElementById(`holdingExpCurrencyYes_${index}`);
+            if (holdingExpCurrYes) populateCurrencyDropdown(holdingExpCurrYes);
+            const holdingExpCurrNo = document.getElementById(`holdingExpCurrencyNo_${index}`);
+            if (holdingExpCurrNo) populateCurrencyDropdown(holdingExpCurrNo);
         }
 
         function removeRelevantActivity(index) {
             relevantActivities[index] = null;
             document.querySelector(`[data-ra="${index}"]`)?.closest('.person-block')?.remove();
+            updateNonHoldingVisibility();
         }
 
         function toggleActivityDates(index) {
@@ -1858,6 +1975,83 @@
             const activitySelect = document.querySelector(`select[data-ra="${index}"][data-field="activityName"]`);
             const holdingFields = document.getElementById(`holdingBusinessFields_${index}`);
             holdingFields.style.display = activitySelect.value === '6' ? 'block' : 'none';
+            updateNonHoldingVisibility();
+        }
+
+        function updateNonHoldingVisibility() {
+            const allSelects = document.querySelectorAll('select[data-field="activityName"]');
+            const selectedValues = Array.from(allSelects).map(s => s.value).filter(v => v !== '');
+            // Hide if at least one activity is selected and all selected are Holding Business (6)
+            const allHolding = selectedValues.length > 0 && selectedValues.every(v => v === '6');
+            const wrapper = document.getElementById('nonHoldingBusinessSections');
+            if (wrapper) wrapper.style.display = allHolding ? 'none' : 'block';
+        }
+
+        // Holding Business Premises
+        const holdingPremisesData = {};
+
+        function toggleActivelyManageExplanation(index) {
+            const selected = document.querySelector(`input[name="activelyManage_${index}"]:checked`)?.value;
+            const explanationDiv = document.getElementById(`activelyManageExplanation_${index}`);
+            const statutoryDiv = document.getElementById(`statutoryComplianceField_${index}`);
+            if (explanationDiv) explanationDiv.style.display = selected === 'YES' ? 'block' : 'none';
+            if (statutoryDiv) statutoryDiv.style.display = selected === 'NO' ? 'block' : 'none';
+            // Seed first premises row the first time each branch is shown
+            if (selected === 'YES') {
+                const yesKey = `${index}_yes`;
+                if (!holdingPremisesData[yesKey] || holdingPremisesData[yesKey].length === 0) {
+                    addHoldingPremise(index, 'yes');
+                }
+            }
+            if (selected === 'NO') {
+                const noKey = `${index}_no`;
+                if (!holdingPremisesData[noKey] || holdingPremisesData[noKey].length === 0) {
+                    addHoldingPremise(index, 'no');
+                }
+            }
+        }
+
+        function addHoldingPremise(raIndex, branch) {
+            const key = `${raIndex}_${branch}`;
+            if (!holdingPremisesData[key]) holdingPremisesData[key] = [];
+            const premIndex = holdingPremisesData[key].length;
+            holdingPremisesData[key].push({});
+            const container = document.getElementById(`holdingPremisesContainer_${raIndex}_${branch}`);
+            if (!container) return;
+            const div = document.createElement('div');
+            div.className = 'person-block';
+            div.style.marginTop = '10px';
+            div.id = `holdingPremise_${raIndex}_${branch}_${premIndex}`;
+            div.innerHTML = `
+                <div class="person-header">
+                    <div class="person-title">Premises ${premIndex + 1}</div>
+                    ${premIndex > 0 ? `<button type="button" class="btn btn-danger" onclick="removeHoldingPremise(${raIndex}, '${branch}', ${premIndex})">Remove</button>` : ''}
+                </div>
+                <div class="form-group">
+                    <label>Address Line 1 <span class="required">*</span></label>
+                    <input type="text" data-hp="${raIndex}_${branch}_${premIndex}" data-field="addr1" placeholder="Enter address line 1">
+                </div>
+                <div class="form-group">
+                    <label>Address Line 2 <span class="required">*</span></label>
+                    <input type="text" data-hp="${raIndex}_${branch}_${premIndex}" data-field="addr2" placeholder="Enter address line 2">
+                </div>
+                <div class="form-group">
+                    <label>Country <span class="required">*</span></label>
+                    <select data-hp="${raIndex}_${branch}_${premIndex}" data-field="country">
+                        <option value="">Select Country</option>
+                    </select>
+                </div>
+            `;
+            container.appendChild(div);
+            const countrySelect = div.querySelector(`select[data-hp="${raIndex}_${branch}_${premIndex}"][data-field="country"]`);
+            if (countrySelect) populateCountryDropdown(countrySelect);
+        }
+
+        function removeHoldingPremise(raIndex, branch, premIndex) {
+            const key = `${raIndex}_${branch}`;
+            if (holdingPremisesData[key]) holdingPremisesData[key][premIndex] = null;
+            const el = document.getElementById(`holdingPremise_${raIndex}_${branch}_${premIndex}`);
+            if (el) el.remove();
         }
 
         // Add Meeting
@@ -2432,7 +2626,7 @@
         // Generate PDF
         function generatePDF() {
             // Validation
-            const required = ['periodStartDate', 'periodEndDate', 'entityName', 'entityNumber', 'incorporationDate', 'declarationType', 'entityActivities'];
+            const required = ['periodStartDate', 'periodEndDate', 'entityName', 'entityNumber', 'incorporationDate', 'declarationType'];
             let valid = true;
 
             required.forEach(id => {
@@ -2488,6 +2682,7 @@
                     const firstName = document.querySelector(`input[data-bo="${idx}"][data-field="firstName"]`)?.value;
                     const lastName = document.querySelector(`input[data-bo="${idx}"][data-field="lastName"]`)?.value;
                     const dob = document.querySelector(`input[data-bo="${idx}"][data-field="dob"]`)?.value;
+                    const nationality = document.querySelector(`select[data-bo="${idx}"][data-field="nationality"]`)?.value;
                     const boType = document.querySelector(`select[data-bo="${idx}"][data-field="boType"]`)?.value;
                     const startDate = document.querySelector(`input[data-bo="${idx}"][data-field="startDate"]`)?.value;
                     const address = document.querySelector(`input[data-bo="${idx}"][data-field="address"]`)?.value;
@@ -2495,14 +2690,14 @@
                     const country = document.querySelector(`select[data-bo="${idx}"][data-field="country"]`)?.value;
                     const taxResidence = document.querySelector(`select[data-bo="${idx}"][data-field="taxResidence"]`)?.value;
 
-                    if (firstName && lastName && dob && boType && startDate && address && city && country && taxResidence) {
+                    if (firstName && lastName && dob && nationality && boType && startDate && address && city && country && taxResidence) {
                         hasValidBO = true;
                     }
                 }
             });
 
             if (!hasValidBO) {
-                alert('Please complete at least one beneficial owner with all required fields (First Name, Last Name, Date of Birth, BO Type, Start Date, Address, City, Country, and Tax Residence).');
+                alert('Please complete at least one beneficial owner with all required fields (First Name, Last Name, Date of Birth, Nationality, BO Type, Start Date, Address, City, Country, and Tax Residence).');
                 valid = false;
             }
 
@@ -2702,6 +2897,7 @@
                     const firstName = document.querySelector(`input[data-bo="${idx}"][data-field="firstName"]`)?.value || '';
                     const lastName = document.querySelector(`input[data-bo="${idx}"][data-field="lastName"]`)?.value || '';
                     const dob = document.querySelector(`input[data-bo="${idx}"][data-field="dob"]`)?.value || '';
+                    const nationality = document.querySelector(`select[data-bo="${idx}"][data-field="nationality"]`)?.value || '';
                     const boType = document.querySelector(`select[data-bo="${idx}"][data-field="boType"]`)?.value || '';
                     const startDate = document.querySelector(`input[data-bo="${idx}"][data-field="startDate"]`)?.value || '';
                     const endDate = document.querySelector(`input[data-bo="${idx}"][data-field="endDate"]`)?.value || '';
@@ -2727,6 +2923,7 @@
                         doc.setFont(undefined, 'normal');
                         yPosition = addText(`Name: ${firstName} ${lastName}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
                         yPosition = addText(`Date of Birth: ${dob}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                        if (nationality) yPosition = addText(`Nationality: ${nationality}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
                         yPosition = addText(`BO Type: ${boType}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
                         yPosition = addText(`Start Date: ${startDate}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
                         if (endDate) yPosition = addText(`End Date: ${endDate}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
@@ -2765,9 +2962,6 @@
             yPosition = addText(`Declaration Type: ${declarationType}`, margin, yPosition, pageWidth - 2 * margin);
             yPosition += 5;
 
-            const entityActivities = getValue('entityActivities');
-            yPosition = addText('Description of Activities:', margin, yPosition, pageWidth - 2 * margin);
-            yPosition = addText(entityActivities || '(none provided)', margin + 5, yPosition, pageWidth - 2 * margin - 5);
             yPosition += 5;
 
             // Type 1 – Entity Conducting a Relevant Activity: output all additional fields
@@ -2780,7 +2974,7 @@
                 yPosition += 3; doc.setFontSize(10); doc.setFont(undefined, 'normal');
                 const repCurr = getValue('reportingCurrency');
                 const totalGross = getValue('totalGrossIncome');
-                if (repCurr || totalGross) yPosition = addText(`Reporting Currency: ${repCurr}   Total Gross Income: ${totalGross}`, margin, yPosition, pageWidth - 2 * margin);
+                if (repCurr || totalGross) yPosition = addText(`Reporting Currency: ${repCurr}   Total Annual Gross Income: ${totalGross}`, margin, yPosition, pageWidth - 2 * margin);
                 const giCurr = getValue('grossIncomeReportingCurrency');
                 const giRelAct = getValue('grossIncomeRelActivity');
                 if (giCurr || giRelAct) yPosition = addText(`Gross Income Currency: ${giCurr}   Gross Income (Relevant Activity): ${giRelAct}`, margin, yPosition, pageWidth - 2 * margin);
@@ -2840,13 +3034,88 @@
                                 if (raStart || raEnd) yPosition = addText(`Period: ${raStart} – ${raEnd}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
                             }
                         }
+                        // Holding Business YES-branch fields
+                        if (raNameEl && raNameEl.value === '6') {
+                            const activelyManageVal = document.querySelector(`input[name="activelyManage_${idx}"]:checked`)?.value;
+                            if (activelyManageVal === 'YES') {
+                                // Expenditure (YES)
+                                const expCurrYesEl = document.getElementById(`holdingExpCurrencyYes_${idx}`);
+                                const expCurrYes = expCurrYesEl && expCurrYesEl.selectedIndex > 0 ? expCurrYesEl.options[expCurrYesEl.selectedIndex].text : '';
+                                const totalExpYes = document.querySelector(`input[data-ra="${idx}"][data-field="holdingTotalExpYes"]`)?.value || '';
+                                const bviExpYes = document.querySelector(`input[data-ra="${idx}"][data-field="holdingBviExpYes"]`)?.value || '';
+                                if (expCurrYes || totalExpYes || bviExpYes) {
+                                    yPosition = addText('Expenditure:', margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                    if (expCurrYes) yPosition = addText(`  Reporting Currency: ${expCurrYes}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                    if (totalExpYes) yPosition = addText(`  Total Expenditure: ${totalExpYes}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                    if (bviExpYes) yPosition = addText(`  BVI Expenditure: ${bviExpYes}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                }
+                                // Employees
+                                const totalEmp = document.querySelector(`input[data-ra="${idx}"][data-field="holdingTotalEmp"]`)?.value || '';
+                                const bviEmp = document.querySelector(`input[data-ra="${idx}"][data-field="holdingBviEmp"]`)?.value || '';
+                                const empActivity = document.querySelector(`input[data-ra="${idx}"][data-field="holdingEmpActivity"]`)?.value || '';
+                                if (totalEmp || bviEmp || empActivity) {
+                                    yPosition = addText('Employees:', margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                    if (totalEmp) yPosition = addText(`  Total Employees: ${totalEmp}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                    if (bviEmp) yPosition = addText(`  BVI Employees: ${bviEmp}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                    if (empActivity) yPosition = addText(`  Employees Engaged in Activity: ${empActivity}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                }
+                                // Premises (YES)
+                                const yesPremises = holdingPremisesData[`${idx}_yes`] || [];
+                                yesPremises.forEach((p, pi) => {
+                                    if (!p) return;
+                                    const a1 = document.querySelector(`input[data-hp="${idx}_yes_${pi}"][data-field="addr1"]`)?.value || '';
+                                    const a2 = document.querySelector(`input[data-hp="${idx}_yes_${pi}"][data-field="addr2"]`)?.value || '';
+                                    const pc = document.querySelector(`select[data-hp="${idx}_yes_${pi}"][data-field="country"]`)?.value || '';
+                                    if (a1 || a2 || pc) yPosition = addText(`  Premises ${pi+1}: ${[a1,a2,pc].filter(Boolean).join(', ')}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                });
+                            }
+                            if (activelyManageVal === 'NO') {
+                                // Expenditure (NO)
+                                const expCurrNoEl = document.getElementById(`holdingExpCurrencyNo_${idx}`);
+                                const expCurrNo = expCurrNoEl && expCurrNoEl.selectedIndex > 0 ? expCurrNoEl.options[expCurrNoEl.selectedIndex].text : '';
+                                const totalExpNo = document.querySelector(`input[data-ra="${idx}"][data-field="holdingTotalExpNo"]`)?.value || '';
+                                const bviExpNo = document.querySelector(`input[data-ra="${idx}"][data-field="holdingBviExpNo"]`)?.value || '';
+                                if (expCurrNo || totalExpNo || bviExpNo) {
+                                    yPosition = addText('Expenditure:', margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                    if (expCurrNo) yPosition = addText(`  Reporting Currency: ${expCurrNo}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                    if (totalExpNo) yPosition = addText(`  Total Expenditure: ${totalExpNo}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                    if (bviExpNo) yPosition = addText(`  BVI Expenditure: ${bviExpNo}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                }
+                                // Premises (NO)
+                                const noPremises = holdingPremisesData[`${idx}_no`] || [];
+                                noPremises.forEach((p, pi) => {
+                                    if (!p) return;
+                                    const a1 = document.querySelector(`input[data-hp="${idx}_no_${pi}"][data-field="addr1"]`)?.value || '';
+                                    const a2 = document.querySelector(`input[data-hp="${idx}_no_${pi}"][data-field="addr2"]`)?.value || '';
+                                    const pc = document.querySelector(`select[data-hp="${idx}_no_${pi}"][data-field="country"]`)?.value || '';
+                                    if (a1 || a2 || pc) yPosition = addText(`  Premises ${pi+1}: ${[a1,a2,pc].filter(Boolean).join(', ')}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                                });
+                            }
+                        }
+                        // Holding Business Gross Income fields
+                        if (raNameEl && raNameEl.value === '6') {
+                            const holdCurrEl = document.querySelector(`select[data-ra="${idx}"][data-field="holdingCurrency"]`);
+                            const holdCurr = holdCurrEl && holdCurrEl.selectedIndex > 0 ? holdCurrEl.options[holdCurrEl.selectedIndex].text : '';
+                            const holdGross = document.querySelector(`input[data-ra="${idx}"][data-field="holdingGrossIncome"]`)?.value || '';
+                            const holdType = document.querySelector(`input[data-ra="${idx}"][data-field="holdingIncomeType"]`)?.value || '';
+                            if (holdCurr) yPosition = addText(`Reporting Currency: ${holdCurr}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                            if (holdGross) yPosition = addText(`Gross Income (Relevant Activity): ${holdGross}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                            if (holdType) yPosition = addText(`Type of Gross Income: ${holdType}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                        }
                         const activelyManage = document.querySelector(`input[name="activelyManage_${idx}"]:checked`)?.value;
                         if (activelyManage) yPosition = addText(`Actively Manages Equity: ${activelyManage}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                        if (activelyManage === 'YES') {
+                            const explanation = document.querySelector(`textarea[data-ra="${idx}"][data-field="activelyManageExplanation"]`)?.value || '';
+                            if (explanation) yPosition = addText(`Explanation: ${explanation}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
+                        }
                         const statCompliance = document.querySelector(`input[name="statutoryCompliance_${idx}"]:checked`)?.value;
                         if (statCompliance) yPosition = addText(`Statutory Compliance: ${statCompliance}`, margin + 5, yPosition, pageWidth - 2 * margin - 5);
                         yPosition += 3;
                     });
                     yPosition += 5;
+                    // Supporting Comments
+                    const raComments = getValue('relevantActivityComments');
+                    if (raComments) yPosition = addText(`Supporting Comments: ${raComments}`, margin, yPosition, pageWidth - 2 * margin);
                 }
 
                 // Direction and Management
@@ -3024,12 +3293,6 @@
 
             } // end Type 1 block
             
-            const supportingComments = getValue('supportingComments');
-            if (supportingComments) {
-                yPosition = addText('Supporting Comments:', margin, yPosition, pageWidth - 2 * margin);
-                yPosition = addText(supportingComments, margin + 5, yPosition, pageWidth - 2 * margin - 5);
-                yPosition += 5;
-            }
 
             // Remarks
             const remarks = getValue('remarks');
