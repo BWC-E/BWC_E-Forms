@@ -6,7 +6,7 @@
     <title>Economic Substance Declaration | Bethel Worldwide Corporation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com/">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-    <link href="./BWC_Economic_Substance_Declaration_160326_files/css2" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
@@ -585,13 +585,38 @@
                         <label><strong>Is the entity part of a MNE Group? <span class="required">*</span></strong></label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <input type="radio" name="mneGroup" value="yes">
+                                <input type="radio" name="mneGroup" value="yes" onchange="toggleMNEGroupFields()">
                                 <span>Yes</span>
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="mneGroup" value="no">
+                                <input type="radio" name="mneGroup" value="no" onchange="toggleMNEGroupFields()">
                                 <span>No</span>
                             </label>
+                        </div>
+                    </div>
+
+                    <!-- MNE Group Name fields — shown only when mneGroup = yes -->
+                    <div id="mneGroupNameSection" style="display:none; border:2px solid #d1d5db; border-radius:8px; padding:20px; margin-bottom:20px; background-color:#f9fafb;">
+                        <div class="form-group" style="margin-bottom:12px;">
+                            <label><strong>Name of the MNE Group if different <span class="required">*</span></strong></label>
+                            <div style="display:flex; gap:24px; margin-top:10px; flex-wrap:wrap;">
+                                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:normal;">
+                                    <input type="checkbox" id="mneSameName" onchange="handleMNECheckbox('same')" style="width:18px; height:18px; cursor:pointer;">
+                                    <span>Same MNE Group Name</span>
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:normal;">
+                                    <input type="checkbox" id="mneDifferentName" onchange="handleMNECheckbox('different')" style="width:18px; height:18px; cursor:pointer;">
+                                    <span>No</span>
+                                </label>
+                            </div>
+                            <span class="error-message" id="error-mneGroupName"></span>
+                        </div>
+                        <div id="mneGroupNameInput" style="display:none;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>MNE Group Name <span class="required">*</span></label>
+                                <input type="text" id="mneGroupNameValue" placeholder="Enter MNE Group Name" maxlength="200">
+                                <span class="error-message" id="error-mneGroupNameValue"></span>
+                            </div>
                         </div>
                     </div>
 
@@ -599,13 +624,74 @@
                         <label><strong>Does the entity have an ultimate parent entity? <span class="required">*</span></strong></label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <input type="radio" name="ultimateParent" value="yes">
+                                <input type="radio" name="ultimateParent" value="yes" onchange="toggleUltimateParentFields()">
                                 <span>Yes</span>
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="ultimateParent" value="no">
+                                <input type="radio" name="ultimateParent" value="no" onchange="toggleUltimateParentFields()">
                                 <span>No</span>
                             </label>
+                        </div>
+                    </div>
+
+                    <!-- Ultimate Parent Entity fields — shown only when ultimateParent = yes -->
+                    <div id="ultimateParentSection" style="display:none; border:2px solid #2d5986; border-radius:8px; padding:24px; margin-bottom:20px; background-color:#f0f6ff;">
+                        <div class="subsection-title" style="margin-top:0;">Add Ultimate Parent Entity</div>
+
+                        <div class="form-group">
+                            <label>Entity Name <span class="required">*</span></label>
+                            <input type="text" id="upe_entityName" placeholder="Enter entity name" maxlength="200">
+                            <span class="error-message" id="error-upe_entityName"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Entity Alternative Name</label>
+                            <input type="text" id="upe_altName" placeholder="Enter alternative name (if any)" maxlength="200">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Entity Jurisdiction of Formation <span class="required">*</span></label>
+                            <select id="upe_jurisdiction">
+                                <option value="">Select Country</option>
+                            </select>
+                            <span class="error-message" id="error-upe_jurisdiction"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Entity Incorporation Number (or its equivalent)</label>
+                            <input type="text" id="upe_incorporationNo" placeholder="Enter incorporation number" maxlength="100">
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Entity Taxpayer Identification Number (TIN) <span class="required">*</span></label>
+                                <input type="text" id="upe_tin" placeholder="Enter TIN" maxlength="100">
+                                <span class="error-message" id="error-upe_tin"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Issued by (TIN) <span class="required">*</span></label>
+                                <select id="upe_tinCountry">
+                                    <option value="">Select Country</option>
+                                </select>
+                                <span class="error-message" id="error-upe_tinCountry"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>Other Identification No.</label>
+                                <input type="text" id="upe_otherIdNo" placeholder="Enter ID number" maxlength="100">
+                            </div>
+                            <div class="form-group">
+                                <label>ID Type (Other Identification No.)</label>
+                                <input type="text" id="upe_otherIdType" placeholder="Enter ID type" maxlength="100">
+                            </div>
+                            <div class="form-group">
+                                <label>Issued by (Other Identification No.)</label>
+                                <select id="upe_otherIdCountry">
+                                    <option value="">Select Country</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -613,13 +699,74 @@
                         <label><strong>Does the entity have an immediate parent entity? <span class="required">*</span></strong></label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <input type="radio" name="immediateParent" value="yes">
+                                <input type="radio" name="immediateParent" value="yes" onchange="toggleImmediateParentFields()">
                                 <span>Yes</span>
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="immediateParent" value="no">
+                                <input type="radio" name="immediateParent" value="no" onchange="toggleImmediateParentFields()">
                                 <span>No</span>
                             </label>
+                        </div>
+                    </div>
+
+                    <!-- Immediate Parent Entity fields — shown only when immediateParent = yes -->
+                    <div id="immediateParentSection" style="display:none; border:2px solid #2d5986; border-radius:8px; padding:24px; margin-bottom:20px; background-color:#f0f6ff;">
+                        <div class="subsection-title" style="margin-top:0;">Add Immediate Parent Entity</div>
+
+                        <div class="form-group">
+                            <label>Entity Name <span class="required">*</span></label>
+                            <input type="text" id="ipe_entityName" placeholder="Enter entity name" maxlength="200">
+                            <span class="error-message" id="error-ipe_entityName"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Entity Alternative Name</label>
+                            <input type="text" id="ipe_altName" placeholder="Enter alternative name (if any)" maxlength="200">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Entity Jurisdiction of Formation <span class="required">*</span></label>
+                            <select id="ipe_jurisdiction">
+                                <option value="">Select Country</option>
+                            </select>
+                            <span class="error-message" id="error-ipe_jurisdiction"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Entity Incorporation Number (or its equivalent)</label>
+                            <input type="text" id="ipe_incorporationNo" placeholder="Enter incorporation number" maxlength="100">
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Entity Taxpayer Identification Number (TIN) <span class="required">*</span></label>
+                                <input type="text" id="ipe_tin" placeholder="Enter TIN" maxlength="100">
+                                <span class="error-message" id="error-ipe_tin"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Issued by (TIN) <span class="required">*</span></label>
+                                <select id="ipe_tinCountry">
+                                    <option value="">Select Country</option>
+                                </select>
+                                <span class="error-message" id="error-ipe_tinCountry"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>Other Identification No.</label>
+                                <input type="text" id="ipe_otherIdNo" placeholder="Enter ID number" maxlength="100">
+                            </div>
+                            <div class="form-group">
+                                <label>ID Type (Other Identification No.)</label>
+                                <input type="text" id="ipe_otherIdType" placeholder="Enter ID type" maxlength="100">
+                            </div>
+                            <div class="form-group">
+                                <label>Issued by (Other Identification No.)</label>
+                                <select id="ipe_otherIdCountry">
+                                    <option value="">Select Country</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1572,6 +1719,12 @@
             populateCountryDropdown(document.getElementById('businessCountry'));
             populateCountryDropdown(document.getElementById('tinCountry'));
             populateCountryDropdown(document.getElementById('otherIdCountry'));
+            populateCountryDropdown(document.getElementById('upe_jurisdiction'));
+            populateCountryDropdown(document.getElementById('upe_tinCountry'));
+            populateCountryDropdown(document.getElementById('upe_otherIdCountry'));
+            populateCountryDropdown(document.getElementById('ipe_jurisdiction'));
+            populateCountryDropdown(document.getElementById('ipe_tinCountry'));
+            populateCountryDropdown(document.getElementById('ipe_otherIdCountry'));
             
             // Ensure all radio buttons are unchecked and add first beneficial owner
             document.querySelectorAll('input[type="radio"]').forEach(radio => {
@@ -1588,6 +1741,82 @@
                 document.getElementById('saveStatus').style.color = '#0369a1';
             }
         });
+
+        // Toggle Immediate Parent Entity section
+        function toggleImmediateParentFields() {
+            const selected = document.querySelector('input[name="immediateParent"]:checked')?.value;
+            const section = document.getElementById('immediateParentSection');
+            section.style.display = selected === 'yes' ? 'block' : 'none';
+            if (selected !== 'yes') {
+                ['ipe_entityName','ipe_altName','ipe_incorporationNo','ipe_tin','ipe_otherIdNo','ipe_otherIdType'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.value = ''; el.classList.remove('error'); }
+                });
+                ['ipe_jurisdiction','ipe_tinCountry','ipe_otherIdCountry'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.selectedIndex = 0; el.classList.remove('error'); }
+                });
+                ['error-ipe_entityName','error-ipe_jurisdiction','error-ipe_tin','error-ipe_tinCountry'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = '';
+                });
+            }
+        }
+
+        // Toggle Ultimate Parent Entity section
+        function toggleUltimateParentFields() {
+            const selected = document.querySelector('input[name="ultimateParent"]:checked')?.value;
+            const section = document.getElementById('ultimateParentSection');
+            section.style.display = selected === 'yes' ? 'block' : 'none';
+            if (selected !== 'yes') {
+                ['upe_entityName','upe_altName','upe_incorporationNo','upe_tin','upe_otherIdNo','upe_otherIdType'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.value = ''; el.classList.remove('error'); }
+                });
+                ['upe_jurisdiction','upe_tinCountry','upe_otherIdCountry'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.selectedIndex = 0; el.classList.remove('error'); }
+                });
+                ['error-upe_entityName','error-upe_jurisdiction','error-upe_tin','error-upe_tinCountry'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = '';
+                });
+            }
+        }
+
+        // Toggle MNE Group Name section
+        function toggleMNEGroupFields() {
+            const selected = document.querySelector('input[name="mneGroup"]:checked')?.value;
+            const section = document.getElementById('mneGroupNameSection');
+            section.style.display = selected === 'yes' ? 'block' : 'none';
+            if (selected !== 'yes') {
+                document.getElementById('mneSameName').checked = false;
+                document.getElementById('mneDifferentName').checked = false;
+                document.getElementById('mneGroupNameInput').style.display = 'none';
+                document.getElementById('mneGroupNameValue').value = '';
+                document.getElementById('error-mneGroupName').textContent = '';
+                document.getElementById('error-mneGroupNameValue').textContent = '';
+            }
+        }
+
+        // Handle mutually exclusive MNE checkboxes
+        function handleMNECheckbox(which) {
+            if (which === 'same') {
+                document.getElementById('mneDifferentName').checked = false;
+                document.getElementById('mneGroupNameInput').style.display = 'none';
+                document.getElementById('mneGroupNameValue').value = '';
+                document.getElementById('error-mneGroupNameValue').textContent = '';
+            } else {
+                document.getElementById('mneSameName').checked = false;
+                const isDifferent = document.getElementById('mneDifferentName').checked;
+                document.getElementById('mneGroupNameInput').style.display = isDifferent ? 'block' : 'none';
+                if (!isDifferent) {
+                    document.getElementById('mneGroupNameValue').value = '';
+                    document.getElementById('error-mneGroupNameValue').textContent = '';
+                }
+            }
+            document.getElementById('error-mneGroupName').textContent = '';
+        }
 
         // Toggle business address fields
         function toggleBusinessAddress() {
@@ -2642,6 +2871,73 @@
                 }
             });
 
+            // Validate Immediate Parent Entity fields if immediateParent = yes
+            const immediateParentSelected = document.querySelector('input[name="immediateParent"]:checked')?.value;
+            if (immediateParentSelected === 'yes') {
+                const ipeRequired = [
+                    { id: 'ipe_entityName',  errId: 'error-ipe_entityName',  label: 'Entity Name' },
+                    { id: 'ipe_jurisdiction', errId: 'error-ipe_jurisdiction', label: 'Entity Jurisdiction of Formation', isSelect: true },
+                    { id: 'ipe_tin',          errId: 'error-ipe_tin',          label: 'Entity Taxpayer Identification Number (TIN)' },
+                    { id: 'ipe_tinCountry',   errId: 'error-ipe_tinCountry',   label: 'Issued by (TIN)', isSelect: true }
+                ];
+                ipeRequired.forEach(field => {
+                    const el = document.getElementById(field.id);
+                    const errEl = document.getElementById(field.errId);
+                    const isEmpty = field.isSelect ? !el.value : !el.value.trim();
+                    if (isEmpty) {
+                        el.classList.add('error');
+                        if (errEl) errEl.textContent = 'This field is required';
+                        valid = false;
+                    } else {
+                        el.classList.remove('error');
+                        if (errEl) errEl.textContent = '';
+                    }
+                });
+            }
+
+            // Validate Ultimate Parent Entity fields if ultimateParent = yes
+            const ultimateParentSelected = document.querySelector('input[name="ultimateParent"]:checked')?.value;
+            if (ultimateParentSelected === 'yes') {
+                const upeRequired = [
+                    { id: 'upe_entityName',  errId: 'error-upe_entityName',  label: 'Entity Name' },
+                    { id: 'upe_jurisdiction', errId: 'error-upe_jurisdiction', label: 'Entity Jurisdiction of Formation', isSelect: true },
+                    { id: 'upe_tin',          errId: 'error-upe_tin',          label: 'Entity Taxpayer Identification Number (TIN)' },
+                    { id: 'upe_tinCountry',   errId: 'error-upe_tinCountry',   label: 'Issued by (TIN)', isSelect: true }
+                ];
+                upeRequired.forEach(field => {
+                    const el = document.getElementById(field.id);
+                    const errEl = document.getElementById(field.errId);
+                    const isEmpty = field.isSelect ? !el.value : !el.value.trim();
+                    if (isEmpty) {
+                        el.classList.add('error');
+                        if (errEl) errEl.textContent = 'This field is required';
+                        valid = false;
+                    } else {
+                        el.classList.remove('error');
+                        if (errEl) errEl.textContent = '';
+                    }
+                });
+            }
+
+            // Validate MNE Group Name section if MNE Group = yes
+            const mneGroupSelected = document.querySelector('input[name="mneGroup"]:checked')?.value;
+            if (mneGroupSelected === 'yes') {
+                const sameName = document.getElementById('mneSameName').checked;
+                const differentName = document.getElementById('mneDifferentName').checked;
+                if (!sameName && !differentName) {
+                    document.getElementById('error-mneGroupName').textContent = 'Please select an option for MNE Group Name';
+                    valid = false;
+                } else if (differentName) {
+                    const mneNameValue = document.getElementById('mneGroupNameValue').value.trim();
+                    if (!mneNameValue) {
+                        document.getElementById('error-mneGroupNameValue').textContent = 'MNE Group Name is required';
+                        valid = false;
+                    } else {
+                        document.getElementById('error-mneGroupNameValue').textContent = '';
+                    }
+                }
+            }
+
             // Validate required radio button groups
             const requiredRadioGroups = [
                 { name: 'sameAddress', label: 'Is Business Address same as Registered Office Address?' },
@@ -2863,13 +3159,74 @@
             yPosition += 5;
 
             const mneGroup = document.querySelector('input[name="mneGroup"]:checked');
-            if (mneGroup) yPosition = addText(`Part of MNE Group: ${mneGroup.value.toUpperCase()}`, margin, yPosition, pageWidth - 2 * margin);
+            if (mneGroup) {
+                yPosition = addText(`Part of MNE Group: ${mneGroup.value.toUpperCase()}`, margin, yPosition, pageWidth - 2 * margin);
+                if (mneGroup.value === 'yes') {
+                    const sameName = document.getElementById('mneSameName').checked;
+                    const differentName = document.getElementById('mneDifferentName').checked;
+                    if (sameName) {
+                        yPosition = addText('MNE Group Name: Same as Entity Name', margin, yPosition, pageWidth - 2 * margin);
+                    } else if (differentName) {
+                        const mneNameVal = document.getElementById('mneGroupNameValue').value.trim();
+                        yPosition = addText(`MNE Group Name: ${mneNameVal}`, margin, yPosition, pageWidth - 2 * margin);
+                    }
+                }
+            }
             
             const ultimateParent = document.querySelector('input[name="ultimateParent"]:checked');
-            if (ultimateParent) yPosition = addText(`Has Ultimate Parent Entity: ${ultimateParent.value.toUpperCase()}`, margin, yPosition, pageWidth - 2 * margin);
+            if (ultimateParent) {
+                yPosition = addText(`Has Ultimate Parent Entity: ${ultimateParent.value.toUpperCase()}`, margin, yPosition, pageWidth - 2 * margin);
+                if (ultimateParent.value === 'yes') {
+                    if (yPosition > pageHeight - 60) { doc.addPage(); yPosition = margin; }
+                    doc.setFont(undefined, 'bold');
+                    yPosition = addText('Ultimate Parent Entity:', margin, yPosition, pageWidth - 2 * margin);
+                    doc.setFont(undefined, 'normal');
+                    const upeName = document.getElementById('upe_entityName')?.value || '';
+                    const upeAlt = document.getElementById('upe_altName')?.value || '';
+                    const upeJurisEl = document.getElementById('upe_jurisdiction');
+                    const upeJuris = upeJurisEl?.value || '';
+                    const upeIncorp = document.getElementById('upe_incorporationNo')?.value || '';
+                    const upeTin = document.getElementById('upe_tin')?.value || '';
+                    const upeTinCountryEl = document.getElementById('upe_tinCountry');
+                    const upeTinCountry = upeTinCountryEl?.value || '';
+                    const upeOtherId = document.getElementById('upe_otherIdNo')?.value || '';
+                    const upeOtherType = document.getElementById('upe_otherIdType')?.value || '';
+                    const upeOtherCountryEl = document.getElementById('upe_otherIdCountry');
+                    const upeOtherCountry = upeOtherCountryEl?.value || '';
+                    if (upeName) yPosition = addText(`  Entity Name: ${upeName}`, margin, yPosition, pageWidth - 2 * margin);
+                    if (upeAlt) yPosition = addText(`  Alternative Name: ${upeAlt}`, margin, yPosition, pageWidth - 2 * margin);
+                    if (upeJuris) yPosition = addText(`  Jurisdiction of Formation: ${upeJuris}`, margin, yPosition, pageWidth - 2 * margin);
+                    if (upeIncorp) yPosition = addText(`  Incorporation Number: ${upeIncorp}`, margin, yPosition, pageWidth - 2 * margin);
+                    if (upeTin) yPosition = addText(`  TIN: ${upeTin}${upeTinCountry ? ' (Issued by: ' + upeTinCountry + ')' : ''}`, margin, yPosition, pageWidth - 2 * margin);
+                    if (upeOtherId) yPosition = addText(`  Other ID No.: ${upeOtherId}${upeOtherType ? ' (Type: ' + upeOtherType + ')' : ''}${upeOtherCountry ? ' (Issued by: ' + upeOtherCountry + ')' : ''}`, margin, yPosition, pageWidth - 2 * margin);
+                }
+            }
             
             const immediateParent = document.querySelector('input[name="immediateParent"]:checked');
-            if (immediateParent) yPosition = addText(`Has Immediate Parent Entity: ${immediateParent.value.toUpperCase()}`, margin, yPosition, pageWidth - 2 * margin);
+            if (immediateParent) {
+                yPosition = addText(`Has Immediate Parent Entity: ${immediateParent.value.toUpperCase()}`, margin, yPosition, pageWidth - 2 * margin);
+                if (immediateParent.value === 'yes') {
+                    if (yPosition > pageHeight - 60) { doc.addPage(); yPosition = margin; }
+                    doc.setFont(undefined, 'bold');
+                    yPosition = addText('Immediate Parent Entity:', margin, yPosition, pageWidth - 2 * margin);
+                    doc.setFont(undefined, 'normal');
+                    const ipeName = document.getElementById('ipe_entityName')?.value || '';
+                    const ipeAlt = document.getElementById('ipe_altName')?.value || '';
+                    const ipeJuris = document.getElementById('ipe_jurisdiction')?.value || '';
+                    const ipeIncorp = document.getElementById('ipe_incorporationNo')?.value || '';
+                    const ipeTin = document.getElementById('ipe_tin')?.value || '';
+                    const ipeTinCountry = document.getElementById('ipe_tinCountry')?.value || '';
+                    const ipeOtherId = document.getElementById('ipe_otherIdNo')?.value || '';
+                    const ipeOtherType = document.getElementById('ipe_otherIdType')?.value || '';
+                    const ipeOtherCountry = document.getElementById('ipe_otherIdCountry')?.value || '';
+                    if (ipeName) yPosition = addText(`  Entity Name: ${ipeName}`, margin, yPosition, pageWidth - 2 * margin);
+                    if (ipeAlt) yPosition = addText(`  Alternative Name: ${ipeAlt}`, margin, yPosition, pageWidth - 2 * margin);
+                    if (ipeJuris) yPosition = addText(`  Jurisdiction of Formation: ${ipeJuris}`, margin, yPosition, pageWidth - 2 * margin);
+                    if (ipeIncorp) yPosition = addText(`  Incorporation Number: ${ipeIncorp}`, margin, yPosition, pageWidth - 2 * margin);
+                    if (ipeTin) yPosition = addText(`  TIN: ${ipeTin}${ipeTinCountry ? ' (Issued by: ' + ipeTinCountry + ')' : ''}`, margin, yPosition, pageWidth - 2 * margin);
+                    if (ipeOtherId) yPosition = addText(`  Other ID No.: ${ipeOtherId}${ipeOtherType ? ' (Type: ' + ipeOtherType + ')' : ''}${ipeOtherCountry ? ' (Issued by: ' + ipeOtherCountry + ')' : ''}`, margin, yPosition, pageWidth - 2 * margin);
+                }
+            }
             
             yPosition += 8;
 
