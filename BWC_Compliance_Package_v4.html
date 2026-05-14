@@ -1,0 +1,2849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BWC Compliance Package — Bethel Worldwide Corporation</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --primary: #0c4a6e;
+  --primary-light: #075985;
+  --primary-bg: #e0f2fe;
+  --accent: #0369a1;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --success: #047857;
+  --success-bg: #d1fae5;
+  --warning: #b45309;
+  --warning-bg: #fef3c7;
+  --danger: #b91c1c;
+  --danger-bg: #fee2e2;
+  --neutral-bg: #f8fafc;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px; line-height: 1.55; color: var(--text); background: var(--neutral-bg);
+}
+body { padding-top: 64px; padding-bottom: 40px; }
+.topnav {
+  position: fixed; top: 0; left: 0; right: 0; background: white;
+  border-bottom: 1px solid var(--border); box-shadow: var(--shadow);
+  z-index: 1000; height: 64px; display: flex; align-items: center;
+  padding: 0 20px; gap: 16px;
+}
+.topnav .brand { font-weight: 700; color: var(--primary); font-size: 15px; white-space: nowrap; }
+.topnav .brand .tag {
+  background: var(--primary-bg); color: var(--primary); font-size: 11px;
+  padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 600;
+}
+.topnav .nav-jump { flex: 1; max-width: 360px; }
+.topnav .nav-jump select {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--border);
+  border-radius: 6px; font-size: 13px; background: white; cursor: pointer;
+}
+.topnav .save-status {
+  font-size: 12px;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #f1f5f9;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.topnav .save-status .dot {
+  display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; background: #94a3b8;
+  margin-right: 6px; vertical-align: middle;
+  transition: background 0.2s;
+}
+.topnav .save-status.state-saved {
+  background: var(--success-bg); color: var(--success);
+  border-color: rgba(4,120,87,0.25);
+}
+.topnav .save-status.state-saved .dot { background: var(--success); }
+.topnav .save-status.state-dirty {
+  background: var(--warning-bg); color: var(--warning);
+  border-color: rgba(180,83,9,0.25);
+}
+.topnav .save-status.state-dirty .dot {
+  background: var(--warning);
+  animation: pulse-amber 1.6s ease-in-out infinite;
+}
+.topnav .save-status.state-saving {
+  background: #dbeafe; color: #1d4ed8;
+  border-color: rgba(29,78,216,0.25);
+}
+.topnav .save-status.state-saving .dot { background: #2563eb; }
+.topnav .save-status.state-error {
+  background: var(--danger-bg); color: var(--danger);
+  border-color: rgba(185,28,28,0.3);
+}
+.topnav .save-status.state-error .dot { background: var(--danger); }
+@keyframes pulse-amber {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.85); }
+}
+.topnav .actions { display: flex; gap: 8px; margin-left: auto; }
+.btn {
+  border: 1px solid transparent; border-radius: 6px; padding: 7px 14px;
+  font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s; font-family: inherit;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-light); }
+.btn-secondary { background: white; color: var(--primary); border-color: var(--border); }
+.btn-secondary:hover:not(:disabled) { background: var(--neutral-bg); border-color: var(--accent); }
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover:not(:disabled) { background: #036a4a; }
+.btn-danger { background: white; color: var(--danger); border-color: var(--border); }
+.btn-danger:hover:not(:disabled) { background: var(--danger-bg); border-color: var(--danger); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+.cover {
+  background: white; border: 1px solid var(--border); border-radius: 10px;
+  padding: 32px; margin-bottom: 24px; box-shadow: var(--shadow);
+}
+.cover h1 { margin: 0 0 6px 0; color: var(--primary); font-size: 26px; font-weight: 700; }
+.cover .subtitle { color: var(--text-muted); font-size: 15px; margin: 0 0 24px 0; }
+.meta-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 24px; margin-top: 20px;
+}
+.meta-grid .meta-item { border-top: 1px solid var(--border-light); padding-top: 8px; }
+.meta-grid .meta-item label {
+  display: block; font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--text-muted); font-weight: 600; margin-bottom: 2px;
+}
+.meta-grid .meta-item .value { font-size: 14px; color: var(--text); font-weight: 500; }
+.status-board {
+  margin-top: 24px; border-top: 1px solid var(--border-light); padding-top: 20px;
+}
+.status-board h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--text-muted); margin: 0 0 10px 0; }
+.status-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px;
+}
+.status-tile {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border: 1px solid var(--border-light);
+  border-radius: 6px; background: white; font-size: 13px;
+  cursor: pointer;
+}
+.status-tile:hover { border-color: var(--accent); background: var(--neutral-bg); }
+.status-tile .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.status-tile .dot.s-na { background: #cbd5e1; }
+.status-tile .dot.s-ip { background: var(--warning); }
+.status-tile .dot.s-c { background: var(--success); }
+.status-tile .name { flex: 1; }
+
+.section {
+  background: white; border: 1px solid var(--border); border-radius: 10px;
+  margin-bottom: 20px; box-shadow: var(--shadow); overflow: hidden;
+}
+.section-header {
+  padding: 16px 22px; border-bottom: 1px solid var(--border-light);
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  user-select: none; background: linear-gradient(to bottom, #f8fafc, white);
+}
+.section-header:hover { background: var(--neutral-bg); }
+.section-header .toggle { font-size: 14px; color: var(--text-muted); transition: transform 0.2s; }
+.section.collapsed .section-header .toggle { transform: rotate(-90deg); }
+.section-header h2 { margin: 0; flex: 1; font-size: 17px; color: var(--primary); font-weight: 600; }
+.section-header .ref { font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.05em; }
+.section-header .status-badge {
+  font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.status-badge.s-na { background: #f1f5f9; color: var(--text-muted); }
+.status-badge.s-ip { background: var(--warning-bg); color: var(--warning); }
+.status-badge.s-c { background: var(--success-bg); color: var(--success); }
+
+.section-body { padding: 22px; }
+.section.collapsed .section-body { display: none; }
+.section-footer {
+  padding: 14px 22px; border-top: 1px solid var(--border-light);
+  background: var(--neutral-bg); display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+.section.collapsed .section-footer { display: none; }
+.section-footer .filler { flex: 1; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+@media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.field .hint { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 400; }
+.field input[type="text"], .field input[type="date"], .field input[type="number"], .field input[type="email"], .field select, .field textarea {
+  width: 100%; padding: 7px 10px; font-size: 13px; font-family: inherit;
+  border: 1px solid var(--border); border-radius: 5px; background: white; color: var(--text);
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(3,105,161,0.15);
+}
+.field textarea { resize: vertical; min-height: 56px; }
+.radio-row, .check-row { display: flex; flex-wrap: wrap; gap: 14px; padding-top: 2px; }
+.radio-row label, .check-row label {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 400; color: var(--text); cursor: pointer;
+}
+.radio-row input, .check-row input { margin: 0; }
+
+.subhead {
+  font-size: 13px; font-weight: 700; color: var(--primary);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  margin: 22px 0 10px 0; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-light);
+}
+.subhead:first-child { margin-top: 0; }
+
+.narr p { margin: 0 0 12px 0; }
+.narr ul, .narr ol { margin: 0 0 12px 0; padding-left: 22px; }
+.narr li { margin-bottom: 5px; }
+.narr h3 { font-size: 14px; color: var(--primary); margin: 18px 0 8px 0; }
+.narr h4 { font-size: 13px; color: var(--text); margin: 14px 0 6px 0; }
+
+table.data {
+  width: 100%; border-collapse: collapse; margin: 8px 0 14px 0; font-size: 13px;
+}
+table.data th, table.data td {
+  border: 1px solid var(--border-light); padding: 8px 10px; text-align: left; vertical-align: top;
+}
+table.data th { background: var(--neutral-bg); font-weight: 600; color: var(--primary); }
+table.data td input[type="text"], table.data td input[type="date"], table.data td input[type="number"],
+table.data td select, table.data td textarea {
+  width: 100%; padding: 4px 6px; font-size: 12px; border: 1px solid var(--border-light);
+  border-radius: 3px; font-family: inherit;
+}
+table.data td textarea { resize: vertical; min-height: 32px; }
+table.data td .row-remove {
+  background: none; border: none; color: var(--danger);
+  cursor: pointer; padding: 4px 8px; font-size: 16px;
+}
+
+.info-box {
+  background: var(--primary-bg); border-left: 3px solid var(--accent);
+  padding: 12px 14px; margin: 14px 0; border-radius: 4px; font-size: 13px;
+}
+.warn-box {
+  background: var(--warning-bg); border-left: 3px solid var(--warning);
+  padding: 12px 14px; margin: 14px 0; border-radius: 4px; font-size: 13px;
+}
+.info-box strong, .warn-box strong { display: block; margin-bottom: 4px; }
+
+.signoff {
+  background: var(--neutral-bg); border: 1px solid var(--border-light);
+  border-radius: 6px; padding: 14px; margin-top: 14px;
+}
+.signoff .subhead { margin-top: 0; }
+
+/* ===== Getting Started panel (v4) ===== */
+.getting-started {
+  margin-top: 24px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  padding: 16px 18px;
+  position: relative;
+}
+.getting-started h3 {
+  margin: 0 0 8px 0;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.getting-started ol {
+  margin: 6px 0 4px 22px;
+  padding: 0;
+  font-size: 13px;
+  color: var(--text);
+}
+.getting-started ol li { margin-bottom: 4px; line-height: 1.5; }
+.getting-started ol li strong { color: var(--primary); }
+.getting-started .dismiss {
+  position: absolute;
+  top: 10px; right: 12px;
+  background: none; border: none;
+  color: var(--text-muted);
+  font-size: 18px; line-height: 1;
+  cursor: pointer; padding: 2px 6px;
+  border-radius: 4px;
+}
+.getting-started .dismiss:hover { background: rgba(255,255,255,0.6); color: var(--text); }
+
+/* ===== Undo Reset toast (v4) ===== */
+.undo-toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 1100;
+  background: #1e293b;
+  color: white;
+  padding: 12px 16px 12px 18px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  display: flex; align-items: center; gap: 14px;
+  font-size: 13px;
+  min-width: 340px;
+  max-width: 480px;
+  animation: toast-in 0.25s ease-out;
+}
+.undo-toast .toast-msg { flex: 1; }
+.undo-toast .toast-msg strong { display: block; margin-bottom: 2px; }
+.undo-toast .toast-msg .countdown { color: #94a3b8; font-size: 11.5px; }
+.undo-toast button.undo-btn {
+  background: #3b82f6; color: white;
+  border: none; padding: 6px 14px;
+  border-radius: 5px; font-weight: 600;
+  cursor: pointer; font-size: 13px;
+  font-family: inherit;
+}
+.undo-toast button.undo-btn:hover { background: #2563eb; }
+.undo-toast button.close-btn {
+  background: none; border: none; color: #94a3b8;
+  font-size: 18px; line-height: 1; cursor: pointer;
+  padding: 2px 6px;
+}
+.undo-toast button.close-btn:hover { color: white; }
+@keyframes toast-in {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@keyframes toast-out {
+  from { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(20px); opacity: 0; }
+}
+.undo-toast.closing { animation: toast-out 0.2s ease-in forwards; }
+
+/* Hidden file input for Import Backup */
+.hidden-file-input { display: none; }
+
+@media print {
+  body { padding-top: 0; background: white; }
+  .topnav, .section-footer, .actions, .row-remove, button, .undo-toast, .getting-started { display: none !important; }
+  .section, .cover { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+  .section.collapsed .section-body { display: block !important; }
+  .section.collapsed .section-footer { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ FIXED TOP NAV ============ -->
+<div class="topnav">
+  <div class="brand">BWC Compliance Package <span class="tag">v4</span></div>
+  <div class="nav-jump">
+    <select id="jumpSelect" onchange="jumpToSection(this.value)">
+      <option value="">Jump to…</option>
+      <option value="cover">Cover &amp; Status</option>
+      <option value="sec-gov">A. Governance Statement</option>
+      <option value="sec-man">B. Compliance Manual</option>
+      <option value="log-sa">Log 1 — Annual Self-Assessment</option>
+      <option value="log-cdd">Log 2 — CDD Checklist</option>
+      <option value="log-sanc">Log 3 — Sanctions Screening Log</option>
+      <option value="log-sar">Log 4 — Internal SAR Log</option>
+      <option value="log-fr">Log 5 — File Review Log</option>
+      <option value="log-tr">Log 6 — Training Log</option>
+      <option value="log-insp">Log 7 — Inspection Pack Checklist</option>
+      <option value="log-rem">Log 8 — Remediation Plan</option>
+      <option value="log-cfi">Log 9 — Client File Index</option>
+      <option value="log-cal">Log 10 — Regulatory Calendar</option>
+      <option value="sec-ann">D. Annexes (Risk Matrix)</option>
+    </select>
+  </div>
+  <div class="save-status"><span class="dot" id="saveDot"></span><span id="saveText">Loading…</span></div>
+  <div class="actions">
+    <button class="btn btn-secondary btn-sm" onclick="saveNow()" title="Save current state to browser storage">💾 Save</button>
+    <button class="btn btn-secondary btn-sm" onclick="loadSaved()" title="Restore the last saved state from browser storage">📂 Load</button>
+    <button class="btn btn-secondary btn-sm" onclick="exportBackup()" title="Download an editable JSON backup of all current data — keep in compliance folder">⬇ Export Backup</button>
+    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importBackupInput').click()" title="Restore from a previously-exported JSON backup">⬆ Import Backup</button>
+    <button class="btn btn-success btn-sm" onclick="exportPackagePDF()">📄 Save Full Package as PDF</button>
+    <input type="file" id="importBackupInput" class="hidden-file-input" accept=".json,application/json" onchange="importBackup(event)">
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ============ COVER / CONTROL ============ -->
+<div class="cover" id="cover">
+  <h1>BWC Compliance Package</h1>
+  <p class="subtitle">Bethel Worldwide Corporation — BVI Registered Agent &amp; TCSP. Governance, AML/CFT/CPF Manual, and supporting working logs. Designed to be practical for a micro entity and sufficient to support an FSC compliance inspection.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><label>Licensee</label><div class="value">Bethel Worldwide Corporation</div></div>
+    <div class="meta-item"><label>Jurisdiction</label><div class="value">British Virgin Islands</div></div>
+    <div class="meta-item"><label>Regulator</label><div class="value">BVI Financial Services Commission</div></div>
+    <div class="meta-item"><label>Licence Type</label><div class="value">Registered Agent / TCSP (Company Management Act 1990)</div></div>
+  </div>
+
+  <div class="subhead" style="margin-top:24px;">Package Control</div>
+  <div class="grid-3">
+    <div class="field"><label>Compliance Year</label>
+      <input type="text" data-pkg="year" placeholder="e.g. 2026"></div>
+    <div class="field"><label>Package Owner</label>
+      <input type="text" data-pkg="owner" placeholder="Patra Stoutt"></div>
+    <div class="field"><label>Date of This Edition</label>
+      <input type="date" data-pkg="editionDate"></div>
+  </div>
+
+  <div class="status-board">
+    <h3>Log Status</h3>
+    <div class="status-grid" id="statusGrid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- Getting Started panel — shown on first use, dismissible -->
+  <div class="getting-started" id="gettingStarted" style="display:none;">
+    <button class="dismiss" onclick="dismissGettingStarted()" title="Dismiss">×</button>
+    <h3>Getting started</h3>
+    <ol>
+      <li>Fill the <strong>Governance Statement</strong> (Section A) first — entity details, role assignments, and the Fit &amp; Proper self-declaration. Save it as a PDF when signed.</li>
+      <li>Open the <strong>Regulatory Calendar</strong> (Log 10) and set the due dates for this year's FSC returns, audited financials, and quarterly reviews.</li>
+      <li>From then on, use logs as needed — rolling logs (Sanctions, SAR, File Review, Training) grow over time; per-instance logs (CDD, Remediation, Self-Assessment) follow the <em>fill → save PDF → reset</em> workflow.</li>
+    </ol>
+    <p style="margin:8px 0 0 0; font-size:12px; color:var(--text-muted);">This panel will hide automatically once any data is saved, or dismiss it now with ×.</p>
+  </div>
+</div>
+
+<!-- ============ A. GOVERNANCE STATEMENT ============ -->
+<div class="section" id="sec-gov" data-log="gov">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>A. Governance Statement</h2>
+    <span class="ref">BWC-GS</span>
+    <span class="status-badge s-na" data-status-badge>Not started</span>
+  </div>
+  <div class="section-body">
+
+    <div class="subhead">1. Entity Details and Licensing</div>
+    <table class="data">
+      <tr><th style="width:35%;">Licensee Name</th><td>Bethel Worldwide Corporation</td></tr>
+      <tr><th>Jurisdiction</th><td>British Virgin Islands</td></tr>
+      <tr><th>Regulator</th><td>BVI Financial Services Commission (FSC)</td></tr>
+      <tr><th>Licence Type</th><td>Registered Agent / Trust and Corporate Service Provider (TCSP)</td></tr>
+      <tr><th>Statutory Authority</th><td>Company Management Act, 1990</td></tr>
+      <tr><th>Registered Office</th><td><input type="text" data-f="gov_regOffice" placeholder="Bethel House, P.O. Box 4749, Road Town, Tortola, VG1110, BVI"></td></tr>
+      <tr><th>Compliance Year</th><td><input type="text" data-f="gov_year" placeholder="e.g. 2026"></td></tr>
+      <tr><th>Date of Statement</th><td><input type="date" data-f="gov_date"></td></tr>
+    </table>
+
+    <div class="subhead">2. Management Structure and Key Roles</div>
+    <p>Bethel Worldwide Corporation is a micro entity with three directors. Operational compliance work is carried out almost entirely by the Principal Director, who is supported on an as-needed basis by an external compliance consultant engaged through a sister business. Bethel has no employees.</p>
+
+    <h4 style="margin:10px 0 6px 0;">Directors</h4>
+    <table class="data">
+      <thead><tr><th>Name</th><th>Address</th><th>Telephone</th><th>Email</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><input type="text" data-f="dir1_name" value="Patra Valencia Stoutt"></td>
+          <td><input type="text" data-f="dir1_addr"></td>
+          <td><input type="text" data-f="dir1_tel" value="+1 (284) 346-7731"></td>
+          <td><input type="text" data-f="dir1_email" value="patra.stoutt@bethelworldwidebvi.com"></td>
+          <td><input type="text" data-f="dir1_role" value="Principal Director (PD)"></td>
+        </tr>
+        <tr>
+          <td><input type="text" data-f="dir2_name" value="Oren Hodge"></td>
+          <td><input type="text" data-f="dir2_addr"></td>
+          <td><input type="text" data-f="dir2_tel" value="+1 (284) 441-0609"></td>
+          <td><input type="text" data-f="dir2_email"></td>
+          <td><input type="text" data-f="dir2_role" value="Director"></td>
+        </tr>
+        <tr>
+          <td><input type="text" data-f="dir3_name"></td>
+          <td><input type="text" data-f="dir3_addr"></td>
+          <td><input type="text" data-f="dir3_tel"></td>
+          <td><input type="text" data-f="dir3_email"></td>
+          <td><input type="text" data-f="dir3_role" value="Director"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 style="margin:14px 0 6px 0;">Role Assignment</h4>
+    <table class="data">
+      <thead><tr><th>Role</th><th>Incumbent</th><th>Primary Responsibilities</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Senior Management</td>
+          <td>Patra Valencia Stoutt (PD)</td>
+          <td>Strategic direction, compliance oversight, regulatory liaison, sign-off on policies and key decisions.</td>
+        </tr>
+        <tr>
+          <td>Compliance Officer</td>
+          <td>Patra Valencia Stoutt (PD)</td>
+          <td>Development and implementation of AML/CFT/CPF policies; training; control testing; regulatory submissions.</td>
+        </tr>
+        <tr>
+          <td>Money Laundering Reporting Officer (MLRO)</td>
+          <td>Patra Valencia Stoutt (PD)</td>
+          <td>Assessment of suspicious transactions/activities; filing of SARs/STRs with the BVI FIA; internal escalation procedures.</td>
+        </tr>
+        <tr>
+          <td>External Compliance Consultant</td>
+          <td><input type="text" data-f="consultant_name" placeholder="Name / sister-business entity"></td>
+          <td>Periodic review, second opinion on higher-risk files, technical updates, training input. Engaged under a written terms-of-engagement; not a substitute for PD accountability.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info-box">
+      <strong>Concentration of roles — micro-entity rationale</strong>
+      Concentration of Senior Management, Compliance Officer and MLRO in a single individual is acknowledged. It is accepted as proportionate for a micro entity of BWC's nature, scale and complexity, and is mitigated by: (i) periodic independent review by the external consultant; (ii) annual self-assessment (Log 1); and (iii) annual internal file review (Log 5). This concentration is disclosed to the FSC in this Statement.
+    </div>
+
+    <div class="subhead">3. Governance Commitment</div>
+    <p>As a micro company licensed as a registered agent and TCSP in the British Virgin Islands, Bethel Worldwide Corporation maintains a risk-based AML/CFT/CPF compliance framework that is proportionate to the nature, size and complexity of the business, in accordance with BVI FSC guidance and the Anti-Money Laundering Terrorist Financing Code of Practice (AMLTFCOP).</p>
+    <p>The framework is:</p>
+    <ul>
+      <li><em>Practical and manageable</em> for the Principal Director to implement, monitor and maintain;</li>
+      <li><em>Regularly reviewed and tested</em> through annual self-assessment and periodic independent review;</li>
+      <li><em>Communicated</em> to auditors, competent authorities and third parties as required.</li>
+    </ul>
+
+    <div class="subhead">4. Key Compliance Responsibilities of the Principal Director</div>
+    <ol style="margin:0 0 12px 22px;">
+      <li><strong>Policy</strong> — maintain a Compliance Manual aligned with AMLTFCOP, the AML Regulations, the Regulatory Code, the FSC Act and FSC Guidance; review at least annually or on material change.</li>
+      <li><strong>CDD &amp; risk</strong> — perform risk-based CDD on all clients (simplified for low-risk; enhanced for higher-risk, including PEPs and high-risk jurisdictions); document each relationship.</li>
+      <li><strong>Beneficial ownership</strong> — maintain accurate, current BO information for all entities for which Bethel acts as registered agent; ensure corporate records are retrievable without undue delay.</li>
+      <li><strong>Sanctions</strong> — screen all clients and BOs against UN, UK OFSI and BVI designations at onboarding, at least annually, and on each new designation notice; freeze and report immediately on a positive match.</li>
+      <li><strong>SARs</strong> — identify, assess and escalate suspicious transactions/activities; file with the BVI FIA where the threshold is met; maintain an internal SAR log (Log 4).</li>
+      <li><strong>Ongoing monitoring</strong> — risk-based periodic review of active relationships (low-risk every 2–3 years; high-risk annually; trigger-based on material change).</li>
+      <li><strong>Internal control testing</strong> — annual sample review of client files (Log 5); document findings and remediation.</li>
+      <li><strong>Training</strong> — complete at least one substantive AML/CFT/CPF training event or guided review per calendar year (Log 6).</li>
+      <li><strong>Regulatory filings &amp; inspections</strong> — file all annual returns on time; respond promptly to FSC requests; prepare inspection pack (Log 7) within FSC timeframes.</li>
+      <li><strong>Record-keeping</strong> — retain CDD, transaction and client-file records for at least 5 years post-relationship.</li>
+    </ol>
+
+    <div class="subhead">5. Fit and Proper Self-Declaration (Annual)</div>
+    <p>I, <strong>Patra Valencia Stoutt</strong>, as Principal Director, confirm as of the date of this Statement that:</p>
+    <div class="check-row" style="flex-direction:column; gap:6px;">
+      <label><input type="checkbox" data-f="fp_1"> I remain a fit and proper person to hold a TCSP licence in the BVI.</label>
+      <label><input type="checkbox" data-f="fp_2"> No convictions, regulatory sanctions, civil judgments or other matters have arisen in the past 12 months that would adversely affect fitness and propriety.</label>
+      <label><input type="checkbox" data-f="fp_3"> I have not been disqualified from acting as a director or company manager in any jurisdiction.</label>
+      <label><input type="checkbox" data-f="fp_4"> I am not a politically exposed person (PEP) or a relative/associate of a PEP.</label>
+      <label><input type="checkbox" data-f="fp_5"> My financial standing is sound with no material outstanding debts or insolvency proceedings.</label>
+      <label><input type="checkbox" data-f="fp_6"> I have read and understood the relevant BVI legislation, AML/CFT/CPF regulations and FSC guidance (incl. TCSP AML/CFT Guidance, 2023 Revised).</label>
+      <label><input type="checkbox" data-f="fp_7"> I have completed at least one substantive AML/CFT/CPF training event or guided review in the past 12 months.</label>
+      <label><input type="checkbox" data-f="fp_8"> I am competent and willing to carry out all compliance responsibilities described in this Statement.</label>
+      <label><input type="checkbox" data-f="fp_9"> I am not aware of any matter that would render Bethel Worldwide Corporation non-compliant with applicable BVI laws, the AMLTFCOP, AML Regulations or FSC rules.</label>
+    </div>
+    <div class="field" style="margin-top:10px;">
+      <label>If any of the above cannot be confirmed, disclosure to the FSC and remedial action:</label>
+      <textarea data-f="fp_disclosure" rows="2"></textarea>
+    </div>
+
+    <div class="signoff">
+      <div class="subhead">Approval and Signature</div>
+      <div class="grid-2">
+        <div class="field"><label>Principal Director — Full Name</label>
+          <input type="text" data-f="signoff_name" value="Patra Valencia Stoutt"></div>
+        <div class="field"><label>Signature Date</label>
+          <input type="date" data-f="signoff_date"></div>
+        <div class="field"><label>Document Reference</label>
+          <input type="text" data-f="signoff_ref" placeholder="BWC-GS-DDMMYY"></div>
+        <div class="field"><label>Next Review Date (12 months)</label>
+          <input type="date" data-f="signoff_review"></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-secondary btn-sm" onclick="markComplete('gov')">✓ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" onclick="markIncomplete('gov')">↺ Mark In Progress</button>
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('gov')">📄 Save This Log as PDF</button>
+  </div>
+</div>
+
+<!-- ============ B. COMPLIANCE MANUAL ============ -->
+<div class="section collapsed" id="sec-man">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>B. Compliance Manual</h2>
+    <span class="ref">BWC-CM</span>
+    <span class="status-badge s-na">Reference</span>
+  </div>
+  <div class="section-body narr">
+
+    <p><strong>Bethel Worldwide Corporation — Registered Agent / TCSP — British Virgin Islands.</strong> This Manual sets out the AML/CFT/CPF policies, procedures and internal controls implemented by BWC. It is a single-author, micro-entity manual: short, practical, and intended to be operable by the Principal Director with periodic external consultant support.</p>
+
+    <div class="subhead">1. Introduction and Purpose</div>
+    <p>This Manual evidences compliance with:</p>
+    <ul>
+      <li>Anti-Money Laundering Terrorist Financing Code of Practice (AMLTFCOP)</li>
+      <li>Anti-Money Laundering Regulations (AML Regulations)</li>
+      <li>Regulatory Code</li>
+      <li>Financial Services Commission Act (FSC Act)</li>
+      <li>Proliferation Financing (Prohibition) Act, 2021</li>
+      <li>Counter-Terrorism Act, 2021</li>
+      <li>Proceeds of Criminal Conduct Act</li>
+      <li>BVI FSC Guidance for Trust and Corporate Service Providers (2023 Revised)</li>
+    </ul>
+
+    <div class="subhead">2. Business Overview and Risk Profile</div>
+    <h4>Services</h4>
+    <ul>
+      <li>Company registration and management (incorporation; registered office &amp; agent)</li>
+      <li>Corporate administration (registered office maintenance; annual returns; documents)</li>
+      <li>Company secretarial services (resolutions; corporate records; regulatory filings)</li>
+    </ul>
+    <h4>Client base</h4>
+    <ul>
+      <li>Primary: intermediaries (law firms, accountants, trust advisors) referring client companies</li>
+      <li>End-clients: beneficial owners of administered companies</li>
+      <li>Sizes: small to medium-sized private companies, family vehicles, investment structures</li>
+    </ul>
+    <h4>Institutional risk rating: <em>LOW–MODERATE</em></h4>
+    <table class="data">
+      <thead><tr><th>Risk factor</th><th>Assessment</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr><td>Geographic</td><td>LOW</td><td>Primarily established intermediaries; limited high-risk-jurisdiction exposure.</td></tr>
+        <tr><td>Customer</td><td>LOW–MODERATE</td><td>Established intermediary clients; limited PEP/unknown-party exposure.</td></tr>
+        <tr><td>Product/Service</td><td>MODERATE</td><td>Company registration/management has inherent BO-concealment risk; requires robust CDD.</td></tr>
+        <tr><td>Delivery channel</td><td>LOW</td><td>Direct relationships with known intermediaries; limited third-party introductions.</td></tr>
+        <tr><td>Size &amp; sophistication</td><td>LOW</td><td>Micro entity; manageable portfolio; less complexity than large TCSPs.</td></tr>
+      </tbody>
+    </table>
+    <p>Reviewed annually and on material change (new service lines; significant client changes).</p>
+
+    <div class="subhead">3. Regulatory Framework — Quick Reference</div>
+    <table class="data">
+      <thead><tr><th>Legislation / guidance</th><th>Key BWC requirements</th></tr></thead>
+      <tbody>
+        <tr><td>AMLTFCOP</td><td>CDD (Part III); record-keeping (Part IV); reporting (s.17/55); ongoing monitoring.</td></tr>
+        <tr><td>AML Regulations</td><td>CDD procedures; beneficial ownership; reliance on third parties; record retention (≥5 years).</td></tr>
+        <tr><td>Regulatory Code</td><td>Fit-and-proper requirements; annual returns; regulatory submissions.</td></tr>
+        <tr><td>FSC Act</td><td>Compliance with FSC rules; inspection cooperation; breach reporting.</td></tr>
+        <tr><td>Proceeds of Criminal Conduct Act</td><td>Suspicious transaction reporting.</td></tr>
+        <tr><td>Counter-Terrorism Act, 2021</td><td>Terrorist financing assessment and reporting.</td></tr>
+        <tr><td>Proliferation Financing (Prohibition) Act, 2021</td><td>Proliferation financing risk assessment and reporting.</td></tr>
+        <tr><td>TCSP AML/CFT Guidance (2023 Revised)</td><td>Core operational guidance — basis of this Manual.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="subhead">4. Governance &amp; Responsibilities</div>
+    <p>The Principal Director (PD) discharges Senior Management, Compliance Officer and MLRO functions for the entity. The concentration of these roles is documented and disclosed in the Governance Statement (Section A). External consultant support is engaged on an as-needed basis through a sister business under written terms of engagement and does not displace PD accountability.</p>
+
+    <div class="subhead">5. Customer Due Diligence (CDD) and Risk Assessment</div>
+    <h4>When CDD is performed</h4>
+    <ul>
+      <li>At the commencement of a business relationship (e.g. a new client company incorporated);</li>
+      <li>For any one-off transaction;</li>
+      <li>Upon suspicion of ML/TF/PF;</li>
+      <li>Where a relationship presents higher-than-normal risk;</li>
+      <li>Where there is doubt about existing customer information.</li>
+    </ul>
+    <h4>CDD process (per Log 2 — CDD Checklist)</h4>
+    <ol>
+      <li><strong>Identify</strong> the applicant for business — entity type and documents (passport / national ID for individuals; Certificate of Incorporation and M&amp;A for corporates; trust deed for trusts).</li>
+      <li><strong>Identify and verify beneficial owners</strong> — ≥25% holders, controllers, senior managing officials where ownership is dispersed.</li>
+      <li><strong>Understand purpose &amp; nature</strong> — source of funds, source of wealth where appropriate, business activity.</li>
+      <li><strong>Risk-rate</strong> the relationship (Low / Moderate / High) using the matrix in Annex G.</li>
+      <li><strong>Decide</strong> — accept (with measures), seek further info, or decline.</li>
+    </ol>
+    <h4>Simplified vs Enhanced CDD</h4>
+    <p><strong>SDD</strong> may be applied to clearly low-risk relationships (e.g. regulated intermediaries in equivalent jurisdictions) with documented justification. <strong>EDD</strong> is required for PEPs, high-risk jurisdictions, complex/opaque ownership and unusual transaction patterns; it includes senior-management approval, source-of-wealth verification and enhanced ongoing monitoring.</p>
+
+    <div class="subhead">6. Beneficial Ownership</div>
+    <p>BWC maintains an internal BO register for every administered entity and ensures BVI BO-system entries are kept current. Changes in BO, controllers or structure are documented and updated promptly. Red flags include: bearer-share legacy; rapid changes in ownership without commercial rationale; nominee structures without verifiable rationale; reluctance to disclose UBO.</p>
+
+    <div class="subhead">7. Sanctions Screening</div>
+    <p>Screening covers UN, UK OFSI and BVI designations. Performed at onboarding, at least annually, and immediately on a new designation notice. Positive matches trigger freezing, transaction restriction and reporting to the FSC, FIA and Governor's Office without delay (Log 3 — Sanctions Screening Log).</p>
+
+    <div class="subhead">8. Ongoing Monitoring</div>
+    <p>Risk-based review schedule: <strong>low-risk every 2–3 years; high-risk annually; trigger-based</strong> on material change. Monitoring covers changes in client profile, BO, business activities and unusual corporate-activity patterns (e.g. multiple registered-office changes without operational reason). Documented in client file and Log 5.</p>
+
+    <div class="subhead">9. Suspicious Activity</div>
+    <p>The PD (as MLRO) receives internal reports, assesses against AML/CFT/CPF indicators, and files a SAR/STR with the BVI FIA where the threshold is met. Confidentiality and the prohibition on tipping-off are observed. The internal SAR Log (Log 4) records all assessments — filed and not-filed.</p>
+
+    <div class="subhead">10. Record-Keeping and Data Security</div>
+    <p>Records retained for at least 5 years post-relationship: CDD documents; BO verification; risk assessments; transaction documents; correspondence; SAR assessments; sanctions screening evidence; training records. Held electronically with access restricted to the PD; backed up; physical originals at the registered office or secure controlled location. Destruction at end-of-period is logged.</p>
+
+    <div class="subhead">11. Third-Party Relationships and Reliance</div>
+    <p>Reliance on third-party CDD is permitted only where the third party is regulated for AML/CFT in an equivalent jurisdiction, has provided written confirmation, and CDD documentation can be obtained without delay on request. The relationship is reviewed annually.</p>
+
+    <div class="subhead">12. Quick Reference — Controls, Frequency, Evidence</div>
+    <table class="data">
+      <thead><tr><th>Function</th><th>Owner</th><th>Frequency</th><th>Where evidenced</th></tr></thead>
+      <tbody>
+        <tr><td>CDD Checklist</td><td>PD</td><td>Before client acceptance</td><td>Client file / Log 2</td></tr>
+        <tr><td>BO Verification</td><td>PD</td><td>Onboarding; updated annually</td><td>Client file / BO register</td></tr>
+        <tr><td>Risk Assessment (client)</td><td>PD</td><td>Onboarding; annual</td><td>Client file / Log 2</td></tr>
+        <tr><td>Sanctions Screening</td><td>PD</td><td>Onboarding; annual; on new designation</td><td>Log 3</td></tr>
+        <tr><td>SAR Assessment</td><td>PD (MLRO)</td><td>On suspicion</td><td>Log 4</td></tr>
+        <tr><td>File Quality Review</td><td>PD (with consultant)</td><td>Quarterly sample</td><td>Log 5</td></tr>
+        <tr><td>Training</td><td>PD</td><td>≥1 substantive event / year</td><td>Log 6</td></tr>
+        <tr><td>Inspection readiness</td><td>PD</td><td>On notice; standing pack</td><td>Log 7</td></tr>
+        <tr><td>Annual Self-Assessment</td><td>PD</td><td>Annually</td><td>Log 1</td></tr>
+        <tr><td>Regulatory Calendar</td><td>PD</td><td>Continuous</td><td>Log 10</td></tr>
+      </tbody>
+    </table>
+
+    <div class="subhead">13. Annexes</div>
+    <ul>
+      <li><strong>Annex A</strong> — Client File Index (Log 9)</li>
+      <li><strong>Annex B</strong> — CDD Checklist (Log 2)</li>
+      <li><strong>Annex C</strong> — Sanctions Screening Log (Log 3)</li>
+      <li><strong>Annex D</strong> — Internal SAR Log (Log 4)</li>
+      <li><strong>Annex E</strong> — File Review Log (Log 5)</li>
+      <li><strong>Annex F</strong> — Training Log (Log 6)</li>
+      <li><strong>Annex G</strong> — Risk Assessment Matrix (Section D)</li>
+      <li><strong>Annex H</strong> — Remediation Plan (Log 8)</li>
+    </ul>
+
+  </div>
+  <div class="section-footer">
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('man')">📄 Save Manual as PDF</button>
+  </div>
+</div>
+
+<!-- ============ LOG 1 — ANNUAL SELF-ASSESSMENT ============ -->
+<div class="section collapsed" id="log-sa" data-log="sa">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>Log 1 — Annual Self-Assessment Checklist</h2>
+    <span class="ref">BWC-SA</span>
+    <span class="status-badge s-na" data-status-badge>Not started</span>
+  </div>
+  <div class="section-body">
+    <p>Self-certification by the Principal Director that the BWC compliance framework is in place and operating effectively. Complete once per calendar year (or after a material change). The completed Log is filed in the inspection pack.</p>
+    <div class="info-box"><strong>Workflow</strong>Fill in for the current year → <em>Save This Log as PDF</em> (file the signed PDF in the annual compliance folder) → <em>Reset for New Year</em> to clear the form for next year. The saved PDFs are the historical record.</div>
+
+    <div class="grid-3">
+      <div class="field"><label>Assessment period</label>
+        <input type="text" data-f="sa_period" placeholder="e.g. 1 Jan – 31 Dec 2026"></div>
+      <div class="field"><label>Date completed</label>
+        <input type="date" data-f="sa_date"></div>
+      <div class="field"><label>Completed by</label>
+        <input type="text" data-f="sa_by" value="Patra Stoutt (PD)"></div>
+    </div>
+
+    <div class="subhead">A. Governance</div>
+    <table class="data">
+      <thead><tr><th style="width:55%;">Item</th><th>Status</th><th>Evidence / Reference</th></tr></thead>
+      <tbody>
+        <tr><td>Governance Statement reviewed, signed and dated within the last 12 months</td>
+          <td><select data-f="sa_g1_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_g1_evid"></td></tr>
+        <tr><td>Roles and responsibilities up to date; concentration of roles disclosed</td>
+          <td><select data-f="sa_g2_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_g2_evid"></td></tr>
+        <tr><td>External consultant engagement documented and current</td>
+          <td><select data-f="sa_g3_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_g3_evid"></td></tr>
+      </tbody>
+    </table>
+
+    <div class="subhead">B. CDD &amp; Risk</div>
+    <table class="data">
+      <thead><tr><th style="width:55%;">Item</th><th>Status</th><th>Evidence / Reference</th></tr></thead>
+      <tbody>
+        <tr><td>CDD Checklist completed for every new client onboarded in the period</td>
+          <td><select data-f="sa_c1_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_c1_evid"></td></tr>
+        <tr><td>BO information current for all administered entities</td>
+          <td><select data-f="sa_c2_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_c2_evid"></td></tr>
+        <tr><td>High-risk client reviews completed annually</td>
+          <td><select data-f="sa_c3_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_c3_evid"></td></tr>
+        <tr><td>Low/Moderate client reviews on schedule (2–3 yr cycle)</td>
+          <td><select data-f="sa_c4_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_c4_evid"></td></tr>
+      </tbody>
+    </table>
+
+    <div class="subhead">C. Sanctions &amp; SARs</div>
+    <table class="data">
+      <thead><tr><th style="width:55%;">Item</th><th>Status</th><th>Evidence / Reference</th></tr></thead>
+      <tbody>
+        <tr><td>Sanctions screening performed for all clients/BOs in the period</td>
+          <td><select data-f="sa_s1_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_s1_evid" placeholder="Log 3 entries"></td></tr>
+        <tr><td>Any positive matches actioned (freeze/report) and documented</td>
+          <td><select data-f="sa_s2_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_s2_evid"></td></tr>
+        <tr><td>Internal SAR Log maintained; all suspicions assessed and documented</td>
+          <td><select data-f="sa_s3_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_s3_evid" placeholder="Log 4 entries"></td></tr>
+      </tbody>
+    </table>
+
+    <div class="subhead">D. Internal Testing, Training, Filings</div>
+    <table class="data">
+      <thead><tr><th style="width:55%;">Item</th><th>Status</th><th>Evidence / Reference</th></tr></thead>
+      <tbody>
+        <tr><td>At least one quarterly file review completed in each quarter of the period</td>
+          <td><select data-f="sa_t1_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_t1_evid" placeholder="Log 5 entries"></td></tr>
+        <tr><td>≥1 substantive AML/CFT/CPF training event/review completed</td>
+          <td><select data-f="sa_t2_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_t2_evid" placeholder="Log 6 entry"></td></tr>
+        <tr><td>All required FSC/FIA returns filed on time</td>
+          <td><select data-f="sa_t3_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_t3_evid" placeholder="Log 10 entries"></td></tr>
+        <tr><td>Record-keeping retention reviewed; no records destroyed in breach of 5-yr rule</td>
+          <td><select data-f="sa_t4_status"><option>—</option><option>Yes</option><option>Partial</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="sa_t4_evid"></td></tr>
+      </tbody>
+    </table>
+
+    <div class="subhead">E. Overall Conclusion</div>
+    <div class="field"><label>Material weaknesses identified?</label>
+      <div class="radio-row">
+        <label><input type="radio" name="sa_concl" value="No" data-f="sa_concl"> No</label>
+        <label><input type="radio" name="sa_concl" value="Yes" data-f="sa_concl"> Yes — remediation required (open a Remediation Plan, Log 8)</label>
+      </div>
+    </div>
+    <div class="field"><label>Summary commentary &amp; remedial actions</label>
+      <textarea data-f="sa_summary" rows="4"></textarea>
+    </div>
+
+    <div class="signoff">
+      <div class="subhead">Sign-Off</div>
+      <div class="grid-2">
+        <div class="field"><label>Signed (Principal Director)</label>
+          <input type="text" data-f="sa_signoff_name" value="Patra Stoutt"></div>
+        <div class="field"><label>Date</label>
+          <input type="date" data-f="sa_signoff_date"></div>
+      </div>
+    </div>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-secondary btn-sm" onclick="markComplete('sa')">✓ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" onclick="markIncomplete('sa')">↺ Mark In Progress</button>
+    <button class="btn btn-danger btn-sm" onclick="resetLog('sa','Annual Self-Assessment')" title="Clear for next year — save the current year as PDF first">⟲ Reset for New Year</button>
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('sa')">📄 Save This Log as PDF</button>
+  </div>
+</div>
+
+<!-- ============ LOG 2 — CDD CHECKLIST ============ -->
+<div class="section collapsed" id="log-cdd" data-log="cdd">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>Log 2 — CDD Checklist (per Client)</h2>
+    <span class="ref">BWC-CDD</span>
+    <span class="status-badge s-na" data-status-badge>Not started</span>
+  </div>
+  <div class="section-body">
+    <p>Complete for every new client relationship before acceptance, and revisit on periodic review or material change. One checklist per client.</p>
+    <div class="info-box"><strong>Workflow — one CDD record per client</strong>Fill in for one client → <em>Save This Log as PDF</em> (file in that client's folder in RegiVault or local archive) → <em>Reset for Next Client</em> to clear the form for the next one. Each saved PDF is a self-contained CDD record for that client.</div>
+
+    <div class="subhead">Client Identification</div>
+    <div class="grid-3">
+      <div class="field"><label>Client (entity name or individual)</label>
+        <input type="text" data-f="cdd_client"></div>
+      <div class="field"><label>BVI Company # (if applicable)</label>
+        <input type="text" data-f="cdd_coNum"></div>
+      <div class="field"><label>Date of CDD</label>
+        <input type="date" data-f="cdd_date"></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Entity type</label>
+        <select data-f="cdd_type">
+          <option value="">—</option>
+          <option>Individual</option>
+          <option>BVI Business Company</option>
+          <option>Foreign company</option>
+          <option>Trust / arrangement</option>
+          <option>Partnership</option>
+          <option>Other</option>
+        </select></div>
+      <div class="field"><label>Introduced by</label>
+        <input type="text" data-f="cdd_intro" placeholder="Direct / Intermediary name"></div>
+    </div>
+
+    <div class="subhead">Step 1 — ID Documents Obtained</div>
+    <div class="check-row" style="flex-direction:column; gap:6px;">
+      <label><input type="checkbox" data-f="cdd_id_passport"> Passport / national ID (individuals)</label>
+      <label><input type="checkbox" data-f="cdd_id_addr"> Proof of address (utility/bank, &lt;3 months)</label>
+      <label><input type="checkbox" data-f="cdd_id_coi"> Certificate of Incorporation (corporates)</label>
+      <label><input type="checkbox" data-f="cdd_id_ma"> Memorandum &amp; Articles / equivalent constitutional document</label>
+      <label><input type="checkbox" data-f="cdd_id_dir"> Register of Directors</label>
+      <label><input type="checkbox" data-f="cdd_id_sh"> Register of Members / Shareholders</label>
+      <label><input type="checkbox" data-f="cdd_id_trust"> Trust deed / equivalent (trusts only)</label>
+      <label><input type="checkbox" data-f="cdd_id_gs"> Good Standing certificate (if pre-existing entity)</label>
+    </div>
+    <div class="field"><label>Notes</label>
+      <textarea data-f="cdd_id_notes" rows="2"></textarea></div>
+
+    <div class="subhead">Step 2 — Beneficial Owners (≥25% / controllers / SMOs)</div>
+    <table class="data">
+      <thead><tr><th>Name</th><th>Nationality</th><th>DOB</th><th>%</th><th>Type</th><th>ID verified</th><th></th></tr></thead>
+      <tbody id="cdd_bo_rows"></tbody>
+    </table>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="addBORow()">+ Add BO</button>
+
+    <div class="subhead">Step 3 — Purpose, Source and Background</div>
+    <div class="grid-2">
+      <div class="field"><label>Purpose &amp; nature of relationship</label>
+        <textarea data-f="cdd_purpose" rows="2"></textarea></div>
+      <div class="field"><label>Business activity</label>
+        <textarea data-f="cdd_activity" rows="2"></textarea></div>
+      <div class="field"><label>Source of funds</label>
+        <textarea data-f="cdd_sof" rows="2"></textarea></div>
+      <div class="field"><label>Source of wealth (EDD; high-risk only)</label>
+        <textarea data-f="cdd_sow" rows="2"></textarea></div>
+    </div>
+
+    <div class="subhead">Step 4 — Risk Rating (Annex G matrix)</div>
+    <div class="grid-3">
+      <div class="field"><label>Geographic risk</label>
+        <select data-f="cdd_r_geo"><option>—</option><option>Low</option><option>Moderate</option><option>High</option></select></div>
+      <div class="field"><label>Customer risk</label>
+        <select data-f="cdd_r_cust"><option>—</option><option>Low</option><option>Moderate</option><option>High</option></select></div>
+      <div class="field"><label>Product/service risk</label>
+        <select data-f="cdd_r_prod"><option>—</option><option>Low</option><option>Moderate</option><option>High</option></select></div>
+      <div class="field"><label>Ownership/structure risk</label>
+        <select data-f="cdd_r_own"><option>—</option><option>Low</option><option>Moderate</option><option>High</option></select></div>
+      <div class="field"><label>PEP status</label>
+        <select data-f="cdd_r_pep"><option>—</option><option>None</option><option>Domestic PEP</option><option>Foreign PEP</option><option>Family/associate of PEP</option></select></div>
+      <div class="field"><label><strong>Overall risk rating</strong></label>
+        <select data-f="cdd_r_overall"><option>—</option><option>Low (SDD eligible)</option><option>Moderate (standard CDD)</option><option>High (EDD required)</option></select></div>
+    </div>
+    <div class="field"><label>Risk rationale</label>
+      <textarea data-f="cdd_r_rationale" rows="2"></textarea></div>
+
+    <div class="subhead">Step 5 — Sanctions &amp; Adverse-Media Screening (at onboarding)</div>
+    <div class="grid-3">
+      <div class="field"><label>Date screened</label><input type="date" data-f="cdd_scr_date"></div>
+      <div class="field"><label>Lists checked</label>
+        <input type="text" data-f="cdd_scr_lists" placeholder="UN, UK OFSI, BVI"></div>
+      <div class="field"><label>Result</label>
+        <select data-f="cdd_scr_result"><option>—</option><option>No match</option><option>False positive (documented)</option><option>Positive — action taken</option></select></div>
+    </div>
+    <div class="field"><label>Screening notes / link to Log 3 entry</label>
+      <textarea data-f="cdd_scr_notes" rows="2"></textarea></div>
+
+    <div class="subhead">Acceptance Decision</div>
+    <div class="field"><label>Decision</label>
+      <div class="radio-row">
+        <label><input type="radio" name="cdd_decision" value="Accept" data-f="cdd_decision"> Accept</label>
+        <label><input type="radio" name="cdd_decision" value="Accept (EDD)" data-f="cdd_decision"> Accept — with EDD conditions</label>
+        <label><input type="radio" name="cdd_decision" value="Further info" data-f="cdd_decision"> Seek further information</label>
+        <label><input type="radio" name="cdd_decision" value="Decline" data-f="cdd_decision"> Decline</label>
+      </div>
+    </div>
+    <div class="field"><label>Decision rationale</label>
+      <textarea data-f="cdd_decision_rationale" rows="2"></textarea></div>
+    <div class="grid-2">
+      <div class="field"><label>EDD measures applied (if any)</label>
+        <textarea data-f="cdd_edd" rows="2"></textarea></div>
+      <div class="field"><label>Next periodic review date</label>
+        <input type="date" data-f="cdd_next_review"></div>
+    </div>
+
+    <div class="signoff">
+      <div class="subhead">Sign-Off</div>
+      <div class="grid-2">
+        <div class="field"><label>Performed by</label>
+          <input type="text" data-f="cdd_perf" value="Patra Stoutt (PD)"></div>
+        <div class="field"><label>Date</label>
+          <input type="date" data-f="cdd_perf_date"></div>
+        <div class="field"><label>Reviewed by (consultant — high-risk only)</label>
+          <input type="text" data-f="cdd_rev"></div>
+        <div class="field"><label>Review date</label>
+          <input type="date" data-f="cdd_rev_date"></div>
+      </div>
+    </div>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-secondary btn-sm" onclick="markComplete('cdd')">✓ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" onclick="markIncomplete('cdd')">↺ Mark In Progress</button>
+    <button class="btn btn-danger btn-sm" onclick="resetLog('cdd','CDD Checklist')" title="Clear for next client — save the current one as PDF first">⟲ Reset for Next Client</button>
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('cdd')">📄 Save This Log as PDF</button>
+  </div>
+</div>
+
+<!-- ============ LOG 3 — SANCTIONS SCREENING ============ -->
+<div class="section collapsed" id="log-sanc" data-log="sanc">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>Log 3 — Sanctions Screening Log</h2>
+    <span class="ref">BWC-SANC</span>
+    <span class="status-badge s-na" data-status-badge>Not started</span>
+  </div>
+  <div class="section-body">
+    <p>Single rolling log of every sanctions check performed against UN, UK OFSI and BVI designations — onboarding, annual review, and on each new designation notice. Positive matches and false positives are documented in the same row.</p>
+
+    <div class="grid-3">
+      <div class="field"><label>Period covered</label>
+        <input type="text" data-f="sanc_period" placeholder="e.g. 2026"></div>
+      <div class="field"><label>Maintained by</label>
+        <input type="text" data-f="sanc_owner" value="Patra Stoutt (PD)"></div>
+      <div class="field"><label>Source lists used</label>
+        <input type="text" data-f="sanc_lists" value="UN; UK OFSI; BVI"></div>
+    </div>
+
+    <table class="data">
+      <thead>
+        <tr>
+          <th style="width:90px;">Date</th>
+          <th>Subject (client / BO)</th>
+          <th>Trigger</th>
+          <th>Lists</th>
+          <th>Result</th>
+          <th>Action / file ref</th>
+          <th>By</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="sanc_rows"></tbody>
+    </table>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="addSancRow()">+ Add Row</button>
+
+    <div class="warn-box" style="margin-top:14px;">
+      <strong>Positive match — required actions</strong>
+      Freeze assets / restrict transactions immediately; do not tip off the subject; report to the FSC, FIA and Governor's Office without delay; record actions and references in the row above and open a Remediation Plan (Log 8) if a control failure is identified.
+    </div>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-secondary btn-sm" onclick="markComplete('sanc')">✓ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" onclick="markIncomplete('sanc')">↺ Mark In Progress</button>
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('sanc')">📄 Save This Log as PDF</button>
+  </div>
+</div>
+
+<!-- ============ LOG 4 — INTERNAL SAR LOG ============ -->
+<div class="section collapsed" id="log-sar" data-log="sar">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>Log 4 — Internal SAR Log</h2>
+    <span class="ref">BWC-SAR</span>
+    <span class="status-badge s-na" data-status-badge>Not started</span>
+  </div>
+  <div class="section-body">
+    <p>Confidential. Every internal suspicion is logged — whether or not it results in a filing with the BVI Financial Investigation Agency (FIA). Filed in a restricted location. Disclosure only to the FIA, FSC or law-enforcement on lawful request.</p>
+
+    <div class="warn-box">
+      <strong>Tipping-off prohibition</strong>
+      The MLRO and any other person aware of an internal SAR or external filing must not disclose its existence or content to the subject or any third party. Breach is a criminal offence under the Proceeds of Criminal Conduct Act.
+    </div>
+
+    <div class="grid-3">
+      <div class="field"><label>Year</label>
+        <input type="text" data-f="sar_year" placeholder="e.g. 2026"></div>
+      <div class="field"><label>MLRO</label>
+        <input type="text" data-f="sar_mlro" value="Patra Stoutt (PD)"></div>
+      <div class="field"><label>Filings made (count)</label>
+        <input type="number" data-f="sar_count" min="0" placeholder="0"></div>
+    </div>
+
+    <table class="data">
+      <thead>
+        <tr>
+          <th style="width:60px;">SAR #</th>
+          <th style="width:95px;">Date raised</th>
+          <th>Subject</th>
+          <th>Trigger / red flag</th>
+          <th>MLRO assessment</th>
+          <th>Decision</th>
+          <th style="width:100px;">FIA ref (if filed)</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="sar_rows"></tbody>
+    </table>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="addSARRow()">+ Add SAR Entry</button>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-secondary btn-sm" onclick="markComplete('sar')">✓ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" onclick="markIncomplete('sar')">↺ Mark In Progress</button>
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('sar')">📄 Save This Log as PDF</button>
+  </div>
+</div>
+
+<!-- ============ LOG 5 — FILE REVIEW LOG ============ -->
+<div class="section collapsed" id="log-fr" data-log="fr">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>Log 5 — File Review Log</h2>
+    <span class="ref">BWC-FR</span>
+    <span class="status-badge s-na" data-status-badge>Not started</span>
+  </div>
+  <div class="section-body">
+    <p>Quarterly sample review of client files to test the operating effectiveness of CDD, BO and ongoing-monitoring controls. Sample at least 5% of active clients per quarter, weighted toward higher-risk. Independent review of high-risk samples by the external consultant where available.</p>
+
+    <div class="grid-3">
+      <div class="field"><label>Year</label>
+        <input type="text" data-f="fr_year" placeholder="e.g. 2026"></div>
+      <div class="field"><label>Reviewer (PD)</label>
+        <input type="text" data-f="fr_reviewer" value="Patra Stoutt (PD)"></div>
+      <div class="field"><label>Independent reviewer (consultant)</label>
+        <input type="text" data-f="fr_ind"></div>
+    </div>
+
+    <table class="data">
+      <thead>
+        <tr>
+          <th style="width:80px;">Quarter</th>
+          <th style="width:100px;">Review date</th>
+          <th>Client / sample</th>
+          <th>Risk</th>
+          <th>Findings</th>
+          <th>Remediation / status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="fr_rows"></tbody>
+    </table>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="addFRRow()">+ Add Review Entry</button>
+
+    <div class="field" style="margin-top:14px;"><label>Annual conclusion on internal control effectiveness</label>
+      <textarea data-f="fr_conclusion" rows="3"></textarea>
+    </div>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-secondary btn-sm" onclick="markComplete('fr')">✓ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" onclick="markIncomplete('fr')">↺ Mark In Progress</button>
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('fr')">📄 Save This Log as PDF</button>
+  </div>
+</div>
+
+<!-- ============ LOG 6 — TRAINING LOG ============ -->
+<div class="section collapsed" id="log-tr" data-log="tr">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>Log 6 — Training Log</h2>
+    <span class="ref">BWC-TR</span>
+    <span class="status-badge s-na" data-status-badge>Not started</span>
+  </div>
+  <div class="section-body">
+    <p>The PD completes at least one substantive AML/CFT/CPF training event or guided review each calendar year, plus any topical refreshers (typology updates, sanctions list changes, new guidance). Evidence is filed (certificate / agenda / notes).</p>
+
+    <div class="grid-2">
+      <div class="field"><label>Year</label>
+        <input type="text" data-f="tr_year" placeholder="e.g. 2026"></div>
+      <div class="field"><label>Annual requirement met?</label>
+        <select data-f="tr_met"><option>—</option><option>Yes</option><option>No — see remediation</option></select></div>
+    </div>
+
+    <table class="data">
+      <thead>
+        <tr>
+          <th style="width:100px;">Date</th>
+          <th>Attendee</th>
+          <th>Course / event / review topic</th>
+          <th>Provider</th>
+          <th style="width:80px;">Hours</th>
+          <th>Evidence held</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tr_rows"></tbody>
+    </table>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="addTrRow()">+ Add Training Entry</button>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-secondary btn-sm" onclick="markComplete('tr')">✓ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" onclick="markIncomplete('tr')">↺ Mark In Progress</button>
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('tr')">📄 Save This Log as PDF</button>
+  </div>
+</div>
+
+<!-- ============ LOG 7 — INSPECTION PACK CHECKLIST ============ -->
+<div class="section collapsed" id="log-insp" data-log="insp">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>Log 7 — Inspection Pack Checklist</h2>
+    <span class="ref">BWC-INSP</span>
+    <span class="status-badge s-na" data-status-badge>Not started</span>
+  </div>
+  <div class="section-body">
+    <p>Standing pack of documents to be ready at all times so that, on FSC notice, the package can be uploaded within the FSC's stated timeframe. Each item references the source log or document.</p>
+
+    <div class="grid-3">
+      <div class="field"><label>Pack last refreshed</label>
+        <input type="date" data-f="insp_refreshed"></div>
+      <div class="field"><label>FSC inspection notice date (if active)</label>
+        <input type="date" data-f="insp_notice"></div>
+      <div class="field"><label>Required upload by</label>
+        <input type="date" data-f="insp_due"></div>
+    </div>
+
+    <table class="data">
+      <thead><tr><th style="width:55%;">Document</th><th>Source</th><th>Ready?</th><th>Location / link</th></tr></thead>
+      <tbody>
+        <tr><td>Governance Statement (current, signed)</td><td>Section A</td>
+          <td><select data-f="insp_d1_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d1_loc"></td></tr>
+        <tr><td>Compliance Manual (current version)</td><td>Section B</td>
+          <td><select data-f="insp_d2_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d2_loc"></td></tr>
+        <tr><td>Most recent Annual Self-Assessment (signed)</td><td>Log 1</td>
+          <td><select data-f="insp_d3_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d3_loc"></td></tr>
+        <tr><td>CDD Checklists — sample of clients onboarded in period</td><td>Log 2</td>
+          <td><select data-f="insp_d4_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d4_loc"></td></tr>
+        <tr><td>Sanctions Screening Log (current year)</td><td>Log 3</td>
+          <td><select data-f="insp_d5_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d5_loc"></td></tr>
+        <tr><td>Internal SAR Log (current year)</td><td>Log 4</td>
+          <td><select data-f="insp_d6_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d6_loc"></td></tr>
+        <tr><td>File Review Log — last 4 quarters</td><td>Log 5</td>
+          <td><select data-f="insp_d7_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d7_loc"></td></tr>
+        <tr><td>Training Log (current year) + evidence</td><td>Log 6</td>
+          <td><select data-f="insp_d8_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d8_loc"></td></tr>
+        <tr><td>Client File Index (master list)</td><td>Log 9</td>
+          <td><select data-f="insp_d9_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d9_loc"></td></tr>
+        <tr><td>Regulatory Calendar — current year</td><td>Log 10</td>
+          <td><select data-f="insp_d10_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d10_loc"></td></tr>
+        <tr><td>Any open Remediation Plans</td><td>Log 8</td>
+          <td><select data-f="insp_d11_r"><option>—</option><option>Yes</option><option>No</option><option>N/A</option></select></td>
+          <td><input type="text" data-f="insp_d11_loc"></td></tr>
+        <tr><td>Fit-and-Proper declarations (PD)</td><td>Section A §5</td>
+          <td><select data-f="insp_d12_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d12_loc"></td></tr>
+        <tr><td>External consultant engagement letter</td><td>Section A §2</td>
+          <td><select data-f="insp_d13_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d13_loc"></td></tr>
+        <tr><td>Annual FSC AML/CFT return — most recent</td><td>External</td>
+          <td><select data-f="insp_d14_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d14_loc"></td></tr>
+        <tr><td>Audited financial statements (if licensee req)</td><td>External</td>
+          <td><select data-f="insp_d15_r"><option>—</option><option>Yes</option><option>No</option></select></td>
+          <td><input type="text" data-f="insp_d15_loc"></td></tr>
+      </tbody>
+    </table>
+
+    <div class="field"><label>Submission notes</label>
+      <textarea data-f="insp_notes" rows="3"></textarea></div>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-secondary btn-sm" onclick="markComplete('insp')">✓ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" onclick="markIncomplete('insp')">↺ Mark In Progress</button>
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('insp')">📄 Save This Log as PDF</button>
+  </div>
+</div>
+
+<!-- ============ LOG 8 — REMEDIATION PLAN ============ -->
+<div class="section collapsed" id="log-rem" data-log="rem">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>Log 8 — Remediation Plan</h2>
+    <span class="ref">BWC-REM</span>
+    <span class="status-badge s-na" data-status-badge>Not started</span>
+  </div>
+  <div class="section-body">
+    <p>Opened whenever an inspection finding, self-assessment, file-review test or other source identifies a compliance deficiency. One plan per deficiency cluster; tracked through to closure with evidence retained.</p>
+    <div class="info-box"><strong>Workflow — one plan per deficiency</strong>Open a plan, work it through to closure → <em>Save This Log as PDF</em> (file in the remediation archive with the closure date in the filename) → <em>Reset for Next Finding</em> when you need to open the next one. The saved PDFs are the audit trail of every plan opened, worked and closed.</div>
+
+    <div class="grid-3">
+      <div class="field"><label>Plan reference</label>
+        <input type="text" data-f="rem_ref" placeholder="RP-2026-001"></div>
+      <div class="field"><label>Plan owner</label>
+        <input type="text" data-f="rem_owner" value="Patra Stoutt (PD)"></div>
+      <div class="field"><label>Date opened</label>
+        <input type="date" data-f="rem_opened"></div>
+    </div>
+
+    <div class="subhead">Source of Finding</div>
+    <div class="check-row">
+      <label><input type="checkbox" data-f="rem_src_fsc"> FSC inspection</label>
+      <label><input type="checkbox" data-f="rem_src_int"> Internal control testing</label>
+      <label><input type="checkbox" data-f="rem_src_sa"> Annual self-assessment</label>
+      <label><input type="checkbox" data-f="rem_src_oth"> Other</label>
+    </div>
+    <div class="field"><label>Source detail / reference</label>
+      <input type="text" data-f="rem_src_ref"></div>
+
+    <div class="subhead">Deficiency &amp; Risk</div>
+    <div class="field"><label>Deficiency description</label>
+      <textarea data-f="rem_desc" rows="3"></textarea></div>
+    <div class="grid-2">
+      <div class="field"><label>Regulatory reference (legislation / guidance)</label>
+        <input type="text" data-f="rem_reg"></div>
+      <div class="field"><label>Specific requirement not met</label>
+        <input type="text" data-f="rem_req"></div>
+    </div>
+    <div class="field"><label>Root cause</label>
+      <textarea data-f="rem_root" rows="2"></textarea></div>
+    <div class="grid-2">
+      <div class="field"><label>Risk impact</label>
+        <select data-f="rem_risk">
+          <option>—</option>
+          <option>High — ML/TF/PF or regulatory sanction exposure</option>
+          <option>Moderate — possible regulatory action / control failure</option>
+          <option>Low — minor gap; limited exposure</option>
+        </select></div>
+      <div class="field"><label>Priority</label>
+        <select data-f="rem_prio"><option>—</option><option>High</option><option>Moderate</option><option>Low</option></select></div>
+    </div>
+
+    <div class="subhead">Remedial Actions</div>
+    <table class="data">
+      <thead><tr><th style="width:50px;">#</th><th>Action</th><th>Owner</th><th style="width:110px;">Target date</th><th>Status</th><th></th></tr></thead>
+      <tbody id="rem_rows"></tbody>
+    </table>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="addRemRow()">+ Add Action</button>
+
+    <div class="subhead">Closure</div>
+    <div class="grid-2">
+      <div class="field"><label>Success criteria / completion evidence</label>
+        <textarea data-f="rem_success" rows="3"></textarea></div>
+      <div class="field"><label>Ongoing monitoring to prevent recurrence</label>
+        <textarea data-f="rem_monitor" rows="3"></textarea></div>
+      <div class="field"><label>Date closed</label>
+        <input type="date" data-f="rem_closed"></div>
+      <div class="field"><label>Closed by</label>
+        <input type="text" data-f="rem_closedby" value="Patra Stoutt (PD)"></div>
+    </div>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-secondary btn-sm" onclick="markComplete('rem')">✓ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" onclick="markIncomplete('rem')">↺ Mark In Progress</button>
+    <button class="btn btn-danger btn-sm" onclick="resetLog('rem','Remediation Plan')" title="Clear for next finding — save the closed plan as PDF first">⟲ Reset for Next Finding</button>
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('rem')">📄 Save This Log as PDF</button>
+  </div>
+</div>
+
+<!-- ============ LOG 9 — CLIENT FILE INDEX ============ -->
+<div class="section collapsed" id="log-cfi" data-log="cfi">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>Log 9 — Client File Index</h2>
+    <span class="ref">BWC-CFI</span>
+    <span class="status-badge s-na" data-status-badge>Not started</span>
+  </div>
+  <div class="section-body">
+    <p>Master index of every entity for which BWC acts as Registered Agent / TCSP. Maintained as the operational record alongside the RegiVault compliance database. This Log is the inspection-ready snapshot.</p>
+
+    <div class="grid-3">
+      <div class="field"><label>Index date</label>
+        <input type="date" data-f="cfi_date"></div>
+      <div class="field"><label>Total active clients</label>
+        <input type="number" data-f="cfi_total" min="0"></div>
+      <div class="field"><label>Maintained by</label>
+        <input type="text" data-f="cfi_by" value="Patra Stoutt (PD)"></div>
+    </div>
+
+    <table class="data">
+      <thead>
+        <tr>
+          <th style="width:50px;">#</th>
+          <th>Company name</th>
+          <th style="width:90px;">BVI Co. #</th>
+          <th style="width:100px;">Incorporated</th>
+          <th>Status</th>
+          <th>Risk</th>
+          <th style="width:100px;">Last CDD</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="cfi_rows"></tbody>
+    </table>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="addCFIRow()">+ Add Client</button>
+
+    <div class="info-box" style="margin-top:14px;">
+      <strong>RegiVault / database cross-reference</strong>
+      The RegiVault compliance database is the system of record. This Log is the printable extract for inspection use. If the two diverge, the database is authoritative and this Log is refreshed from it.
+    </div>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-secondary btn-sm" onclick="markComplete('cfi')">✓ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" onclick="markIncomplete('cfi')">↺ Mark In Progress</button>
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('cfi')">📄 Save This Log as PDF</button>
+  </div>
+</div>
+
+<!-- ============ LOG 10 — REGULATORY CALENDAR ============ -->
+<div class="section collapsed" id="log-cal" data-log="cal">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>Log 10 — Regulatory Calendar</h2>
+    <span class="ref">BWC-CAL</span>
+    <span class="status-badge s-na" data-status-badge>Not started</span>
+  </div>
+  <div class="section-body">
+    <p>Annual filings, returns, screenings and reviews owed by BWC as licensee and as Registered Agent for administered clients. Pre-populated with the standard recurring items; edit/extend per year.</p>
+
+    <div class="grid-3">
+      <div class="field"><label>Calendar year</label>
+        <input type="text" data-f="cal_year" placeholder="e.g. 2026"></div>
+      <div class="field"><label>Maintained by</label>
+        <input type="text" data-f="cal_by" value="Patra Stoutt (PD)"></div>
+      <div class="field"><label>Last refreshed</label>
+        <input type="date" data-f="cal_refreshed"></div>
+    </div>
+
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Obligation</th>
+          <th>Owed to</th>
+          <th style="width:110px;">Due</th>
+          <th>Frequency</th>
+          <th>Status</th>
+          <th>Reference / link</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="cal_rows"></tbody>
+    </table>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="addCalRow()">+ Add Obligation</button>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="seedCalendar()">↻ Reset to Default Items</button>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-secondary btn-sm" onclick="markComplete('cal')">✓ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" onclick="markIncomplete('cal')">↺ Mark In Progress</button>
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('cal')">📄 Save This Log as PDF</button>
+  </div>
+</div>
+
+<!-- ============ D. ANNEX G — RISK MATRIX ============ -->
+<div class="section collapsed" id="sec-ann">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="toggle">▼</span>
+    <h2>D. Annex G — Risk Assessment Matrix</h2>
+    <span class="ref">BWC-AN-G</span>
+    <span class="status-badge s-na">Reference</span>
+  </div>
+  <div class="section-body narr">
+    <p>Reference matrix used in Log 2 (CDD Checklist) to risk-rate each client relationship.</p>
+    <table class="data">
+      <thead><tr><th>Risk factor</th><th>Low</th><th>Moderate</th><th>High</th></tr></thead>
+      <tbody>
+        <tr><td>Geographic</td>
+          <td>Established jurisdictions; no sanctions exposure</td>
+          <td>Emerging markets; limited high-risk exposure</td>
+          <td>Sanctioned jurisdictions; weak AML/CFT regimes</td></tr>
+        <tr><td>Customer</td>
+          <td>Clear identity; established intermediary; no PEP</td>
+          <td>Some complexity; moderate adverse info; emerging PEP</td>
+          <td>PEP / family; extensive adverse media; opacity</td></tr>
+        <tr><td>Product / Service</td>
+          <td>Basic company registration; direct client</td>
+          <td>Complex structures; frequent changes</td>
+          <td>Bearer-share legacy; complex trusts; frequent restructuring</td></tr>
+        <tr><td>Ownership</td>
+          <td>Direct, clear BO; no nominees</td>
+          <td>Indirect structure; some nominees; manageable complexity</td>
+          <td>Multiple layers; shell indicators; straw shareholders</td></tr>
+        <tr><td>Delivery / channel</td>
+          <td>Direct, known intermediary</td>
+          <td>Non-face-to-face; new intermediary</td>
+          <td>Anonymous; unverifiable introduction</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Rating rule.</strong> The overall rating defaults to the highest individual factor; an EDD case requires senior-management approval and enhanced ongoing monitoring.</p>
+  </div>
+  <div class="section-footer">
+    <span class="filler"></span>
+    <button class="btn btn-success btn-sm" onclick="exportLogPDF('ann')">📄 Save Annex as PDF</button>
+  </div>
+</div>
+
+</div><!-- /.container -->
+
+<script>
+/* =====================================================
+   BWC Compliance Package — client-side persistence & PDF
+   - localStorage auto-save every 30s
+   - manual Save / Load / Clear
+   - per-log status (not started / in progress / complete)
+   - per-log PDF export and full-package PDF export
+   ===================================================== */
+
+const STORAGE_KEY = 'bwc_compliance_pkg_v1';
+
+/* The complete list of logs in display order. Used for:
+   - the status dashboard tiles
+   - the package PDF export
+   - mapping a status badge per section */
+const LOGS = [
+  { key: 'gov',  id: 'sec-gov',  name: 'A. Governance Statement' },
+  { key: 'sa',   id: 'log-sa',   name: 'Log 1 — Annual Self-Assessment' },
+  { key: 'cdd',  id: 'log-cdd',  name: 'Log 2 — CDD Checklist' },
+  { key: 'sanc', id: 'log-sanc', name: 'Log 3 — Sanctions Screening Log' },
+  { key: 'sar',  id: 'log-sar',  name: 'Log 4 — Internal SAR Log' },
+  { key: 'fr',   id: 'log-fr',   name: 'Log 5 — File Review Log' },
+  { key: 'tr',   id: 'log-tr',   name: 'Log 6 — Training Log' },
+  { key: 'insp', id: 'log-insp', name: 'Log 7 — Inspection Pack Checklist' },
+  { key: 'rem',  id: 'log-rem',  name: 'Log 8 — Remediation Plan' },
+  { key: 'cfi',  id: 'log-cfi',  name: 'Log 9 — Client File Index' },
+  { key: 'cal',  id: 'log-cal',  name: 'Log 10 — Regulatory Calendar' }
+];
+
+/* ---------- Section collapse/expand ---------- */
+function toggleSection(headerEl){
+  headerEl.parentElement.classList.toggle('collapsed');
+}
+
+function jumpToSection(id){
+  if(!id) return;
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.remove('collapsed');
+  el.scrollIntoView({ behavior:'smooth', block:'start' });
+  document.getElementById('jumpSelect').value = '';
+}
+
+/* ---------- Status tracking ---------- */
+function setStatus(logKey, status){
+  // status: 's-na' | 's-ip' | 's-c'
+  const map = { 'gov':'sec-gov','sa':'log-sa','cdd':'log-cdd','sanc':'log-sanc',
+                'sar':'log-sar','fr':'log-fr','tr':'log-tr','insp':'log-insp',
+                'rem':'log-rem','cfi':'log-cfi','cal':'log-cal' };
+  const id = map[logKey];
+  if(!id) return;
+  const sec = document.getElementById(id);
+  if(!sec) return;
+  const badge = sec.querySelector('[data-status-badge]');
+  if(!badge) return;
+  badge.classList.remove('s-na','s-ip','s-c');
+  badge.classList.add(status);
+  badge.textContent = status==='s-c' ? 'Complete' : status==='s-ip' ? 'In progress' : 'Not started';
+  // mirror in dashboard tile
+  const tile = document.querySelector('.status-tile[data-log="'+logKey+'"] .dot');
+  if(tile){ tile.classList.remove('s-na','s-ip','s-c'); tile.classList.add(status); }
+}
+
+function markComplete(logKey){ setStatus(logKey,'s-c'); saveNow(true); }
+function markIncomplete(logKey){ setStatus(logKey,'s-ip'); saveNow(true); }
+
+/* Reset a single log: clear all fields within that section, drop any
+   dynamic rows, reset its status badge, and persist the cleared state.
+   Use for per-instance logs (CDD per client, Remediation per finding,
+   Self-Assessment per year) — fill → Save as PDF → archive → Reset → next.
+   v4: snapshots the prior state before clearing and shows a 60s Undo toast. */
+function resetLog(logKey, logLabel){
+  const map = { 'sa':'log-sa', 'cdd':'log-cdd', 'rem':'log-rem' };
+  const id = map[logKey];
+  if (!id) return;
+  const sec = document.getElementById(id);
+  if (!sec) return;
+  const label = logLabel || logKey;
+  const msg = 'Reset this log (' + label + ')?\n\n'
+            + 'This clears every field in this section only. Other logs are not affected.\n\n'
+            + 'Make sure you have saved the current instance as PDF first (the saved PDF is the historical record).\n\n'
+            + 'You will have 60 seconds to undo this reset.';
+  if (!confirm(msg)) return;
+
+  // 1. SNAPSHOT prior state of this section before clearing
+  const snapshot = captureSectionState(sec, logKey);
+
+  // 2. Clear every data-f field inside the section
+  sec.querySelectorAll('[data-f]').forEach(el => {
+    if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+    else el.value = '';
+  });
+  // 3. Empty any dynamic-row tbody in this section
+  sec.querySelectorAll('table.data tbody[id]').forEach(tb => { tb.innerHTML = ''; });
+  // 4. Reset status badge to Not started
+  setStatus(logKey, 's-na');
+  // 5. Persist the cleared state
+  saveNow(true);
+  setSaveState('saved', 'Reset ' + label + ' · ready for next instance · ' + formatTime(new Date()));
+
+  // 6. Offer 60-second Undo
+  showUndoResetToast(snapshot, logKey, label);
+}
+
+/* Snapshot a section's current field values and dynamic-row HTML.
+   Returns an object that restoreSectionState() can apply. */
+function captureSectionState(sec, logKey){
+  const snap = { fields: {}, rows: {}, statusKey: logKey, statusState: 's-na' };
+  sec.querySelectorAll('[data-f]').forEach(el => {
+    const k = el.getAttribute('data-f');
+    if (el.type === 'checkbox') snap.fields[k] = { kind:'checkbox', v: el.checked };
+    else if (el.type === 'radio') { if (el.checked) snap.fields[k] = { kind:'radio', v: el.value }; }
+    else snap.fields[k] = { kind:'value', v: el.value };
+  });
+  sec.querySelectorAll('table.data tbody[id]').forEach(tb => {
+    snap.rows[tb.id] = tb.innerHTML;
+  });
+  // Capture badge state
+  const badge = sec.querySelector('[data-status-badge]');
+  if (badge){
+    if (badge.classList.contains('s-c')) snap.statusState = 's-c';
+    else if (badge.classList.contains('s-ip')) snap.statusState = 's-ip';
+    else snap.statusState = 's-na';
+  }
+  return snap;
+}
+
+/* Restore a section snapshot, then re-bind autosave to any newly-restored
+   dynamic rows. */
+function restoreSectionState(sec, snap){
+  if (!sec || !snap) return;
+  // Restore dynamic rows first so the inputs exist
+  if (snap.rows){
+    Object.keys(snap.rows).forEach(id => {
+      const tb = document.getElementById(id);
+      if (tb) tb.innerHTML = snap.rows[id];
+    });
+  }
+  if (snap.fields){
+    Object.keys(snap.fields).forEach(k => {
+      const entry = snap.fields[k];
+      const els = sec.querySelectorAll('[data-f="'+CSS.escape(k)+'"]');
+      els.forEach(el => {
+        if (entry.kind === 'checkbox') el.checked = !!entry.v;
+        else if (entry.kind === 'radio') el.checked = (el.value === entry.v);
+        else el.value = (entry.v == null ? '' : entry.v);
+      });
+    });
+  }
+  setStatus(snap.statusKey, snap.statusState);
+  bumpRowCounterFromDOM();
+  attachAutoSave();
+}
+
+/* ===== Undo Reset toast (v4) ===== */
+let __undoToastTimer = null;
+let __undoTickTimer = null;
+function showUndoResetToast(snapshot, logKey, label){
+  hideUndoResetToast(); // dismiss any prior toast
+  const map = { 'sa':'log-sa', 'cdd':'log-cdd', 'rem':'log-rem' };
+  const sec = document.getElementById(map[logKey]);
+  const toast = document.createElement('div');
+  toast.className = 'undo-toast';
+  toast.id = 'undoResetToast';
+  toast.innerHTML =
+    '<div class="toast-msg">'+
+      '<strong>' + label + ' reset</strong>'+
+      '<span class="countdown" id="undoCountdown">Undo available for 60 seconds</span>'+
+    '</div>'+
+    '<button class="undo-btn" id="undoResetBtn">Undo Reset</button>'+
+    '<button class="close-btn" title="Dismiss">×</button>';
+  document.body.appendChild(toast);
+
+  // Wire up the actions
+  toast.querySelector('#undoResetBtn').onclick = () => {
+    if (sec) restoreSectionState(sec, snapshot);
+    saveNow(true);
+    setSaveState('saved', 'Restored ' + label + ' · ' + formatTime(new Date()));
+    hideUndoResetToast();
+  };
+  toast.querySelector('.close-btn').onclick = () => hideUndoResetToast();
+
+  // Countdown + auto-dismiss
+  let remaining = 60;
+  const countdownEl = toast.querySelector('#undoCountdown');
+  __undoTickTimer = setInterval(() => {
+    remaining--;
+    if (countdownEl) countdownEl.textContent = remaining > 0
+      ? ('Undo available for ' + remaining + ' second' + (remaining === 1 ? '' : 's'))
+      : 'Undo expired';
+    if (remaining <= 0){ clearInterval(__undoTickTimer); __undoTickTimer = null; }
+  }, 1000);
+  __undoToastTimer = setTimeout(() => hideUndoResetToast(), 60000);
+}
+function hideUndoResetToast(){
+  if (__undoToastTimer){ clearTimeout(__undoToastTimer); __undoToastTimer = null; }
+  if (__undoTickTimer){ clearInterval(__undoTickTimer); __undoTickTimer = null; }
+  const t = document.getElementById('undoResetToast');
+  if (!t) return;
+  t.classList.add('closing');
+  setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, 220);
+}
+
+/* Build the status dashboard tiles */
+function buildStatusBoard(){
+  const wrap = document.getElementById('statusGrid');
+  wrap.innerHTML = '';
+  LOGS.forEach(L => {
+    const t = document.createElement('div');
+    t.className = 'status-tile';
+    t.dataset.log = L.key;
+    t.onclick = () => jumpToSection(L.id);
+    t.innerHTML = '<span class="dot s-na"></span><span class="name">'+L.name+'</span>';
+    wrap.appendChild(t);
+  });
+}
+
+/* ---------- Dynamic row builders ---------- */
+function rowCellInput(field, type='text', placeholder=''){
+  return '<td><input type="'+type+'" data-f="'+field+'"'+(placeholder?(' placeholder="'+placeholder+'"'):'')+'></td>';
+}
+function rowCellSelect(field, options){
+  const opts = options.map(o => '<option>'+o+'</option>').join('');
+  return '<td><select data-f="'+field+'"><option>—</option>'+opts+'</select></td>';
+}
+function rowCellTextarea(field){
+  return '<td><textarea data-f="'+field+'" rows="1"></textarea></td>';
+}
+function removeBtn(){
+  return '<td><button type="button" class="row-remove" onclick="this.closest(\'tr\').remove(); attachAutoSave();">×</button></td>';
+}
+
+let __rowCounter = 0;
+function nextRow(){ return ++__rowCounter; }
+
+/* CDD — Beneficial Owners */
+function addBORow(){
+  const r = nextRow();
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    rowCellInput('cdd_bo_'+r+'_name')+
+    rowCellInput('cdd_bo_'+r+'_nat')+
+    rowCellInput('cdd_bo_'+r+'_dob','date')+
+    rowCellInput('cdd_bo_'+r+'_pct','number')+
+    rowCellSelect('cdd_bo_'+r+'_typ', ['Owner ≥25%','Controller','Senior Managing Official','Other'])+
+    rowCellSelect('cdd_bo_'+r+'_ver', ['Yes','In progress','No'])+
+    removeBtn();
+  document.getElementById('cdd_bo_rows').appendChild(tr);
+  attachAutoSave();
+}
+
+/* Sanctions row */
+function addSancRow(){
+  const r = nextRow();
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    rowCellInput('sanc_'+r+'_date','date')+
+    rowCellInput('sanc_'+r+'_subj')+
+    rowCellSelect('sanc_'+r+'_trig', ['Onboarding','Annual','New designation','Trigger event'])+
+    rowCellInput('sanc_'+r+'_lists','text','UN/UK OFSI/BVI')+
+    rowCellSelect('sanc_'+r+'_res', ['No match','False positive','Positive — actioned'])+
+    rowCellInput('sanc_'+r+'_act')+
+    rowCellInput('sanc_'+r+'_by','text','PD')+
+    removeBtn();
+  document.getElementById('sanc_rows').appendChild(tr);
+  attachAutoSave();
+}
+
+/* SAR row */
+function addSARRow(){
+  const r = nextRow();
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    rowCellInput('sar_'+r+'_num','text','SAR-2026-001')+
+    rowCellInput('sar_'+r+'_date','date')+
+    rowCellInput('sar_'+r+'_subj')+
+    rowCellTextarea('sar_'+r+'_trig')+
+    rowCellTextarea('sar_'+r+'_ass')+
+    rowCellSelect('sar_'+r+'_dec', ['Filed with FIA','Not filed — documented','Pending'])+
+    rowCellInput('sar_'+r+'_fia')+
+    removeBtn();
+  document.getElementById('sar_rows').appendChild(tr);
+  attachAutoSave();
+}
+
+/* File Review row */
+function addFRRow(){
+  const r = nextRow();
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    rowCellSelect('fr_'+r+'_q', ['Q1','Q2','Q3','Q4'])+
+    rowCellInput('fr_'+r+'_date','date')+
+    rowCellInput('fr_'+r+'_client')+
+    rowCellSelect('fr_'+r+'_risk', ['Low','Moderate','High'])+
+    rowCellTextarea('fr_'+r+'_find')+
+    rowCellTextarea('fr_'+r+'_rem')+
+    removeBtn();
+  document.getElementById('fr_rows').appendChild(tr);
+  attachAutoSave();
+}
+
+/* Training row */
+function addTrRow(){
+  const r = nextRow();
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    rowCellInput('tr_'+r+'_date','date')+
+    rowCellInput('tr_'+r+'_att','text','Patra Stoutt')+
+    rowCellInput('tr_'+r+'_course')+
+    rowCellInput('tr_'+r+'_prov')+
+    rowCellInput('tr_'+r+'_hrs','number')+
+    rowCellSelect('tr_'+r+'_evid', ['Certificate','Agenda + notes','Email confirmation','Other'])+
+    removeBtn();
+  document.getElementById('tr_rows').appendChild(tr);
+  attachAutoSave();
+}
+
+/* Remediation action row */
+function addRemRow(){
+  const r = nextRow();
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td>'+r+'</td>'+
+    rowCellTextarea('rem_'+r+'_act')+
+    rowCellInput('rem_'+r+'_owner')+
+    rowCellInput('rem_'+r+'_due','date')+
+    rowCellSelect('rem_'+r+'_st', ['Not started','In progress','Complete'])+
+    removeBtn();
+  document.getElementById('rem_rows').appendChild(tr);
+  attachAutoSave();
+}
+
+/* Client File Index row */
+function addCFIRow(){
+  const r = nextRow();
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    rowCellInput('cfi_'+r+'_num','text')+
+    rowCellInput('cfi_'+r+'_co')+
+    rowCellInput('cfi_'+r+'_bvi')+
+    rowCellInput('cfi_'+r+'_inc','date')+
+    rowCellSelect('cfi_'+r+'_st', ['Active','Struck off','In liquidation','Resigned'])+
+    rowCellSelect('cfi_'+r+'_risk', ['Low','Moderate','High'])+
+    rowCellInput('cfi_'+r+'_lastCDD','date')+
+    removeBtn();
+  document.getElementById('cfi_rows').appendChild(tr);
+  attachAutoSave();
+}
+
+/* Regulatory Calendar row */
+function addCalRow(obligation='', owedTo='', due='', freq='Annual', status='Not started', ref=''){
+  const r = nextRow();
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td><input type="text" data-f="cal_'+r+'_ob" value="'+obligation.replace(/"/g,'&quot;')+'"></td>'+
+    '<td><input type="text" data-f="cal_'+r+'_to" value="'+owedTo.replace(/"/g,'&quot;')+'"></td>'+
+    '<td><input type="date" data-f="cal_'+r+'_due" value="'+due+'"></td>'+
+    '<td><select data-f="cal_'+r+'_freq">'+
+      ['Annual','Quarterly','Monthly','One-off','As triggered'].map(o=>'<option'+(o===freq?' selected':'')+'>'+o+'</option>').join('')+
+    '</select></td>'+
+    '<td><select data-f="cal_'+r+'_st">'+
+      ['Not started','In progress','Filed','Overdue','N/A'].map(o=>'<option'+(o===status?' selected':'')+'>'+o+'</option>').join('')+
+    '</select></td>'+
+    '<td><input type="text" data-f="cal_'+r+'_ref" value="'+ref.replace(/"/g,'&quot;')+'"></td>'+
+    removeBtn();
+  document.getElementById('cal_rows').appendChild(tr);
+  attachAutoSave();
+}
+
+/* Seed the Regulatory Calendar with the standard recurring items */
+function seedCalendar(){
+  if(!confirm('Reset the Regulatory Calendar to the default item list? Existing rows will be removed.')) return;
+  document.getElementById('cal_rows').innerHTML = '';
+  const defaults = [
+    ['FSC AML/CFT Annual Return','BVI FSC','','Annual','Not started',''],
+    ['Fiduciary Services Business Annual Return','BVI FSC','','Annual','Not started',''],
+    ['Audited Financial Statements (Co. Management Act 1990, s.17)','BVI FSC','','Annual','Not started',''],
+    ['Annual Sanctions Screening — full client base','Internal (UN/UK OFSI/BVI)','','Annual','Not started','Log 3'],
+    ['Annual Self-Assessment (PD)','Internal','','Annual','Not started','Log 1'],
+    ['File Review Q1','Internal','','Quarterly','Not started','Log 5'],
+    ['File Review Q2','Internal','','Quarterly','Not started','Log 5'],
+    ['File Review Q3','Internal','','Quarterly','Not started','Log 5'],
+    ['File Review Q4','Internal','','Quarterly','Not started','Log 5'],
+    ['Training — ≥1 substantive event','PD','','Annual','Not started','Log 6'],
+    ['Governance Statement — annual review &amp; sign','PD / Board','','Annual','Not started','Section A'],
+    ['Client annual returns (BVI BCA)','BVI Registrar','','Annual','Not started','Per client'],
+    ['Economic Substance Declarations (administered clients)','BVI ITA','','Annual','Not started','Per client']
+  ];
+  defaults.forEach(d => addCalRow(d[0],d[1],d[2],d[3],d[4],d[5]));
+}
+
+/* ---------- Save / Load / Clear (localStorage) ---------- */
+
+function collectState(){
+  const state = { fields: {}, pkg: {}, rows: {}, statuses: {}, savedAt: new Date().toISOString() };
+
+  // All data-f fields (inputs, selects, textareas)
+  document.querySelectorAll('[data-f]').forEach(el => {
+    const k = el.getAttribute('data-f');
+    if (el.type === 'checkbox') {
+      state.fields[k] = el.checked;
+    } else if (el.type === 'radio') {
+      if (el.checked) state.fields[k] = el.value;
+    } else {
+      state.fields[k] = el.value;
+    }
+  });
+  // Package-level (data-pkg) fields
+  document.querySelectorAll('[data-pkg]').forEach(el => {
+    state.pkg[el.getAttribute('data-pkg')] = el.value;
+  });
+  // Dynamic row tables: serialize the HTML of each tbody so rows survive a reload
+  ['cdd_bo_rows','sanc_rows','sar_rows','fr_rows','tr_rows','rem_rows','cfi_rows','cal_rows'].forEach(id => {
+    const tb = document.getElementById(id);
+    if (tb) state.rows[id] = tb.innerHTML;
+  });
+  // Per-log status badges
+  LOGS.forEach(L => {
+    const sec = document.getElementById(L.id);
+    if (!sec) return;
+    const badge = sec.querySelector('[data-status-badge]');
+    if (!badge) return;
+    let s = 's-na';
+    if (badge.classList.contains('s-c')) s = 's-c';
+    else if (badge.classList.contains('s-ip')) s = 's-ip';
+    state.statuses[L.key] = s;
+  });
+  return state;
+}
+
+function applyState(state){
+  if (!state) return;
+  // Restore tbody HTML first so the inputs exist before we set their values
+  if (state.rows){
+    Object.keys(state.rows).forEach(id => {
+      const tb = document.getElementById(id);
+      if (tb) tb.innerHTML = state.rows[id];
+    });
+  }
+  // data-f fields
+  if (state.fields){
+    Object.keys(state.fields).forEach(k => {
+      const els = document.querySelectorAll('[data-f="'+CSS.escape(k)+'"]');
+      els.forEach(el => {
+        const v = state.fields[k];
+        if (el.type === 'checkbox') el.checked = !!v;
+        else if (el.type === 'radio') el.checked = (el.value === v);
+        else el.value = (v == null ? '' : v);
+      });
+    });
+  }
+  // package-level
+  if (state.pkg){
+    Object.keys(state.pkg).forEach(k => {
+      const el = document.querySelector('[data-pkg="'+k+'"]');
+      if (el) el.value = state.pkg[k];
+    });
+  }
+  // statuses
+  if (state.statuses){
+    Object.keys(state.statuses).forEach(k => setStatus(k, state.statuses[k]));
+  }
+  // After restoring rows, bump the row counter past any existing index
+  // so the next "Add row" click doesn't collide with a restored field name.
+  bumpRowCounterFromDOM();
+  attachAutoSave();
+}
+
+function bumpRowCounterFromDOM(){
+  let max = __rowCounter;
+  // Look at every data-f attribute and pull out trailing numeric segments
+  // matching patterns like cdd_bo_<N>_name, sanc_<N>_date, etc.
+  document.querySelectorAll('[data-f]').forEach(el => {
+    const m = el.getAttribute('data-f').match(/_(\d+)_/);
+    if (m){
+      const n = parseInt(m[1], 10);
+      if (!isNaN(n) && n > max) max = n;
+    }
+  });
+  __rowCounter = max;
+}
+
+function saveNow(silent){
+  try {
+    setSaveState('saving', 'Saving…');
+    const state = collectState();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    setSaveState('saved', 'All changes saved · ' + formatTime(new Date()));
+    // After the first real save in the session, auto-hide Getting Started.
+    // We don't set the dismissed flag — if the user later clears data,
+    // the panel will reappear on reload because the STORAGE_KEY check resolves false.
+    const gs = document.getElementById('gettingStarted');
+    if (gs && gs.style.display !== 'none') gs.style.display = 'none';
+  } catch(e){
+    console.error('Save failed', e);
+    setSaveState('error', 'Save failed — check browser storage');
+  }
+}
+
+function loadSaved(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw){ alert('No saved package found in this browser.'); return; }
+    const state = JSON.parse(raw);
+    applyState(state);
+    setSaveState('saved', 'Loaded from save · ' + (state.savedAt ? formatTime(new Date(state.savedAt)) : ''));
+  } catch(e){
+    console.error('Load failed', e);
+    setSaveState('error', 'Load failed: ' + e.message);
+  }
+}
+
+function clearSaved(){
+  if (!confirm('Clear all saved data? This will reset every field on this page. Cannot be undone.\n\nIf you might want this data back, click Cancel and use Export Backup first.')) return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  } catch(e){
+    alert('Clear failed: ' + e.message);
+  }
+}
+
+/* =====================================================
+   Backup (JSON) export / import — v4
+   Lets the user keep an editable copy of the package state outside
+   localStorage, so the data is recoverable across browsers/devices and
+   survives a profile wipe. NOT a substitute for the saved PDFs, which
+   remain the authoritative inspection record.
+   ===================================================== */
+
+function exportBackup(){
+  try {
+    const state = collectState();
+    state.__exportedAt = new Date().toISOString();
+    state.__appVersion = 'v4';
+    state.__schemaVersion = 1;
+    const json = JSON.stringify(state, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'BWC_CompliancePackage_Backup_' + todayISO() + '.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    setSaveState('saved', 'Backup exported · ' + formatTime(new Date()));
+  } catch(e){
+    console.error('Export backup failed', e);
+    alert('Could not export backup: ' + e.message);
+  }
+}
+
+function importBackup(event){
+  const file = event.target.files && event.target.files[0];
+  event.target.value = ''; // reset the input so the same file can be re-selected later
+  if (!file) return;
+
+  // Light safety checks before we hit the file contents
+  if (!/\.json$/i.test(file.name)){
+    alert('Please select a .json backup file (one exported via "Export Backup").');
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024){ // 5 MB sanity cap
+    alert('That file is unusually large for a BWC backup (' + Math.round(file.size/1024) + ' KB). Aborted.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    let parsed;
+    try { parsed = JSON.parse(reader.result); }
+    catch(e){ alert('That file is not valid JSON.\n\n' + e.message); return; }
+
+    // Validate shape — minimum: a 'fields' object
+    if (!parsed || typeof parsed !== 'object' || !parsed.fields || typeof parsed.fields !== 'object'){
+      alert('That JSON file is not a valid BWC backup (no fields data).');
+      return;
+    }
+
+    const when = parsed.__exportedAt ? new Date(parsed.__exportedAt).toLocaleString() : 'unknown';
+    const ver = parsed.__appVersion || 'unknown';
+    const ok = confirm(
+      'Import this backup?\n\n'+
+      'Exported: ' + when + '\n'+
+      'App version: ' + ver + '\n\n'+
+      'This will OVERWRITE all current data in the package. The current state will not be recoverable unless you export it first.\n\n'+
+      'Continue?'
+    );
+    if (!ok) return;
+
+    try {
+      applyState(parsed);
+      saveNow(true);
+      setSaveState('saved', 'Backup imported · ' + formatTime(new Date()));
+      // Hide the getting-started panel since the user clearly has prior data
+      hideGettingStartedPanel(true);
+    } catch(e){
+      console.error('Import apply failed', e);
+      setSaveState('error', 'Import failed: ' + e.message);
+      alert('Could not apply backup: ' + e.message);
+    }
+  };
+  reader.onerror = () => alert('Could not read the file: ' + reader.error);
+  reader.readAsText(file);
+}
+
+/* =====================================================
+   Getting Started panel — v4
+   Shown on first use, dismissed automatically once any data is saved,
+   or manually via the × button. Dismissal is stored separately so it
+   survives across sessions but is independent of the main package state.
+   ===================================================== */
+const GS_DISMISS_KEY = 'bwc_compliance_gs_dismissed';
+
+function shouldShowGettingStarted(){
+  // Don't show if user dismissed it
+  try { if (localStorage.getItem(GS_DISMISS_KEY) === '1') return false; } catch(e){}
+  // Don't show if there's already saved package data
+  try { if (localStorage.getItem(STORAGE_KEY)) return false; } catch(e){}
+  return true;
+}
+
+function showGettingStartedPanelIfNeeded(){
+  const el = document.getElementById('gettingStarted');
+  if (!el) return;
+  el.style.display = shouldShowGettingStarted() ? 'block' : 'none';
+}
+
+function dismissGettingStarted(){
+  try { localStorage.setItem(GS_DISMISS_KEY, '1'); } catch(e){}
+  hideGettingStartedPanel(false);
+}
+
+function hideGettingStartedPanel(persist){
+  const el = document.getElementById('gettingStarted');
+  if (el) el.style.display = 'none';
+  if (persist){
+    try { localStorage.setItem(GS_DISMISS_KEY, '1'); } catch(e){}
+  }
+}
+
+/* ---------- Auto-save ---------- */
+let __autoSaveTimer = null;
+function attachAutoSave(){
+  document.querySelectorAll('[data-f], [data-pkg]').forEach(el => {
+    if (el.__autoSaveBound) return;
+    el.__autoSaveBound = true;
+    const onUserChange = () => { markDirty(); debounceSave(); };
+    el.addEventListener('change', onUserChange);
+    if (el.tagName === 'INPUT' && (el.type==='text' || el.type==='number' || el.type==='email' || el.type==='date')) {
+      el.addEventListener('input', onUserChange);
+    }
+    if (el.tagName === 'TEXTAREA') {
+      el.addEventListener('input', onUserChange);
+    }
+  });
+}
+function debounceSave(){
+  if (__autoSaveTimer) clearTimeout(__autoSaveTimer);
+  __autoSaveTimer = setTimeout(() => saveNow(true), 1500);
+}
+
+/* Periodic safety-net save every 30s */
+setInterval(() => { saveNow(true); }, 30000);
+
+/* ---------- Save state machine ---------- */
+/* States:
+   - idle     — neutral, no data loaded yet (e.g. fresh page, no localStorage)
+   - dirty    — fields changed since last save; amber pulse
+   - saving   — save in flight (briefly); blue
+   - saved    — in-memory state matches storage; green with timestamp
+   - error    — save attempt failed; red
+   Programmatic value changes (applyState restoring fields) do NOT trigger
+   `markDirty` because we set .value/.checked directly, which doesn't fire
+   input/change events. Only user edits flip to dirty.
+*/
+let __saveState = 'idle';
+function setSaveState(state, text){
+  __saveState = state;
+  const el = document.querySelector('.save-status');
+  if (!el) return;
+  el.classList.remove('state-idle','state-dirty','state-saving','state-saved','state-error');
+  el.classList.add('state-' + state);
+  const txt = el.querySelector('#saveText');
+  if (txt) txt.textContent = text;
+}
+function updateSaveStatus(text){
+  // Backwards-compat shim — used by load/error paths; defaults to saved/idle
+  const el = document.querySelector('.save-status');
+  if (!el) return;
+  const txt = el.querySelector('#saveText');
+  if (txt) txt.textContent = text;
+}
+function markDirty(){
+  if (__saveState === 'saving') return;       // don't override an in-flight save flash
+  setSaveState('dirty', 'Unsaved changes');
+}
+function formatTime(d){
+  const pad = n => String(n).padStart(2,'0');
+  return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+}
+
+/* =====================================================
+   PDF EXPORT
+   Strategy: render each section to a clean PDF using jsPDF text primitives.
+   - exportLogPDF(logKey)        — single section
+   - exportPackagePDF()          — full package, all sections
+   The renderer walks the DOM of the chosen section(s), turning headings,
+   paragraphs, tables, fields and sign-offs into PDF content.
+   ===================================================== */
+
+/* Map of internal log keys to section element IDs and human titles */
+const LOG_TO_SECTION = {
+  gov:  { id:'sec-gov',  title:'Governance Statement' },
+  man:  { id:'sec-man',  title:'Compliance Manual' },
+  sa:   { id:'log-sa',   title:'Log 1 — Annual Self-Assessment' },
+  cdd:  { id:'log-cdd',  title:'Log 2 — CDD Checklist' },
+  sanc: { id:'log-sanc', title:'Log 3 — Sanctions Screening Log' },
+  sar:  { id:'log-sar',  title:'Log 4 — Internal SAR Log' },
+  fr:   { id:'log-fr',   title:'Log 5 — File Review Log' },
+  tr:   { id:'log-tr',   title:'Log 6 — Training Log' },
+  insp: { id:'log-insp', title:'Log 7 — Inspection Pack Checklist' },
+  rem:  { id:'log-rem',  title:'Log 8 — Remediation Plan' },
+  cfi:  { id:'log-cfi',  title:'Log 9 — Client File Index' },
+  cal:  { id:'log-cal',  title:'Log 10 — Regulatory Calendar' },
+  ann:  { id:'sec-ann',  title:'Annex G — Risk Assessment Matrix' }
+};
+
+/* Get a value safely from any field-bearing element */
+function getValue(el){
+  try {
+    if (!el) return '';
+    if (el.type === 'checkbox') return el.checked ? '☑' : '☐';
+    if (el.type === 'radio') return el.checked ? el.value : null;
+    return (el.value || '').toString();
+  } catch(e){ return ''; }
+}
+
+/* Get a label for a field by finding the nearest preceding label / th text */
+function getFieldLabel(el){
+  // 1. preceding <label> in same .field
+  const fieldDiv = el.closest('.field');
+  if (fieldDiv){
+    const lbl = fieldDiv.querySelector('label');
+    if (lbl) return lbl.textContent.trim().replace(/\s+/g,' ');
+  }
+  // 2. radio-row / check-row sibling label
+  const rl = el.closest('label');
+  if (rl) return rl.textContent.trim().replace(/\s+/g,' ');
+  // 3. fallback to placeholder or field name
+  return (el.placeholder || el.getAttribute('data-f') || '').toString();
+}
+
+/* PDF renderer state */
+function makePDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+  const margin = 40;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const contentWidth = pageWidth - margin*2;
+  let cursorY = margin;
+
+  function ensureSpace(h){
+    if (cursorY + h > pageHeight - margin){
+      doc.addPage();
+      cursorY = margin;
+      drawHeader();
+    }
+  }
+
+  function drawHeader(){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(120);
+    doc.text('Bethel Worldwide Corporation — Compliance Package', margin, 22);
+    doc.text('Generated ' + new Date().toLocaleString(), pageWidth - margin, 22, { align:'right' });
+    doc.setDrawColor(200);
+    doc.line(margin, 28, pageWidth - margin, 28);
+    doc.setTextColor(0);
+  }
+
+  function drawFooter(){
+    const pages = doc.internal.getNumberOfPages();
+    for (let p = 1; p <= pages; p++){
+      doc.setPage(p);
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(8);
+      doc.setTextColor(120);
+      doc.text('Page ' + p + ' of ' + pages, pageWidth - margin, pageHeight - 20, { align:'right' });
+      doc.text('Confidential — BWC compliance record', margin, pageHeight - 20);
+      doc.setTextColor(0);
+    }
+  }
+
+  function title(text, opts={}){
+    ensureSpace(28);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(opts.size || 16);
+    doc.setTextColor(12,74,110); // primary
+    doc.text(text, margin, cursorY + 16);
+    cursorY += 22;
+    doc.setTextColor(0);
+  }
+
+  function h2(text){
+    ensureSpace(22);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(12);
+    doc.setTextColor(12,74,110);
+    doc.text(text, margin, cursorY + 14);
+    cursorY += 18;
+    doc.setDrawColor(200);
+    doc.line(margin, cursorY, pageWidth - margin, cursorY);
+    cursorY += 6;
+    doc.setTextColor(0);
+  }
+
+  function h3(text){
+    ensureSpace(18);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(60);
+    doc.text(text, margin, cursorY + 12);
+    cursorY += 16;
+    doc.setTextColor(0);
+  }
+
+  function paragraph(text, opts={}){
+    if (!text) return;
+    doc.setFont('helvetica', opts.bold ? 'bold' : 'normal');
+    doc.setFontSize(opts.size || 9.5);
+    const lines = doc.splitTextToSize(text, contentWidth - (opts.indent||0));
+    lines.forEach(line => {
+      ensureSpace(13);
+      doc.text(line, margin + (opts.indent||0), cursorY + 10);
+      cursorY += 12;
+    });
+    cursorY += 2;
+  }
+
+  function kvRow(label, value){
+    if (value === '' || value == null) return;
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(9);
+    const lblLines = doc.splitTextToSize(label + ':', contentWidth * 0.42 - 8);
+    doc.setFont('helvetica','normal');
+    const valLines = doc.splitTextToSize(String(value), contentWidth * 0.58 - 8);
+    const rowH = Math.max(lblLines.length, valLines.length) * 12 + 2;
+    ensureSpace(rowH);
+    doc.setFont('helvetica','bold');
+    doc.setTextColor(60);
+    lblLines.forEach((ln,i)=> doc.text(ln, margin, cursorY + 10 + i*12));
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(0);
+    valLines.forEach((ln,i)=> doc.text(ln, margin + contentWidth * 0.42, cursorY + 10 + i*12));
+    cursorY += rowH;
+  }
+
+  function table(headers, rows){
+    if (!rows || !rows.length) return;
+    const cols = headers.length;
+    const colW = contentWidth / cols;
+    // Header
+    ensureSpace(20);
+    doc.setFillColor(241,245,249);
+    doc.rect(margin, cursorY, contentWidth, 16, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(12,74,110);
+    headers.forEach((h,i) => {
+      const lines = doc.splitTextToSize(h, colW - 6);
+      doc.text(lines[0] || '', margin + i*colW + 4, cursorY + 11);
+    });
+    cursorY += 16;
+    doc.setTextColor(0);
+    doc.setFont('helvetica','normal');
+    // Rows
+    rows.forEach(row => {
+      // compute row height based on tallest cell
+      const wrapped = row.map((c,i) => doc.splitTextToSize(String(c||''), colW - 6));
+      const lineCount = Math.max(...wrapped.map(w => w.length));
+      const rowH = Math.max(14, lineCount * 10 + 4);
+      ensureSpace(rowH);
+      doc.setDrawColor(220);
+      doc.rect(margin, cursorY, contentWidth, rowH);
+      for (let i = 1; i < cols; i++){
+        doc.line(margin + i*colW, cursorY, margin + i*colW, cursorY + rowH);
+      }
+      wrapped.forEach((lines,i) => {
+        lines.forEach((ln,j) => {
+          doc.text(ln, margin + i*colW + 4, cursorY + 10 + j*10);
+        });
+      });
+      cursorY += rowH;
+    });
+    cursorY += 4;
+  }
+
+  function spacer(h){ cursorY += (h||8); }
+
+  function pageBreak(){
+    doc.addPage();
+    cursorY = margin;
+    drawHeader();
+  }
+
+  // Initial header
+  drawHeader();
+
+  return { doc, title, h2, h3, paragraph, kvRow, table, spacer, pageBreak, drawFooter,
+           getY:()=>cursorY };
+}
+
+/* =====================================================
+   Section-to-PDF rendering
+   Walks a section element and emits PDF content in order.
+   ===================================================== */
+
+function renderSectionToPDF(pdf, sectionEl, opts={}){
+  if (!sectionEl) return;
+  const titleEl = sectionEl.querySelector('.section-header h2');
+  const refEl = sectionEl.querySelector('.section-header .ref');
+  const headerText = (titleEl ? titleEl.textContent.trim() : '') + (refEl ? '   ['+refEl.textContent.trim()+']' : '');
+  if (opts.asTitle) pdf.title(headerText, { size:18 });
+  else pdf.h2(headerText);
+
+  // Status badge value
+  const badge = sectionEl.querySelector('[data-status-badge]');
+  if (badge){
+    pdf.paragraph('Status: ' + badge.textContent.trim());
+  }
+
+  const body = sectionEl.querySelector('.section-body');
+  if (!body) return;
+
+  // Walk only direct & nested children we care about, in document order
+  walkAndEmit(pdf, body);
+}
+
+/* Walk children in source order and emit PDF content */
+function walkAndEmit(pdf, root){
+  const nodes = Array.from(root.children);
+  nodes.forEach(node => emitNode(pdf, node));
+}
+
+function textOfChildren(el){
+  return (el.textContent || '').replace(/\s+/g,' ').trim();
+}
+
+function emitNode(pdf, node){
+  if (!node) return;
+  // Skip script/style
+  const tag = node.tagName;
+  if (tag === 'SCRIPT' || tag === 'STYLE') return;
+
+  // Tables
+  if (tag === 'TABLE' && node.classList.contains('data')){
+    emitTable(pdf, node);
+    return;
+  }
+
+  // Subheads
+  if (node.classList && node.classList.contains('subhead')){
+    pdf.h3(textOfChildren(node));
+    return;
+  }
+
+  // Paragraphs / lists / h4
+  if (tag === 'P'){
+    const t = textOfChildren(node);
+    if (t) pdf.paragraph(t);
+    return;
+  }
+  if (tag === 'H3' || tag === 'H4'){
+    pdf.h3(textOfChildren(node));
+    return;
+  }
+  if (tag === 'UL' || tag === 'OL'){
+    Array.from(node.children).forEach((li,i) => {
+      const bullet = (tag === 'OL') ? (i+1)+'. ' : '• ';
+      pdf.paragraph(bullet + textOfChildren(li), { indent: 12 });
+    });
+    return;
+  }
+  if (node.classList && (node.classList.contains('info-box') || node.classList.contains('warn-box'))){
+    // Render as indented paragraph with a label
+    const strong = node.querySelector('strong');
+    if (strong){ pdf.paragraph(strong.textContent.trim(), { bold:true, indent: 6 }); }
+    // Remaining text minus the strong text
+    const txt = textOfChildren(node);
+    const strongText = strong ? strong.textContent.trim() : '';
+    const rest = txt.replace(strongText,'').trim();
+    if (rest) pdf.paragraph(rest, { indent: 6 });
+    pdf.spacer(4);
+    return;
+  }
+
+  // Form grids — flatten to label/value pairs
+  if (node.classList && (node.classList.contains('grid-2') || node.classList.contains('grid-3'))){
+    Array.from(node.querySelectorAll('.field, .radio-row, .check-row')).forEach(f => emitField(pdf, f));
+    return;
+  }
+
+  // Standalone fields
+  if (node.classList && node.classList.contains('field')){
+    emitField(pdf, node);
+    return;
+  }
+
+  // Radio / check rows
+  if (node.classList && (node.classList.contains('radio-row') || node.classList.contains('check-row'))){
+    emitField(pdf, node);
+    return;
+  }
+
+  // Signoff block
+  if (node.classList && node.classList.contains('signoff')){
+    pdf.spacer(4);
+    pdf.h3('Sign-Off');
+    Array.from(node.querySelectorAll('.field')).forEach(f => emitField(pdf, f));
+    return;
+  }
+
+  // Generic container — recurse
+  if (node.children && node.children.length){
+    walkAndEmit(pdf, node);
+  }
+}
+
+function emitField(pdf, fieldEl){
+  // field with single labeled control
+  if (fieldEl.classList.contains('field')){
+    const lbl = fieldEl.querySelector('label');
+    const labelText = lbl ? lbl.textContent.trim().replace(/\s+/g,' ') : '';
+    // Could contain input, select, textarea, OR a radio-row
+    const rr = fieldEl.querySelector('.radio-row');
+    if (rr){
+      let picked = '';
+      rr.querySelectorAll('input[type="radio"]').forEach(r => { if (r.checked) picked = r.parentElement.textContent.trim(); });
+      pdf.kvRow(labelText, picked || '—');
+      return;
+    }
+    // Multiple checkboxes
+    const cbList = fieldEl.querySelectorAll('input[type="checkbox"]');
+    if (cbList.length > 1){
+      const lines = [];
+      cbList.forEach(cb => {
+        const ll = cb.parentElement.textContent.trim();
+        lines.push((cb.checked ? '☑ ' : '☐ ') + ll);
+      });
+      pdf.kvRow(labelText, lines.join('\n'));
+      return;
+    }
+    const control = fieldEl.querySelector('input, select, textarea');
+    if (control){
+      pdf.kvRow(labelText, getValue(control) || '—');
+      return;
+    }
+    if (labelText) pdf.paragraph(labelText);
+    return;
+  }
+
+  // Standalone radio/check row (no .field wrapper)
+  if (fieldEl.classList.contains('radio-row')){
+    let picked = '';
+    fieldEl.querySelectorAll('input[type="radio"]').forEach(r => { if (r.checked) picked = r.parentElement.textContent.trim(); });
+    pdf.paragraph('Selection: ' + (picked || '—'));
+    return;
+  }
+  if (fieldEl.classList.contains('check-row')){
+    const lines = [];
+    fieldEl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      lines.push((cb.checked ? '☑ ' : '☐ ') + cb.parentElement.textContent.trim());
+    });
+    lines.forEach(ln => pdf.paragraph(ln, { indent: 6 }));
+  }
+}
+
+function emitTable(pdf, tableEl){
+  const headers = [];
+  const headerRow = tableEl.querySelector('thead tr');
+  if (headerRow){
+    Array.from(headerRow.children).forEach(th => headers.push(th.textContent.trim()));
+  } else {
+    // Some tables are "kv" style with th in each row
+    const firstRow = tableEl.querySelector('tr');
+    if (firstRow && firstRow.querySelector('th')){
+      // Render as kv pairs
+      Array.from(tableEl.querySelectorAll('tr')).forEach(tr => {
+        const th = tr.querySelector('th');
+        const td = tr.querySelector('td');
+        if (!th || !td) return;
+        const label = th.textContent.trim();
+        // Cell may have an input or plain text
+        let val = '';
+        const ctrl = td.querySelector('input, select, textarea');
+        if (ctrl) val = getValue(ctrl);
+        else val = td.textContent.trim();
+        pdf.kvRow(label, val || '—');
+      });
+      return;
+    }
+  }
+
+  // Standard tabular: tbody rows
+  const tbody = tableEl.querySelector('tbody');
+  if (!tbody) return;
+  const rows = [];
+  Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+    const cells = Array.from(tr.children).map(td => {
+      // Exclude the "remove" button column from PDF
+      if (td.querySelector('.row-remove')) return null;
+      const ctrl = td.querySelector('input, select, textarea');
+      if (ctrl) return getValue(ctrl);
+      return td.textContent.trim();
+    }).filter(v => v !== null);
+    if (cells.some(c => c && c.length)) rows.push(cells);
+  });
+  // Trim trailing empty column from headers if removeBtn column was present
+  let h = headers.slice();
+  if (h.length && rows.length && h.length > rows[0].length) h = h.slice(0, rows[0].length);
+  if (rows.length) pdf.table(h, rows);
+}
+
+/* =====================================================
+   Smart filename builder
+   For per-instance logs (CDD, Remediation, Self-Assessment) and any log
+   with a meaningful year/date/reference field, build a filename that:
+   - identifies the client / year / reference, so multiple saves don't
+     overwrite each other in the Downloads folder
+   - is filesystem-safe across Windows/macOS/Linux
+   - is capped to a reasonable length
+   ===================================================== */
+
+function sanitiseFilename(s){
+  return String(s == null ? '' : s)
+    .replace(/[\u2013\u2014]/g, '-')     // en/em dashes → hyphen
+    .replace(/[^A-Za-z0-9_.-]+/g, '_')   // anything else → underscore
+    .replace(/_+/g, '_')                 // collapse multiple underscores
+    .replace(/^[_.-]+|[_.-]+$/g, '')     // trim leading/trailing punctuation
+    .substring(0, 80);
+}
+
+function todayISO(){
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+
+function fieldValue(name){
+  const el = document.querySelector('[data-f="'+name+'"]');
+  return el ? (el.value || '') : '';
+}
+function packageYear(){
+  const yr = (document.querySelector('[data-pkg="year"]') || {}).value || '';
+  if (yr) return sanitiseFilename(yr);
+  // fallback to first 4-digit year found in common log year fields
+  const candidates = ['gov_year','sa_period','sanc_period','sar_year','fr_year','tr_year','cal_year'];
+  for (const f of candidates){
+    const m = (fieldValue(f).match(/\b(20\d{2})\b/) || [])[1];
+    if (m) return m;
+  }
+  return new Date().getFullYear().toString();
+}
+
+function getLogFilename(logKey){
+  const yr = packageYear();
+  const td = todayISO();
+  switch(logKey){
+    case 'gov': {
+      const y = sanitiseFilename(fieldValue('gov_year')) || yr;
+      return 'BWC_GovernanceStatement_' + y + '.pdf';
+    }
+    case 'man':
+      return 'BWC_ComplianceManual_' + yr + '.pdf';
+    case 'sa': {
+      const period = fieldValue('sa_period');
+      const y = (period.match(/\b(20\d{2})\b/) || [])[1] || yr;
+      return 'BWC_SelfAssessment_' + y + '.pdf';
+    }
+    case 'cdd': {
+      const client = sanitiseFilename(fieldValue('cdd_client')) || 'UnnamedClient';
+      const dt = fieldValue('cdd_date') || td;
+      return 'BWC_CDD_' + client + '_' + dt + '.pdf';
+    }
+    case 'sanc': {
+      const p = sanitiseFilename(fieldValue('sanc_period')) || yr;
+      return 'BWC_SanctionsLog_' + p + '.pdf';
+    }
+    case 'sar': {
+      const y = sanitiseFilename(fieldValue('sar_year')) || yr;
+      return 'BWC_SARLog_' + y + '.pdf';
+    }
+    case 'fr': {
+      const y = sanitiseFilename(fieldValue('fr_year')) || yr;
+      return 'BWC_FileReviewLog_' + y + '.pdf';
+    }
+    case 'tr': {
+      const y = sanitiseFilename(fieldValue('tr_year')) || yr;
+      return 'BWC_TrainingLog_' + y + '.pdf';
+    }
+    case 'insp': {
+      const notice = fieldValue('insp_notice');
+      const refreshed = fieldValue('insp_refreshed');
+      const dt = notice || refreshed || td;
+      return 'BWC_InspectionPack_' + dt + '.pdf';
+    }
+    case 'rem': {
+      const ref = sanitiseFilename(fieldValue('rem_ref')) || ('RP_' + td);
+      return 'BWC_Remediation_' + ref + '.pdf';
+    }
+    case 'cfi': {
+      const dt = fieldValue('cfi_date') || td;
+      return 'BWC_ClientFileIndex_' + dt + '.pdf';
+    }
+    case 'cal': {
+      const y = sanitiseFilename(fieldValue('cal_year')) || yr;
+      return 'BWC_RegulatoryCalendar_' + y + '.pdf';
+    }
+    case 'ann':
+      return 'BWC_AnnexG_RiskMatrix.pdf';
+    default:
+      return 'BWC_' + logKey + '_' + td + '.pdf';
+  }
+}
+
+/* =====================================================
+   Public PDF export entry points
+   ===================================================== */
+
+function exportLogPDF(logKey){
+  try {
+    const meta = LOG_TO_SECTION[logKey];
+    if (!meta){ alert('Unknown log: '+logKey); return; }
+    const sec = document.getElementById(meta.id);
+    if (!sec){ alert('Section not found: '+meta.id); return; }
+    // Ensure section is expanded for accurate content gathering (DOM-only — no scroll)
+    const wasCollapsed = sec.classList.contains('collapsed');
+    if (wasCollapsed) sec.classList.remove('collapsed');
+
+    const pdf = makePDF();
+    pdf.title('BWC ' + meta.title, { size: 16 });
+    // Package context line
+    const yr = (document.querySelector('[data-pkg="year"]') || {}).value || '';
+    const owner = (document.querySelector('[data-pkg="owner"]') || {}).value || '';
+    if (yr || owner){
+      pdf.paragraph('Compliance Year: ' + (yr || '—') + '   |   Owner: ' + (owner || '—'));
+    }
+    pdf.spacer(6);
+    renderSectionToPDF(pdf, sec);
+    pdf.drawFooter();
+    const fname = getLogFilename(logKey);
+    pdf.doc.save(fname);
+
+    if (wasCollapsed) sec.classList.add('collapsed');
+  } catch(e){
+    console.error(e);
+    alert('PDF export failed: ' + e.message);
+  }
+}
+
+function exportPackagePDF(){
+  try {
+    const pdf = makePDF();
+    // Cover page
+    pdf.title('BWC Compliance Package', { size: 20 });
+    pdf.paragraph('Bethel Worldwide Corporation — Registered Agent & TCSP, British Virgin Islands.');
+    pdf.paragraph('Governance Statement, AML/CFT/CPF Manual, and supporting working logs.');
+    pdf.spacer(8);
+
+    const yr = (document.querySelector('[data-pkg="year"]') || {}).value || '';
+    const owner = (document.querySelector('[data-pkg="owner"]') || {}).value || '';
+    const ed = (document.querySelector('[data-pkg="editionDate"]') || {}).value || '';
+    pdf.kvRow('Compliance Year', yr || '—');
+    pdf.kvRow('Package Owner', owner || '—');
+    pdf.kvRow('Date of Edition', ed || '—');
+    pdf.kvRow('Generated', new Date().toLocaleString());
+    pdf.spacer(10);
+
+    // Status summary
+    pdf.h3('Log Status Summary');
+    const statusRows = LOGS.map(L => {
+      const sec = document.getElementById(L.id);
+      const badge = sec ? sec.querySelector('[data-status-badge]') : null;
+      const s = badge ? badge.textContent.trim() : '—';
+      return [L.name, s];
+    });
+    pdf.table(['Section / Log','Status'], statusRows);
+
+    // Render each section
+    const order = ['gov','man','sa','cdd','sanc','sar','fr','tr','insp','rem','cfi','cal','ann'];
+    order.forEach(k => {
+      const meta = LOG_TO_SECTION[k];
+      if (!meta) return;
+      const sec = document.getElementById(meta.id);
+      if (!sec) return;
+      const wasCollapsed = sec.classList.contains('collapsed');
+      if (wasCollapsed) sec.classList.remove('collapsed');
+      pdf.pageBreak();
+      renderSectionToPDF(pdf, sec, { asTitle: true });
+      if (wasCollapsed) sec.classList.add('collapsed');
+    });
+
+    pdf.drawFooter();
+    const fyr = packageYear();
+    pdf.doc.save('BWC_CompliancePackage_' + fyr + '_' + todayISO() + '.pdf');
+  } catch(e){
+    console.error(e);
+    alert('Package PDF export failed: ' + e.message);
+  }
+}
+
+/* =====================================================
+   Bootstrap on DOM ready
+   ===================================================== */
+function init(){
+  // 1. Build the status dashboard tiles
+  buildStatusBoard();
+
+  // 2. Show Getting Started panel if first use
+  showGettingStartedPanelIfNeeded();
+
+  // 3. Attempt to auto-load any saved state
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw){
+    try {
+      const state = JSON.parse(raw);
+      applyState(state);
+      setSaveState('saved', 'Auto-loaded · ' + (state.savedAt ? formatTime(new Date(state.savedAt)) : ''));
+    } catch(e){
+      console.warn('Could not auto-load', e);
+      setSaveState('idle', 'Ready');
+    }
+  } else {
+    setSaveState('idle', 'Ready — no saved data yet');
+    // Seed the calendar with sensible defaults on first open
+    setTimeout(() => {
+      const tb = document.getElementById('cal_rows');
+      if (tb && tb.children.length === 0){
+        // Seed silently without confirm prompt
+        const defaults = [
+          ['FSC AML/CFT Annual Return','BVI FSC','','Annual','Not started',''],
+          ['Fiduciary Services Business Annual Return','BVI FSC','','Annual','Not started',''],
+          ['Audited Financial Statements (Co. Management Act 1990, s.17)','BVI FSC','','Annual','Not started',''],
+          ['Annual Sanctions Screening — full client base','Internal (UN/UK OFSI/BVI)','','Annual','Not started','Log 3'],
+          ['Annual Self-Assessment (PD)','Internal','','Annual','Not started','Log 1'],
+          ['File Review Q1','Internal','','Quarterly','Not started','Log 5'],
+          ['File Review Q2','Internal','','Quarterly','Not started','Log 5'],
+          ['File Review Q3','Internal','','Quarterly','Not started','Log 5'],
+          ['File Review Q4','Internal','','Quarterly','Not started','Log 5'],
+          ['Training — ≥1 substantive event','PD','','Annual','Not started','Log 6'],
+          ['Governance Statement — annual review & sign','PD / Board','','Annual','Not started','Section A'],
+          ['Client annual returns (BVI BCA)','BVI Registrar','','Annual','Not started','Per client'],
+          ['Economic Substance Declarations (administered clients)','BVI ITA','','Annual','Not started','Per client']
+        ];
+        defaults.forEach(d => addCalRow(d[0],d[1],d[2],d[3],d[4],d[5]));
+      }
+    }, 50);
+  }
+
+  // 4. Wire up auto-save handlers on every existing field
+  attachAutoSave();
+
+  // 5. Add a Clear-saved button to the nav (less prominent than Save/Load/PDF)
+  const actions = document.querySelector('.topnav .actions');
+  if (actions){
+    const clr = document.createElement('button');
+    clr.className = 'btn btn-danger btn-sm';
+    clr.textContent = 'Clear All';
+    clr.title = 'Wipe ALL saved data and reset every field. Cannot be undone — export a backup first if you might want it back.';
+    clr.onclick = clearSaved;
+    actions.appendChild(clr);
+  }
+}
+
+if (document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+
+</body>
+</html>
