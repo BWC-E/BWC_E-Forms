@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complaints Log | Bethel Worldwide Corporation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d5986 100%);
+    padding: 30px 15px;
+    font-family: 'Crimson Pro', Georgia, serif;
+    color: #1f2937;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(135deg, #2d5986 0%, #1e3a5f 100%);
+    padding: 35px 40px;
+    color: white;
+    text-align: center;
+    border-bottom: 4px solid #d4af37;
+}
+
+.header h1 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'Playfair Display', Georgia, serif;
+}
+
+.header h2 {
+    margin: 6px 0 0 0;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0.95;
+}
+
+.header .subtitle {
+    margin-top: 10px;
+    font-size: 13px;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.content { padding: 30px 40px; }
+
+/* Save indicator */
+.save-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #10b981;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.save-indicator.show { opacity: 1; }
+.save-indicator.error { background: #dc2626; }
+
+/* Guide */
+details.guide {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-left: 5px solid #d4af37;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    padding: 0;
+}
+
+details.guide summary {
+    cursor: pointer;
+    padding: 14px 18px;
+    font-weight: 700;
+    font-size: 16px;
+    color: #1e3a5f;
+    font-family: 'Playfair Display', Georgia, serif;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+details.guide summary::-webkit-details-marker { display: none; }
+details.guide summary::after {
+    content: "▼";
+    font-size: 12px;
+    transition: transform 0.2s;
+}
+details.guide[open] summary::after { transform: rotate(180deg); }
+
+.guide-content {
+    padding: 0 22px 22px 22px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #334155;
+}
+
+.guide-content h3 {
+    color: #1e3a5f;
+    font-size: 16px;
+    font-weight: 700;
+    margin: 18px 0 8px 0;
+    font-family: 'Playfair Display', Georgia, serif;
+}
+
+.guide-content ul, .guide-content ol { margin: 8px 0 12px 22px; }
+.guide-content li { margin-bottom: 5px; }
+
+.guide-content .stat-key {
+    background: #fef3c7;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #78350f;
+}
+
+/* Dashboard */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.stat-card.significant { border-left: 4px solid #dc2626; }
+.stat-card.open { border-left: 4px solid #f59e0b; }
+.stat-card.resolved { border-left: 4px solid #10b981; }
+.stat-card.fsc { border-left: 4px solid #7c3aed; }
+.stat-card.total { border-left: 4px solid #2d5986; }
+
+.stat-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e3a5f;
+    font-family: 'Playfair Display', Georgia, serif;
+}
+
+.stat-sub {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding: 14px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    align-items: center;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 28px;
+    background: #cbd5e1;
+    margin: 0 5px;
+}
+
+.btn {
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-primary { background: #2d5986; color: white; }
+.btn-primary:hover { background: #1e3a5f; }
+
+.btn-secondary { background: #6b7280; color: white; }
+.btn-secondary:hover { background: #4b5563; }
+
+.btn-export { background: #d4af37; color: #1e3a5f; }
+.btn-export:hover { background: #b8941f; color: white; }
+
+.btn-danger { background: #ef4444; color: white; padding: 6px 12px; font-size: 13px; }
+.btn-danger:hover { background: #dc2626; }
+
+.btn-edit { background: #2d5986; color: white; padding: 6px 12px; font-size: 13px; }
+.btn-edit:hover { background: #1e3a5f; }
+
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Filters */
+.filters {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 18px;
+    align-items: center;
+}
+
+.filters input, .filters select {
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+}
+
+.filters input:focus, .filters select:focus {
+    outline: none;
+    border-color: #2d5986;
+}
+
+/* Table */
+.table-wrap {
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: white;
+}
+
+th {
+    background: #1e3a5f;
+    color: white;
+    text-align: left;
+    padding: 12px 10px;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+}
+
+td {
+    padding: 11px 10px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+}
+
+tr:hover td { background: #f8fafc; }
+tr.selected td { background: #fef3c7; }
+
+td.cell-narrow { white-space: nowrap; }
+td.cell-summary { max-width: 280px; }
+
+.ref-badge {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    background: #eef2ff;
+    color: #3730a3;
+    padding: 3px 7px;
+    border-radius: 4px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-pill {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.status-Open { background: #fef3c7; color: #92400e; }
+.status-UnderInvestigation { background: #dbeafe; color: #1e40af; }
+.status-AwaitingComplainant { background: #e9d5ff; color: #6b21a8; }
+.status-ResolvedUpheld { background: #d1fae5; color: #065f46; }
+.status-ResolvedNotUpheld { background: #e0f2fe; color: #075985; }
+.status-Closed { background: #e5e7eb; color: #374151; }
+
+.sig-flag {
+    background: #dc2626;
+    color: white;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.no-flag { color: #94a3b8; font-size: 12px; }
+
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #2d5986;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+    font-style: italic;
+}
+
+.empty-state h3 {
+    color: #1e3a5f;
+    margin-bottom: 10px;
+    font-family: 'Playfair Display', serif;
+    font-style: normal;
+}
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+    z-index: 1000;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 30px 15px;
+    overflow-y: auto;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+    background: white;
+    border-radius: 10px;
+    max-width: 900px;
+    width: 100%;
+    margin: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #2d5986 0%, #1e3a5f 100%);
+    color: white;
+    padding: 20px 28px;
+    border-bottom: 3px solid #d4af37;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 22px;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 26px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 6px;
+}
+
+.modal-body {
+    padding: 25px 28px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 16px 28px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.form-section {
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #e5e7eb;
+}
+.form-section:last-child { border-bottom: none; }
+
+.form-section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 17px;
+    color: #1e3a5f;
+    margin-bottom: 14px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #d4af37;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+.form-group { margin-bottom: 14px; }
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #334155;
+    font-size: 14px;
+}
+
+.required { color: #dc2626; }
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="date"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    transition: border-color 0.15s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2d5986;
+    box-shadow: 0 0 0 3px rgba(45, 89, 134, 0.1);
+}
+
+.form-group textarea { resize: vertical; min-height: 70px; }
+
+.form-group .readonly {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.hint {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 3px;
+    font-style: italic;
+}
+
+.field-error {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 3px;
+    display: none;
+}
+.form-group.has-error input,
+.form-group.has-error select,
+.form-group.has-error textarea {
+    border-color: #dc2626;
+}
+.form-group.has-error .field-error { display: block; }
+
+.fsc-warning {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 11px 14px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: #78350f;
+    display: none;
+}
+.fsc-warning.show { display: block; }
+
+.fsc-warning strong { color: #92400e; }
+
+/* Footer */
+.footer {
+    background: #f8fafc;
+    padding: 18px 40px;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* Confirmation dialog */
+.confirm-dialog {
+    background: white;
+    border-radius: 10px;
+    max-width: 440px;
+    width: 100%;
+    padding: 25px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.confirm-dialog h3 {
+    color: #1e3a5f;
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 10px;
+}
+
+.confirm-dialog p {
+    color: #475569;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+.confirm-dialog .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+@media (max-width: 900px) {
+    .dashboard { grid-template-columns: repeat(2, 1fr); }
+    .filters { grid-template-columns: 1fr 1fr; }
+    .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+    .content { padding: 20px; }
+    .header { padding: 25px 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Internal Complaints Log</h1>
+        <h2>Bethel Worldwide Corporation</h2>
+        <div class="subtitle">Maintained pursuant to the BVI Financial Services Commission Regulatory Code 2009</div>
+    </div>
+
+    <div class="content">
+
+        <!-- USER GUIDE -->
+        <details class="guide" open>
+            <summary>📖 User Guide &amp; BVI Compliance Notes</summary>
+            <div class="guide-content">
+
+                <h3>Purpose of this log</h3>
+                <p>This log records complaints received by Bethel Worldwide Corporation (BWC) from clients, counterparties or other stakeholders. As a registered agent licensed by the BVI Financial Services Commission (the "Commission"), BWC is required under the Regulatory Code 2009 to maintain a complaints handling procedure and a register of significant complaints. This log is the primary record evidencing that obligation.</p>
+
+                <h3>What counts as a "significant complaint"?</h3>
+                <p>Treat a complaint as significant where any of the following apply:</p>
+                <ul>
+                    <li>It alleges a breach of regulatory requirements (AML/CFT, beneficial ownership, economic substance, fitness and propriety, etc.);</li>
+                    <li>It involves alleged loss, damage or financial detriment of a material amount;</li>
+                    <li>It is made by a regulator, court or law enforcement agency;</li>
+                    <li>It cannot be resolved internally within 30 calendar days of receipt;</li>
+                    <li>It alleges misconduct or dishonesty on the part of a director, officer or employee;</li>
+                    <li>It has the potential to materially affect BWC's reputation or licensed status.</li>
+                </ul>
+                <p>When the <strong>Significant Complaint</strong> flag is set to <em>Yes</em>, the FSC notification field becomes required. The Commission expects to be notified of significant complaints promptly.</p>
+
+                <h3>How to use this log</h3>
+                <ol>
+                    <li>Click <span class="stat-key">+ New Complaint</span> to log an entry. The Reference No. is generated automatically as <span class="stat-key">BWC-COMP-YYYY-NNNN</span>.</li>
+                    <li>Acknowledge the complainant in writing within 5–7 business days and enter the <strong>Date of Acknowledgment</strong>.</li>
+                    <li>Update <strong>Status</strong> as the matter progresses. Once resolved, enter the <strong>Resolution Date</strong> — "Days to Resolution" is calculated automatically.</li>
+                    <li>Have the entry signed off in the <strong>Reviewed By</strong> field by the Compliance Officer or MLRO.</li>
+                </ol>
+
+                <h3>Saving your work</h3>
+                <ul>
+                    <li><strong>Automatic save:</strong> every change is saved immediately to this browser's local storage. You will see a green confirmation in the top-right.</li>
+                    <li><strong>Manual save:</strong> click <span class="stat-key">💾 Save Now</span> for peace of mind — useful before closing the tab.</li>
+                    <li><strong>Backup off-device:</strong> click <span class="stat-key">⬇️ Backup JSON</span> regularly. Local storage is browser-specific and is wiped if you clear browsing data or change device. <strong>The JSON backup is the only portable record.</strong></li>
+                    <li><strong>Restore:</strong> click <span class="stat-key">⬆️ Restore JSON</span> and select a previously exported file. This replaces the current dataset.</li>
+                </ul>
+
+                <h3>Exporting entries as PDF</h3>
+                <p>Tick the checkbox next to each entry you want to export (or use "select all" in the table header), then choose:</p>
+                <ul>
+                    <li><span class="stat-key">📄 Export PDF (Summary)</span> — a tabular summary of the selected entries. Suitable for filing or a quick overview.</li>
+                    <li><span class="stat-key">📋 Export PDF (Detail)</span> — one full page per complaint, showing every field. <strong>This is the format to use for FSC inspections or external counsel.</strong></li>
+                </ul>
+
+                <h3>Retention</h3>
+                <p>Records of complaints (and their resolution) should be retained for a minimum of <strong>5 years</strong> from the date of resolution, in line with BWC's general record-retention policy under the AML/CFT Code of Practice.</p>
+
+                <h3>Confidentiality</h3>
+                <p>Complaint records may contain confidential client information and personal data. Access to this log should be restricted to authorised personnel only. Do not transmit JSON backups or PDF exports over unsecured channels.</p>
+            </div>
+        </details>
+
+        <!-- DASHBOARD -->
+        <div class="dashboard">
+            <div class="stat-card total">
+                <div class="stat-label">Total YTD</div>
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-sub" id="statYear">2026</div>
+            </div>
+            <div class="stat-card open">
+                <div class="stat-label">Open</div>
+                <div class="stat-value" id="statOpen">0</div>
+                <div class="stat-sub">In progress</div>
+            </div>
+            <div class="stat-card resolved">
+                <div class="stat-label">Resolved</div>
+                <div class="stat-value" id="statResolved">0</div>
+                <div class="stat-sub">Closed</div>
+            </div>
+            <div class="stat-card significant">
+                <div class="stat-label">Significant</div>
+                <div class="stat-value" id="statSignificant">0</div>
+                <div class="stat-sub">FSC-notifiable</div>
+            </div>
+            <div class="stat-card fsc">
+                <div class="stat-label">Avg Days</div>
+                <div class="stat-value" id="statAvgDays">—</div>
+                <div class="stat-sub">To resolution</div>
+            </div>
+        </div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <button class="btn btn-primary" onclick="openModal()">+ New Complaint</button>
+            <button class="btn btn-secondary" onclick="manualSave()">💾 Save Now</button>
+            <div class="toolbar-divider"></div>
+            <button class="btn btn-export" id="btnPdfSummary" onclick="exportSelectedPDF(false)" disabled>📄 Export PDF (Summary)</button>
+            <button class="btn btn-export" id="btnPdfDetail" onclick="exportSelectedPDF(true)" disabled>📋 Export PDF (Detail)</button>
+            <div class="toolbar-divider"></div>
+            <button class="btn btn-secondary" onclick="exportJSON()">⬇️ Backup JSON</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+            <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">⬆️ Restore JSON</button>
+            <div style="flex:1"></div>
+            <span id="selectionCount" style="font-size:13px;color:#475569;font-weight:600;"></span>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filters">
+            <input type="text" id="filterSearch" placeholder="🔍 Search reference, complainant, summary..." oninput="renderTable()">
+            <select id="filterYear" onchange="renderTable()">
+                <option value="">All years</option>
+            </select>
+            <select id="filterStatus" onchange="renderTable()">
+                <option value="">All statuses</option>
+                <option value="Open">Open</option>
+                <option value="Under Investigation">Under Investigation</option>
+                <option value="Awaiting Complainant">Awaiting Complainant</option>
+                <option value="Resolved – Upheld">Resolved – Upheld</option>
+                <option value="Resolved – Not Upheld">Resolved – Not Upheld</option>
+                <option value="Closed">Closed</option>
+            </select>
+            <select id="filterSignificant" onchange="renderTable()">
+                <option value="">All complaints</option>
+                <option value="Yes">Significant only</option>
+                <option value="No">Non-significant only</option>
+            </select>
+            <select id="filterSort" onchange="renderTable()">
+                <option value="dateLogged-desc">Date logged (newest)</option>
+                <option value="dateLogged-asc">Date logged (oldest)</option>
+                <option value="refNo-desc">Reference No. (desc)</option>
+                <option value="refNo-asc">Reference No. (asc)</option>
+                <option value="status">Status</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="clearFilters()">Clear</button>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-wrap">
+            <table id="logTable">
+                <thead>
+                    <tr>
+                        <th style="width:38px"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                        <th>Ref. No.</th>
+                        <th>Date Logged</th>
+                        <th>Complainant</th>
+                        <th>Type</th>
+                        <th>Summary</th>
+                        <th>Status</th>
+                        <th>Sig.</th>
+                        <th>Resolved</th>
+                        <th>Days</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="logTableBody"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Bethel Worldwide Corporation &middot; Internal Complaints Log &middot; Confidential &middot; All data stored locally in this browser
+    </div>
+</div>
+
+<!-- ENTRY MODAL -->
+<div class="modal-overlay" id="entryModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="modalTitle">New Complaint Entry</h2>
+            <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="entryForm" onsubmit="event.preventDefault(); saveEntry();">
+
+                <div class="form-section">
+                    <div class="form-section-title">1. Identification</div>
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label>Reference No.</label>
+                            <input type="text" id="f_refNo" class="readonly" readonly>
+                            <div class="hint">Auto-generated on save</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Date Logged <span class="required">*</span></label>
+                            <input type="date" id="f_dateLogged" required onchange="updateDaysCalc()">
+                            <div class="field-error" data-for="f_dateLogged">Required</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Logged By <span class="required">*</span></label>
+                            <input type="text" id="f_loggedBy" placeholder="e.g. D. Whyne" required>
+                            <div class="field-error" data-for="f_loggedBy">Required</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">2. Complainant</div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>Complainant Name <span class="required">*</span></label>
+                            <input type="text" id="f_complainantName" placeholder="Individual or entity name" required>
+                            <div class="field-error" data-for="f_complainantName">Required</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Contact (email / phone)</label>
+                            <input type="text" id="f_complainantContact" placeholder="e.g. name@example.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Method of Receipt</label>
+                        <select id="f_methodOfReceipt">
+                            <option value="">— Select —</option>
+                            <option>Email</option>
+                            <option>Letter</option>
+                            <option>Telephone</option>
+                            <option>In-person</option>
+                            <option>Online portal</option>
+                            <option>Regulator referral</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">3. The Complaint</div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>Date of Incident</label>
+                            <input type="date" id="f_dateOfIncident">
+                            <div class="hint">Date of the underlying issue (if different from date logged)</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Type of Complaint <span class="required">*</span></label>
+                            <select id="f_typeOfComplaint" required>
+                                <option value="">— Select —</option>
+                                <option>Service</option>
+                                <option>Compliance</option>
+                                <option>Document Delay</option>
+                                <option>Financial / Fees</option>
+                                <option>Conflict of Interest</option>
+                                <option>Confidentiality / Data</option>
+                                <option>AML/CFT</option>
+                                <option>Beneficial Ownership</option>
+                                <option>Economic Substance</option>
+                                <option>Other</option>
+                            </select>
+                            <div class="field-error" data-for="f_typeOfComplaint">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Summary of Issue <span class="required">*</span></label>
+                        <textarea id="f_summaryOfIssue" rows="3" placeholder="Brief factual description of the complaint" required></textarea>
+                        <div class="field-error" data-for="f_summaryOfIssue">Required</div>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>Significant Complaint? <span class="required">*</span></label>
+                            <select id="f_significantComplaint" required onchange="toggleFSCWarning()">
+                                <option value="No">No</option>
+                                <option value="Yes">Yes — FSC notifiable</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date Reported to FSC</label>
+                            <input type="date" id="f_reportedToFSC">
+                            <div class="hint">Leave blank if not reported / not applicable</div>
+                        </div>
+                    </div>
+                    <div class="fsc-warning" id="fscWarning">
+                        <strong>⚠ Significant complaint:</strong> the Commission expects to be notified promptly. Record the date of notification above, and retain the cover letter or email in the matter file.
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">4. Handling</div>
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label>Date of Acknowledgment</label>
+                            <input type="date" id="f_dateOfAcknowledgment">
+                            <div class="hint">Target: 5–7 business days</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Assigned To <span class="required">*</span></label>
+                            <input type="text" id="f_assignedTo" placeholder="e.g. Compliance Department" required>
+                            <div class="field-error" data-for="f_assignedTo">Required</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Status <span class="required">*</span></label>
+                            <select id="f_status" required>
+                                <option>Open</option>
+                                <option>Under Investigation</option>
+                                <option>Awaiting Complainant</option>
+                                <option>Resolved – Upheld</option>
+                                <option>Resolved – Not Upheld</option>
+                                <option>Closed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">5. Investigation &amp; Resolution</div>
+                    <div class="form-group">
+                        <label>Root Cause</label>
+                        <textarea id="f_rootCause" rows="2" placeholder="e.g. Pending KYC documentation from new shareholder"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Action Taken</label>
+                        <textarea id="f_actionTaken" rows="3" placeholder="Steps taken to investigate and resolve"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Preventive / Remedial Measures</label>
+                        <textarea id="f_preventiveMeasures" rows="2" placeholder="What has been changed to prevent recurrence"></textarea>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>Redress / Compensation</label>
+                            <input type="text" id="f_redress" placeholder='e.g. Fee waiver of USD 250 / "None"'>
+                        </div>
+                        <div class="form-group">
+                            <label>Resolution Date</label>
+                            <input type="date" id="f_resolutionDate" onchange="updateDaysCalc()">
+                            <div class="hint" id="daysHint">Days to resolution: —</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">6. Oversight</div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>Reviewed By</label>
+                            <input type="text" id="f_reviewedBy" placeholder="Compliance Officer / MLRO">
+                        </div>
+                        <div class="form-group">
+                            <label>Review Date</label>
+                            <input type="date" id="f_reviewDate">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Internal Notes</label>
+                        <textarea id="f_notes" rows="2" placeholder="Any additional notes for internal use only"></textarea>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveEntry()">Save Entry</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="modal-overlay" id="confirmDialog">
+    <div class="confirm-dialog">
+        <h3 id="confirmTitle">Confirm</h3>
+        <p id="confirmMessage"></p>
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="closeConfirm()">Cancel</button>
+            <button class="btn btn-danger" id="confirmOk">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- SAVE INDICATOR -->
+<div class="save-indicator" id="saveIndicator">✓ Saved</div>
+
+<script>
+// ============================================================
+// BWC COMPLAINTS LOG  —  Persistence & State
+// ============================================================
+const STORAGE_KEY = 'BWC_ComplaintsLog_v1';
+const SCHEMA_VERSION = 1;
+let entries = [];
+let editingId = null;
+let selectedIds = new Set();
+
+// ---------- Utilities ----------
+function uid() {
+    return 'c_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 9);
+}
+
+function todayISO() {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return yyyy + '-' + mm + '-' + dd;
+}
+
+function getValue(id) {
+    const el = document.getElementById(id);
+    return el ? (el.value || '').trim() : '';
+}
+
+function setValue(id, v) {
+    const el = document.getElementById(id);
+    if (el) el.value = v == null ? '' : v;
+}
+
+function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function fmtDate(iso) {
+    if (!iso) return '—';
+    try {
+        const d = new Date(iso + 'T00:00:00');
+        if (isNaN(d)) return iso;
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch (e) { return iso; }
+}
+
+function daysBetween(a, b) {
+    if (!a || !b) return null;
+    const d1 = new Date(a + 'T00:00:00');
+    const d2 = new Date(b + 'T00:00:00');
+    if (isNaN(d1) || isNaN(d2)) return null;
+    return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+}
+
+// ---------- Reference No. generator ----------
+function generateRefNo(year) {
+    const y = year || new Date().getFullYear();
+    const prefix = 'BWC-COMP-' + y + '-';
+    const existing = entries
+        .map(e => e.refNo)
+        .filter(r => r && r.startsWith(prefix))
+        .map(r => parseInt(r.slice(prefix.length), 10))
+        .filter(n => !isNaN(n));
+    const next = (existing.length ? Math.max.apply(null, existing) : 0) + 1;
+    return prefix + String(next).padStart(4, '0');
+}
+
+// ---------- Storage ----------
+function loadFromStorage() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.entries)) {
+            entries = parsed.entries;
+        }
+    } catch (e) {
+        console.error('Failed to load from storage:', e);
+        showIndicator('⚠ Load error — see console', true);
+    }
+}
+
+function saveToStorage(silent) {
+    try {
+        const payload = {
+            version: SCHEMA_VERSION,
+            savedAt: new Date().toISOString(),
+            entries: entries
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        if (!silent) showIndicator('✓ Saved');
+        return true;
+    } catch (e) {
+        console.error('Save failed:', e);
+        showIndicator('⚠ Save failed', true);
+        return false;
+    }
+}
+
+function manualSave() {
+    saveToStorage();
+}
+
+function showIndicator(text, isError) {
+    const el = document.getElementById('saveIndicator');
+    if (!el) return;
+    el.textContent = text;
+    el.classList.toggle('error', !!isError);
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+// ---------- Modal: Create / Edit ----------
+function openModal(id) {
+    editingId = id || null;
+    const modal = document.getElementById('entryModal');
+    const title = document.getElementById('modalTitle');
+
+    // Reset all field-level errors
+    document.querySelectorAll('.form-group.has-error').forEach(g => g.classList.remove('has-error'));
+
+    if (id) {
+        const e = entries.find(x => x.id === id);
+        if (!e) return;
+        title.textContent = 'Edit Complaint — ' + e.refNo;
+        setValue('f_refNo', e.refNo || '');
+        setValue('f_dateLogged', e.dateLogged || '');
+        setValue('f_loggedBy', e.loggedBy || '');
+        setValue('f_complainantName', e.complainantName || '');
+        setValue('f_complainantContact', e.complainantContact || '');
+        setValue('f_methodOfReceipt', e.methodOfReceipt || '');
+        setValue('f_dateOfIncident', e.dateOfIncident || '');
+        setValue('f_typeOfComplaint', e.typeOfComplaint || '');
+        setValue('f_summaryOfIssue', e.summaryOfIssue || '');
+        setValue('f_significantComplaint', e.significantComplaint || 'No');
+        setValue('f_reportedToFSC', e.reportedToFSC || '');
+        setValue('f_dateOfAcknowledgment', e.dateOfAcknowledgment || '');
+        setValue('f_assignedTo', e.assignedTo || '');
+        setValue('f_status', e.status || 'Open');
+        setValue('f_rootCause', e.rootCause || '');
+        setValue('f_actionTaken', e.actionTaken || '');
+        setValue('f_preventiveMeasures', e.preventiveMeasures || '');
+        setValue('f_redress', e.redress || '');
+        setValue('f_resolutionDate', e.resolutionDate || '');
+        setValue('f_reviewedBy', e.reviewedBy || '');
+        setValue('f_reviewDate', e.reviewDate || '');
+        setValue('f_notes', e.notes || '');
+    } else {
+        title.textContent = 'New Complaint Entry';
+        // Clear
+        document.getElementById('entryForm').reset();
+        setValue('f_refNo', '(auto-generated on save)');
+        setValue('f_dateLogged', todayISO());
+        setValue('f_significantComplaint', 'No');
+        setValue('f_status', 'Open');
+    }
+
+    toggleFSCWarning();
+    updateDaysCalc();
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('entryModal').classList.remove('show');
+    document.body.style.overflow = '';
+    editingId = null;
+}
+
+function toggleFSCWarning() {
+    const sig = getValue('f_significantComplaint');
+    document.getElementById('fscWarning').classList.toggle('show', sig === 'Yes');
+}
+
+function updateDaysCalc() {
+    const dl = getValue('f_dateLogged');
+    const rd = getValue('f_resolutionDate');
+    const d = daysBetween(dl, rd);
+    const hint = document.getElementById('daysHint');
+    if (d == null) {
+        hint.textContent = 'Days to resolution: —';
+    } else if (d < 0) {
+        hint.textContent = 'Days to resolution: (resolution date precedes log date)';
+    } else {
+        hint.textContent = 'Days to resolution: ' + d;
+    }
+}
+
+function validateEntry() {
+    const required = [
+        'f_dateLogged', 'f_loggedBy', 'f_complainantName',
+        'f_typeOfComplaint', 'f_summaryOfIssue',
+        'f_significantComplaint', 'f_assignedTo', 'f_status'
+    ];
+    let ok = true;
+    let firstError = null;
+    required.forEach(id => {
+        const el = document.getElementById(id);
+        const group = el ? el.closest('.form-group') : null;
+        if (!el || !el.value || !el.value.trim()) {
+            ok = false;
+            if (group) group.classList.add('has-error');
+            if (!firstError) firstError = el;
+        } else {
+            if (group) group.classList.remove('has-error');
+        }
+    });
+    if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.focus();
+    }
+    return ok;
+}
+
+function saveEntry() {
+    if (!validateEntry()) {
+        showIndicator('⚠ Please complete required fields', true);
+        return;
+    }
+
+    const dateLogged = getValue('f_dateLogged');
+    const yearFromDate = dateLogged ? parseInt(dateLogged.slice(0, 4), 10) : new Date().getFullYear();
+
+    const data = {
+        dateLogged: dateLogged,
+        loggedBy: getValue('f_loggedBy'),
+        complainantName: getValue('f_complainantName'),
+        complainantContact: getValue('f_complainantContact'),
+        methodOfReceipt: getValue('f_methodOfReceipt'),
+        dateOfIncident: getValue('f_dateOfIncident'),
+        typeOfComplaint: getValue('f_typeOfComplaint'),
+        summaryOfIssue: getValue('f_summaryOfIssue'),
+        significantComplaint: getValue('f_significantComplaint') || 'No',
+        reportedToFSC: getValue('f_reportedToFSC'),
+        dateOfAcknowledgment: getValue('f_dateOfAcknowledgment'),
+        assignedTo: getValue('f_assignedTo'),
+        status: getValue('f_status'),
+        rootCause: getValue('f_rootCause'),
+        actionTaken: getValue('f_actionTaken'),
+        preventiveMeasures: getValue('f_preventiveMeasures'),
+        redress: getValue('f_redress'),
+        resolutionDate: getValue('f_resolutionDate'),
+        reviewedBy: getValue('f_reviewedBy'),
+        reviewDate: getValue('f_reviewDate'),
+        notes: getValue('f_notes'),
+        updatedAt: new Date().toISOString()
+    };
+
+    if (editingId) {
+        const idx = entries.findIndex(e => e.id === editingId);
+        if (idx >= 0) {
+            entries[idx] = Object.assign({}, entries[idx], data);
+        }
+    } else {
+        data.id = uid();
+        data.refNo = generateRefNo(yearFromDate);
+        data.createdAt = new Date().toISOString();
+        entries.push(data);
+    }
+
+    saveToStorage();
+    closeModal();
+    renderAll();
+}
+
+// ---------- Delete ----------
+function deleteEntry(id) {
+    const e = entries.find(x => x.id === id);
+    if (!e) return;
+    openConfirm(
+        'Delete complaint',
+        'Permanently delete ' + e.refNo + ' (' + (e.complainantName || 'no name') + ')? This cannot be undone.',
+        () => {
+            entries = entries.filter(x => x.id !== id);
+            selectedIds.delete(id);
+            saveToStorage();
+            renderAll();
+        }
+    );
+}
+
+// ---------- Confirm dialog ----------
+function openConfirm(title, message, onOk) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+    const okBtn = document.getElementById('confirmOk');
+    const newBtn = okBtn.cloneNode(true);
+    okBtn.parentNode.replaceChild(newBtn, okBtn);
+    newBtn.addEventListener('click', () => {
+        closeConfirm();
+        try { onOk(); } catch (e) { console.error(e); }
+    });
+    document.getElementById('confirmDialog').classList.add('show');
+}
+
+function closeConfirm() {
+    document.getElementById('confirmDialog').classList.remove('show');
+}
+
+// ---------- Rendering ----------
+function renderAll() {
+    renderDashboard();
+    renderYearFilter();
+    renderTable();
+    updateSelectionUI();
+}
+
+function renderDashboard() {
+    const year = new Date().getFullYear();
+    document.getElementById('statYear').textContent = year;
+    const ytd = entries.filter(e => (e.dateLogged || '').startsWith(String(year)));
+    const open = entries.filter(e => !/^Resolved|Closed/.test(e.status || ''));
+    const resolved = entries.filter(e => /^Resolved|Closed/.test(e.status || ''));
+    const sig = entries.filter(e => e.significantComplaint === 'Yes');
+    const durations = resolved
+        .map(e => daysBetween(e.dateLogged, e.resolutionDate))
+        .filter(d => typeof d === 'number' && d >= 0);
+    const avg = durations.length
+        ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)
+        : null;
+
+    document.getElementById('statTotal').textContent = ytd.length;
+    document.getElementById('statOpen').textContent = open.length;
+    document.getElementById('statResolved').textContent = resolved.length;
+    document.getElementById('statSignificant').textContent = sig.length;
+    document.getElementById('statAvgDays').textContent = avg == null ? '—' : avg;
+}
+
+function renderYearFilter() {
+    const sel = document.getElementById('filterYear');
+    const current = sel.value;
+    const years = Array.from(new Set(
+        entries.map(e => (e.dateLogged || '').slice(0, 4)).filter(Boolean)
+    )).sort().reverse();
+    sel.innerHTML = '<option value="">All years</option>' +
+        years.map(y => '<option value="' + y + '">' + y + '</option>').join('');
+    if (years.indexOf(current) >= 0) sel.value = current;
+}
+
+function applyFilters(list) {
+    const q = (document.getElementById('filterSearch').value || '').toLowerCase().trim();
+    const year = document.getElementById('filterYear').value;
+    const status = document.getElementById('filterStatus').value;
+    const sig = document.getElementById('filterSignificant').value;
+
+    let out = list.slice();
+    if (year) out = out.filter(e => (e.dateLogged || '').startsWith(year));
+    if (status) out = out.filter(e => e.status === status);
+    if (sig) out = out.filter(e => (e.significantComplaint || 'No') === sig);
+    if (q) {
+        out = out.filter(e => {
+            const blob = [
+                e.refNo, e.complainantName, e.complainantContact,
+                e.typeOfComplaint, e.summaryOfIssue, e.assignedTo,
+                e.loggedBy, e.rootCause, e.actionTaken, e.notes
+            ].filter(Boolean).join(' ').toLowerCase();
+            return blob.indexOf(q) !== -1;
+        });
+    }
+
+    const sortKey = document.getElementById('filterSort').value;
+    out.sort((a, b) => {
+        if (sortKey === 'dateLogged-desc') return (b.dateLogged || '').localeCompare(a.dateLogged || '');
+        if (sortKey === 'dateLogged-asc')  return (a.dateLogged || '').localeCompare(b.dateLogged || '');
+        if (sortKey === 'refNo-desc')      return (b.refNo || '').localeCompare(a.refNo || '');
+        if (sortKey === 'refNo-asc')       return (a.refNo || '').localeCompare(b.refNo || '');
+        if (sortKey === 'status')          return (a.status || '').localeCompare(b.status || '');
+        return 0;
+    });
+    return out;
+}
+
+function statusClass(s) {
+    if (!s) return '';
+    return 'status-' + s.replace(/[^A-Za-z]/g, '');
+}
+
+function renderTable() {
+    const tbody = document.getElementById('logTableBody');
+    const list = applyFilters(entries);
+
+    if (!list.length) {
+        const emptyMsg = entries.length
+            ? 'No complaints match the current filters.'
+            : 'No complaints logged yet. Click <strong>+ New Complaint</strong> to add the first entry.';
+        tbody.innerHTML = '<tr><td colspan="11" class="empty-state"><h3>Nothing to show</h3><div>' + emptyMsg + '</div></td></tr>';
+        renderYearFilter();
+        updateSelectionUI();
+        return;
+    }
+
+    tbody.innerHTML = list.map(e => {
+        const days = daysBetween(e.dateLogged, e.resolutionDate);
+        const sel = selectedIds.has(e.id);
+        return '<tr class="' + (sel ? 'selected' : '') + '">'
+            + '<td><input type="checkbox" class="row-check" data-id="' + escapeHtml(e.id) + '"' + (sel ? ' checked' : '') + ' onchange="toggleSelect(\'' + e.id + '\', this.checked)"></td>'
+            + '<td><span class="ref-badge">' + escapeHtml(e.refNo || '') + '</span></td>'
+            + '<td class="cell-narrow">' + escapeHtml(fmtDate(e.dateLogged)) + '</td>'
+            + '<td>' + escapeHtml(e.complainantName || '') + '</td>'
+            + '<td>' + escapeHtml(e.typeOfComplaint || '') + '</td>'
+            + '<td class="cell-summary">' + escapeHtml((e.summaryOfIssue || '').slice(0, 160)) + ((e.summaryOfIssue || '').length > 160 ? '…' : '') + '</td>'
+            + '<td><span class="status-pill ' + statusClass(e.status) + '">' + escapeHtml(e.status || '') + '</span></td>'
+            + '<td>' + (e.significantComplaint === 'Yes' ? '<span class="sig-flag">YES</span>' : '<span class="no-flag">—</span>') + '</td>'
+            + '<td class="cell-narrow">' + escapeHtml(fmtDate(e.resolutionDate)) + '</td>'
+            + '<td>' + (days == null ? '—' : days) + '</td>'
+            + '<td class="cell-narrow">'
+            + '<button class="btn btn-edit btn-sm" onclick="openModal(\'' + e.id + '\')">Edit</button> '
+            + '<button class="btn btn-danger btn-sm" onclick="deleteEntry(\'' + e.id + '\')">Delete</button>'
+            + '</td>'
+            + '</tr>';
+    }).join('');
+
+    updateSelectionUI();
+}
+
+function toggleSelect(id, checked) {
+    if (checked) selectedIds.add(id); else selectedIds.delete(id);
+    const row = document.querySelector('input.row-check[data-id="' + id.replace(/"/g, '\\"') + '"]');
+    if (row) row.closest('tr').classList.toggle('selected', checked);
+    updateSelectionUI();
+}
+
+function toggleSelectAll() {
+    const master = document.getElementById('selectAll');
+    const visible = applyFilters(entries);
+    if (master.checked) {
+        visible.forEach(e => selectedIds.add(e.id));
+    } else {
+        visible.forEach(e => selectedIds.delete(e.id));
+    }
+    renderTable();
+}
+
+function updateSelectionUI() {
+    const n = selectedIds.size;
+    document.getElementById('btnPdfSummary').disabled = n === 0;
+    document.getElementById('btnPdfDetail').disabled = n === 0;
+    document.getElementById('selectionCount').textContent = n
+        ? n + ' entr' + (n === 1 ? 'y' : 'ies') + ' selected'
+        : '';
+
+    // Sync master checkbox state
+    const visible = applyFilters(entries);
+    const master = document.getElementById('selectAll');
+    if (!visible.length) {
+        master.checked = false;
+        master.indeterminate = false;
+        return;
+    }
+    const selectedVisible = visible.filter(e => selectedIds.has(e.id)).length;
+    if (selectedVisible === 0) {
+        master.checked = false;
+        master.indeterminate = false;
+    } else if (selectedVisible === visible.length) {
+        master.checked = true;
+        master.indeterminate = false;
+    } else {
+        master.checked = false;
+        master.indeterminate = true;
+    }
+}
+
+function clearFilters() {
+    document.getElementById('filterSearch').value = '';
+    document.getElementById('filterYear').value = '';
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('filterSignificant').value = '';
+    document.getElementById('filterSort').value = 'dateLogged-desc';
+    renderTable();
+}
+
+// ---------- JSON import / export ----------
+function exportJSON() {
+    const payload = {
+        version: SCHEMA_VERSION,
+        exportedAt: new Date().toISOString(),
+        source: 'BWC Complaints Log',
+        entries: entries
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = todayISO();
+    a.href = url;
+    a.download = 'BWC_Complaints_Log_Backup_' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showIndicator('✓ JSON backup downloaded');
+}
+
+function importJSON(ev) {
+    const file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const parsed = JSON.parse(e.target.result);
+            if (!parsed || !Array.isArray(parsed.entries)) {
+                throw new Error('File does not look like a BWC Complaints Log backup.');
+            }
+            openConfirm(
+                'Restore from backup',
+                'This will REPLACE the current ' + entries.length + ' entries with the ' + parsed.entries.length + ' entries from the backup. Continue?',
+                () => {
+                    entries = parsed.entries;
+                    selectedIds.clear();
+                    saveToStorage();
+                    renderAll();
+                    showIndicator('✓ Restored ' + entries.length + ' entries');
+                }
+            );
+        } catch (err) {
+            console.error(err);
+            showIndicator('⚠ Invalid backup file', true);
+            alert('Could not import file: ' + err.message);
+        }
+        ev.target.value = '';
+    };
+    reader.readAsText(file);
+}
+
+// ============================================================
+// PDF EXPORT
+// ============================================================
+function exportSelectedPDF(detailMode) {
+    if (!selectedIds.size) {
+        showIndicator('⚠ Select at least one entry', true);
+        return;
+    }
+    const list = entries.filter(e => selectedIds.has(e.id));
+    list.sort((a, b) => (a.refNo || '').localeCompare(b.refNo || ''));
+    if (detailMode) {
+        generateDetailPDF(list);
+    } else {
+        generateSummaryPDF(list);
+    }
+}
+
+function getJsPDF() {
+    if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
+    if (window.jsPDF) return window.jsPDF;
+    return null;
+}
+
+function pdfHeader(doc, pageWidth, margin, subtitle) {
+    // Navy band
+    doc.setFillColor(30, 58, 95);
+    doc.rect(0, 0, pageWidth, 22, 'F');
+    // Gold accent
+    doc.setFillColor(212, 175, 55);
+    doc.rect(0, 22, pageWidth, 1.5, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('BETHEL WORLDWIDE CORPORATION', pageWidth / 2, 10, { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text('Internal Complaints Log — ' + (subtitle || ''), pageWidth / 2, 17, { align: 'center' });
+    doc.setTextColor(0, 0, 0);
+}
+
+function pdfFooter(doc, pageWidth, pageHeight, pageNum, totalPages) {
+    const margin = 14;
+    doc.setDrawColor(212, 175, 55);
+    doc.setLineWidth(0.4);
+    doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14);
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    const stamp = 'Generated ' + new Date().toLocaleString('en-GB') + ' · Confidential';
+    doc.text(stamp, margin, pageHeight - 9);
+    const pn = 'Page ' + pageNum + ' of ' + totalPages;
+    doc.text(pn, pageWidth - margin, pageHeight - 9, { align: 'right' });
+    doc.setTextColor(0, 0, 0);
+}
+
+// ---------- Summary PDF ----------
+function generateSummaryPDF(list) {
+    const JsPDF = getJsPDF();
+    if (!JsPDF) { alert('PDF library failed to load. Please check your internet connection and reload.'); return; }
+
+    try {
+        const doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 10;
+
+        // Column definitions for landscape A4 (297mm wide, ~277 usable)
+        const cols = [
+            { key: 'refNo',                 label: 'Ref. No.',       w: 28 },
+            { key: 'dateLogged',            label: 'Logged',         w: 20, fmt: fmtDateShort },
+            { key: 'complainantName',       label: 'Complainant',    w: 38 },
+            { key: 'typeOfComplaint',       label: 'Type',           w: 28 },
+            { key: 'summaryOfIssue',        label: 'Summary',        w: 70 },
+            { key: 'status',                label: 'Status',         w: 30 },
+            { key: 'significantComplaint',  label: 'Sig.',           w: 12 },
+            { key: 'resolutionDate',        label: 'Resolved',       w: 20, fmt: fmtDateShort },
+            { key: 'days',                  label: 'Days',           w: 12, compute: (e) => {
+                const d = daysBetween(e.dateLogged, e.resolutionDate);
+                return d == null ? '—' : String(d);
+            } },
+            { key: 'assignedTo',            label: 'Assigned',       w: 19 }
+        ];
+
+        const headerH = 8;
+        const rowMinH = 7;
+        let pageNum = 1;
+
+        function fmtDateShort(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso + 'T00:00:00');
+            if (isNaN(d)) return iso;
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
+        }
+
+        function drawTableHeader(y) {
+            doc.setFillColor(30, 58, 95);
+            doc.rect(margin, y, pageWidth - 2 * margin, headerH, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            let x = margin + 1.5;
+            cols.forEach(c => {
+                doc.text(c.label, x, y + 5.5);
+                x += c.w;
+            });
+            doc.setTextColor(0, 0, 0);
+        }
+
+        function drawRow(e, y, rowIdx) {
+            // Pre-compute wrapped text per column to find row height
+            const cellLines = cols.map(c => {
+                let v;
+                if (c.compute) {
+                    v = c.compute(e);
+                } else {
+                    v = e[c.key];
+                    if (c.fmt) v = c.fmt(v);
+                }
+                if (v == null || v === '') v = '—';
+                v = String(v);
+                if (c.key === 'significantComplaint') v = (v === 'Yes' ? 'YES' : '—');
+                return doc.splitTextToSize(v, c.w - 3);
+            });
+            const lineCount = Math.max.apply(null, cellLines.map(l => l.length));
+            const rowH = Math.max(rowMinH, 4 + lineCount * 3.6);
+
+            // Zebra stripe
+            if (rowIdx % 2 === 1) {
+                doc.setFillColor(248, 250, 252);
+                doc.rect(margin, y, pageWidth - 2 * margin, rowH, 'F');
+            }
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(30, 41, 59);
+
+            let x = margin + 1.5;
+            cellLines.forEach((lines, i) => {
+                const c = cols[i];
+                // Significant flag styling
+                if (c.key === 'significantComplaint' && lines[0] === 'YES') {
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(220, 38, 38);
+                    doc.text('YES', x, y + 4.5);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(30, 41, 59);
+                } else {
+                    doc.text(lines, x, y + 4.5);
+                }
+                x += c.w;
+            });
+
+            // Bottom rule
+            doc.setDrawColor(226, 232, 240);
+            doc.setLineWidth(0.2);
+            doc.line(margin, y + rowH, pageWidth - margin, y + rowH);
+
+            return rowH;
+        }
+
+        // Start drawing
+        pdfHeader(doc, pageWidth, margin, 'Summary of Selected Complaints (' + list.length + ')');
+        let y = 30;
+
+        // Filter context line
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text('Selection: ' + list.length + ' entries · Sorted by Reference No.', margin, y);
+        y += 5;
+        doc.setTextColor(0, 0, 0);
+
+        drawTableHeader(y);
+        y += headerH;
+
+        list.forEach((e, idx) => {
+            // Page break check: estimate row height first
+            const tempLines = cols.map(c => {
+                let v;
+                if (c.compute) v = c.compute(e); else v = e[c.key];
+                if (c.fmt) v = c.fmt(v);
+                if (v == null || v === '') v = '—';
+                return doc.splitTextToSize(String(v), c.w - 3);
+            });
+            const estH = Math.max(rowMinH, 4 + Math.max.apply(null, tempLines.map(l => l.length)) * 3.6);
+
+            if (y + estH > pageHeight - 18) {
+                pdfFooter(doc, pageWidth, pageHeight, pageNum, -1);
+                doc.addPage();
+                pageNum++;
+                pdfHeader(doc, pageWidth, margin, 'Summary of Selected Complaints (continued)');
+                y = 30;
+                drawTableHeader(y);
+                y += headerH;
+            }
+            const drawn = drawRow(e, y, idx);
+            y += drawn;
+        });
+
+        pdfFooter(doc, pageWidth, pageHeight, pageNum, pageNum);
+
+        // Pass two for total page numbers
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let p = 1; p <= totalPages; p++) {
+            doc.setPage(p);
+            // Clear and redraw footer
+            doc.setFillColor(255, 255, 255);
+            doc.rect(0, pageHeight - 18, pageWidth, 18, 'F');
+            pdfFooter(doc, pageWidth, pageHeight, p, totalPages);
+        }
+
+        const stamp = todayISO();
+        doc.save('BWC_Complaints_Summary_' + stamp + '.pdf');
+        showIndicator('✓ Summary PDF downloaded');
+    } catch (err) {
+        console.error('Summary PDF error:', err);
+        alert('Failed to generate PDF: ' + err.message);
+    }
+}
+
+// ---------- Detail PDF ----------
+function generateDetailPDF(list) {
+    const JsPDF = getJsPDF();
+    if (!JsPDF) { alert('PDF library failed to load. Please check your internet connection and reload.'); return; }
+
+    try {
+        const doc = new JsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 16;
+        const contentW = pageWidth - 2 * margin;
+
+        list.forEach((e, idx) => {
+            if (idx > 0) doc.addPage();
+            renderDetailPage(doc, e, pageWidth, pageHeight, margin, contentW);
+        });
+
+        // Pass two: footer with totals
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let p = 1; p <= totalPages; p++) {
+            doc.setPage(p);
+            doc.setFillColor(255, 255, 255);
+            doc.rect(0, pageHeight - 18, pageWidth, 18, 'F');
+            pdfFooter(doc, pageWidth, pageHeight, p, totalPages);
+        }
+
+        const stamp = todayISO();
+        doc.save('BWC_Complaints_Detail_' + stamp + '.pdf');
+        showIndicator('✓ Detail PDF downloaded');
+    } catch (err) {
+        console.error('Detail PDF error:', err);
+        alert('Failed to generate PDF: ' + err.message);
+    }
+}
+
+function renderDetailPage(doc, e, pageWidth, pageHeight, margin, contentW) {
+    pdfHeader(doc, pageWidth, margin, 'Complaint Record — ' + (e.refNo || ''));
+
+    let y = 32;
+
+    // Ref banner
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(212, 175, 55);
+    doc.setLineWidth(0.6);
+    doc.rect(margin, y, contentW, 14, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(30, 58, 95);
+    doc.text(e.refNo || '—', margin + 4, y + 6);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
+    doc.text('Date logged: ' + fmtDate(e.dateLogged), margin + 4, y + 11);
+    if (e.significantComplaint === 'Yes') {
+        doc.setFillColor(220, 38, 38);
+        doc.rect(pageWidth - margin - 36, y + 3, 32, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text('SIGNIFICANT', pageWidth - margin - 20, y + 8.5, { align: 'center' });
+    }
+    doc.setTextColor(0, 0, 0);
+    y += 18;
+
+    function section(title) {
+        if (y > pageHeight - 30) return; // safety
+        doc.setFillColor(30, 58, 95);
+        doc.rect(margin, y, contentW, 6, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text(title.toUpperCase(), margin + 3, y + 4.2);
+        doc.setTextColor(0, 0, 0);
+        y += 8;
+    }
+
+    function row(label, value, fullWidth) {
+        if (value == null || value === '') value = '—';
+        value = String(value);
+        const labelW = 48;
+        const valueW = (fullWidth ? contentW : contentW) - labelW - 2;
+        const lines = doc.splitTextToSize(value, valueW);
+        const rowH = Math.max(6, 4 + lines.length * 4.2);
+
+        if (y + rowH > pageHeight - 20) {
+            doc.addPage();
+            pdfHeader(doc, pageWidth, margin, 'Complaint Record — ' + (e.refNo || '') + ' (continued)');
+            y = 32;
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text(label, margin + 1, y + 4);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(15, 23, 42);
+        doc.text(lines, margin + labelW, y + 4);
+
+        doc.setDrawColor(241, 245, 249);
+        doc.setLineWidth(0.2);
+        doc.line(margin, y + rowH, margin + contentW, y + rowH);
+        y += rowH;
+    }
+
+    function pairRow(l1, v1, l2, v2) {
+        // Two-column row
+        if (v1 == null || v1 === '') v1 = '—';
+        if (v2 == null || v2 === '') v2 = '—';
+        const colW = contentW / 2;
+        const labelW = 30;
+        const valueW = colW - labelW - 2;
+        const lines1 = doc.splitTextToSize(String(v1), valueW);
+        const lines2 = doc.splitTextToSize(String(v2), valueW);
+        const rowH = Math.max(6, 4 + Math.max(lines1.length, lines2.length) * 4.2);
+
+        if (y + rowH > pageHeight - 20) {
+            doc.addPage();
+            pdfHeader(doc, pageWidth, margin, 'Complaint Record — ' + (e.refNo || '') + ' (continued)');
+            y = 32;
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text(l1, margin + 1, y + 4);
+        doc.text(l2, margin + colW + 1, y + 4);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(15, 23, 42);
+        doc.text(lines1, margin + labelW, y + 4);
+        doc.text(lines2, margin + colW + labelW, y + 4);
+
+        doc.setDrawColor(241, 245, 249);
+        doc.setLineWidth(0.2);
+        doc.line(margin, y + rowH, margin + contentW, y + rowH);
+        y += rowH;
+    }
+
+    section('1. Identification');
+    pairRow('Date Logged', fmtDate(e.dateLogged), 'Logged By', e.loggedBy);
+
+    section('2. Complainant');
+    pairRow('Name', e.complainantName, 'Contact', e.complainantContact);
+    row('Method of Receipt', e.methodOfReceipt);
+
+    section('3. The Complaint');
+    pairRow('Date of Incident', fmtDate(e.dateOfIncident), 'Type', e.typeOfComplaint);
+    row('Summary', e.summaryOfIssue);
+    pairRow('Significant', e.significantComplaint || 'No', 'Reported to FSC', fmtDate(e.reportedToFSC));
+
+    section('4. Handling');
+    pairRow('Date of Acknowledgment', fmtDate(e.dateOfAcknowledgment), 'Status', e.status);
+    row('Assigned To', e.assignedTo);
+
+    section('5. Investigation & Resolution');
+    row('Root Cause', e.rootCause);
+    row('Action Taken', e.actionTaken);
+    row('Preventive / Remedial Measures', e.preventiveMeasures);
+    const days = daysBetween(e.dateLogged, e.resolutionDate);
+    pairRow('Resolution Date', fmtDate(e.resolutionDate), 'Days to Resolution', days == null ? '—' : String(days));
+    row('Redress / Compensation', e.redress);
+
+    section('6. Oversight');
+    pairRow('Reviewed By', e.reviewedBy, 'Review Date', fmtDate(e.reviewDate));
+    if (e.notes && e.notes.trim()) {
+        row('Internal Notes', e.notes);
+    }
+
+    // Signature block
+    if (y < pageHeight - 50) y = Math.max(y + 6, pageHeight - 50);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(30, 58, 95);
+    doc.text('Authorised Signature', margin, y);
+    doc.text('Date', margin + 110, y);
+    y += 14;
+    doc.setDrawColor(100, 116, 139);
+    doc.setLineWidth(0.3);
+    doc.line(margin, y, margin + 90, y);
+    doc.line(margin + 110, y, margin + 160, y);
+    doc.setTextColor(0, 0, 0);
+}
+
+// ============================================================
+// INITIALISATION
+// ============================================================
+function init() {
+    loadFromStorage();
+    renderAll();
+
+    // ESC to close modals
+    document.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Escape') {
+            closeModal();
+            closeConfirm();
+        }
+    });
+
+    // Click outside modal to close
+    document.getElementById('entryModal').addEventListener('click', (ev) => {
+        if (ev.target.id === 'entryModal') closeModal();
+    });
+    document.getElementById('confirmDialog').addEventListener('click', (ev) => {
+        if (ev.target.id === 'confirmDialog') closeConfirm();
+    });
+
+    // Ctrl/Cmd + S = manual save
+    document.addEventListener('keydown', (ev) => {
+        if ((ev.ctrlKey || ev.metaKey) && ev.key === 's') {
+            ev.preventDefault();
+            manualSave();
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
