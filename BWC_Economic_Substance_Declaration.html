@@ -1182,16 +1182,19 @@
                                     <option value="ZMW">ZMW - Zambian Kwacha</option>
                                     <option value="ZWL">ZWL - Zimbabwean Dollar</option>
                                 </select>
+                                <span class="error-message" id="error-grossIncomeReportingCurrency"></span>
                             </div>
                             <div class="form-group">
                                 <label>Gross income in relation to The Relevant Activity <span class="required">*</span></label>
                                 <input type="text" id="grossIncomeRelActivity" placeholder="Enter amount">
+                                <span class="error-message" id="error-grossIncomeRelActivity"></span>
                             </div>
                         </div>
                         <div class="grid-2">
                             <div class="form-group">
                                 <label>Net Book Value of tangible assets <span class="required">*</span></label>
                                 <input type="text" id="netBookValue" placeholder="Enter value">
+                                <span class="error-message" id="error-netBookValue"></span>
                             </div>
                             <div class="form-group">
                                 <label>Type of Gross Income <span class="required">*</span></label>
@@ -1211,6 +1214,7 @@
                                     </ul>
                                 </div>
                                 <input type="text" id="typeGrossIncome" placeholder="Enter type">
+                                <span class="error-message" id="error-typeGrossIncome"></span>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1264,6 +1268,7 @@
                             <div class="form-group">
                                 <label>Quorum of Board Meetings <span class="required">*</span></label>
                                 <input type="text" id="quorumBoardMeetings" placeholder="Enter quorum">
+                                <span class="error-message" id="error-quorumBoardMeetings"></span>
                             </div>
                             <div class="form-group">
                                 <label>Quorum of Directors Physically Present in the Virgin Islands <span class="required">*</span></label>
@@ -1459,14 +1464,17 @@
                                     <option value="ZMW">ZMW - Zambian Kwacha</option>
                                     <option value="ZWL">ZWL - Zimbabwean Dollar</option>
                                 </select>
+                                <span class="error-message" id="error-expenditureReportingCurrency"></span>
                             </div>
                             <div class="form-group">
                                 <label>Total Expenditure <span class="required">*</span></label>
                                 <input type="text" id="totalExpenditure" placeholder="Enter amount">
+                                <span class="error-message" id="error-totalExpenditure"></span>
                             </div>
                             <div class="form-group">
                                 <label>BVI Expenditure <span class="required">*</span></label>
                                 <input type="text" id="bviExpenditure" placeholder="Enter amount">
+                                <span class="error-message" id="error-bviExpenditure"></span>
                             </div>
                         </div>
 
@@ -1530,6 +1538,7 @@
                             <div class="form-group">
                                 <label>Identify the relevant IP asset which it holds <span class="required">*</span></label>
                                 <input type="text" id="relevantIPAsset" placeholder="Identify IP asset">
+                                <span class="error-message" id="error-relevantIPAsset"></span>
                             </div>
                         </div>
 
@@ -1563,15 +1572,18 @@
                                         <option value="CHF">CHF</option>
                                         <option value="JPY">JPY</option>
                                     </select>
+                                <span class="error-message" id="error-outsourcingReportingCurrency"></span>
                                 </div>
                                 <div class="form-group">
                                     <label>Outsourcing Expenditure <span class="required">*</span></label>
                                     <input type="text" id="outsourcingExpenditure" placeholder="Enter amount" maxlength="50">
+                                <span class="error-message" id="error-outsourcingExpenditure"></span>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label>Equipment <span class="required">*</span></label>
                                 <input type="text" id="equipment" placeholder="Describe equipment" maxlength="300">
+                                <span class="error-message" id="error-equipment"></span>
                             </div>
                         </div>
 
@@ -3117,6 +3129,205 @@
                 }
             });
 
+            // Validate entityType (select - not in the basic required array)
+            const entityTypeEl = document.getElementById('entityType');
+            if (!entityTypeEl.value) {
+                entityTypeEl.classList.add('error');
+                const etErr = document.getElementById('error-entityType');
+                if (etErr) etErr.textContent = 'This field is required';
+                valid = false;
+            } else {
+                entityTypeEl.classList.remove('error');
+                const etErr = document.getElementById('error-entityType');
+                if (etErr) etErr.textContent = '';
+            }
+
+            // Validate Type 1 fields
+            if (document.getElementById('declarationType')?.value === '1') {
+
+                // Determine whether non-Holding Business sections are visible
+                const nonHoldingWrapper = document.getElementById('nonHoldingBusinessSections');
+                const nonHoldingVisible = nonHoldingWrapper && nonHoldingWrapper.style.display !== 'none';
+
+                if (nonHoldingVisible) {
+                    // Text / select fields compulsory for Type 1 (non-Holding path)
+                    const type1Fields = [
+                        { id: 'reportingCurrency',            isSelect: true  },
+                        { id: 'totalGrossIncome',              isSelect: false },
+                        { id: 'grossIncomeReportingCurrency',  isSelect: true  },
+                        { id: 'grossIncomeRelActivity',        isSelect: false },
+                        { id: 'netBookValue',                  isSelect: false },
+                        { id: 'typeGrossIncome',               isSelect: false },
+                        { id: 'numBoardMeetings',              isSelect: false },
+                        { id: 'boardMeetingsBVI',              isSelect: false },
+                        { id: 'quorumBoardMeetings',           isSelect: false },
+                        { id: 'expenditureReportingCurrency',  isSelect: true  },
+                        { id: 'totalExpenditure',              isSelect: false },
+                        { id: 'bviExpenditure',                isSelect: false },
+                        { id: 'totalEmployees',                isSelect: false },
+                        { id: 'bviEmployees',                  isSelect: false },
+                        { id: 'employeesEngaged',              isSelect: false },
+                    ];
+                    type1Fields.forEach(field => {
+                        const el = document.getElementById(field.id);
+                        if (!el) return;
+                        const errEl = document.getElementById('error-' + field.id);
+                        const isEmpty = field.isSelect ? !el.value : !el.value.trim();
+                        if (isEmpty) {
+                            el.classList.add('error');
+                            if (errEl) errEl.textContent = 'This field is required';
+                            valid = false;
+                        } else {
+                            el.classList.remove('error');
+                            if (errEl) errEl.textContent = '';
+                        }
+                    });
+
+                    // Radio groups compulsory for Type 1 (non-Holding path)
+                    const type1Radios = [
+                        { name: 'directedBVI',            label: 'Directed and managed in the BVI' },
+                        { name: 'minutesBVI',              label: 'Minutes kept in the BVI' },
+                        { name: 'quorumPhysicallyPresent', label: 'Quorum of Directors Physically Present in the Virgin Islands' },
+                        { name: 'highRiskIP',              label: 'Is the entity a High Risk IP entity' },
+                        { name: 'cigaOutsourced',          label: 'CIGA Outsourced' },
+                    ];
+                    type1Radios.forEach(group => {
+                        const checked = document.querySelector(`input[name="${group.name}"]:checked`);
+                        if (!checked) {
+                            alert(`Please answer: ${group.label}`);
+                            valid = false;
+                        }
+                    });
+
+                    // Conditional: High Risk IP = YES → relevantIPAsset and conductCIGA required
+                    const highRiskIPVal = document.querySelector('input[name="highRiskIP"]:checked')?.value;
+                    if (highRiskIPVal === 'YES') {
+                        const ipAssetEl = document.getElementById('relevantIPAsset');
+                        if (ipAssetEl && !ipAssetEl.value.trim()) {
+                            ipAssetEl.classList.add('error');
+                            const errEl = document.getElementById('error-relevantIPAsset');
+                            if (errEl) errEl.textContent = 'This field is required';
+                            valid = false;
+                        } else if (ipAssetEl) {
+                            ipAssetEl.classList.remove('error');
+                            const errEl = document.getElementById('error-relevantIPAsset');
+                            if (errEl) errEl.textContent = '';
+                        }
+                        const conductCIGAChecked = document.querySelector('input[name="conductCIGA"]:checked');
+                        if (!conductCIGAChecked) {
+                            alert('Please answer: Does the entity conduct CIGA other than those outlined in Section 7(h) of the ESA?');
+                            valid = false;
+                        }
+                    }
+
+                    // Conditional: CIGA Outsourced = YES → currency, expenditure and equipment required
+                    const cigaOutsourcedVal = document.querySelector('input[name="cigaOutsourced"]:checked')?.value;
+                    if (cigaOutsourcedVal === 'YES') {
+                        const outCurrEl = document.getElementById('outsourcingReportingCurrency');
+                        if (outCurrEl && !outCurrEl.value) {
+                            outCurrEl.classList.add('error');
+                            const errEl = document.getElementById('error-outsourcingReportingCurrency');
+                            if (errEl) errEl.textContent = 'This field is required';
+                            valid = false;
+                        } else if (outCurrEl) {
+                            outCurrEl.classList.remove('error');
+                            const errEl = document.getElementById('error-outsourcingReportingCurrency');
+                            if (errEl) errEl.textContent = '';
+                        }
+                        const outExpEl = document.getElementById('outsourcingExpenditure');
+                        if (outExpEl && !outExpEl.value.trim()) {
+                            outExpEl.classList.add('error');
+                            const errEl = document.getElementById('error-outsourcingExpenditure');
+                            if (errEl) errEl.textContent = 'This field is required';
+                            valid = false;
+                        } else if (outExpEl) {
+                            outExpEl.classList.remove('error');
+                            const errEl = document.getElementById('error-outsourcingExpenditure');
+                            if (errEl) errEl.textContent = '';
+                        }
+                        const equipEl = document.getElementById('equipment');
+                        if (equipEl && !equipEl.value.trim()) {
+                            equipEl.classList.add('error');
+                            const errEl = document.getElementById('error-equipment');
+                            if (errEl) errEl.textContent = 'This field is required';
+                            valid = false;
+                        } else if (equipEl) {
+                            equipEl.classList.remove('error');
+                            const errEl = document.getElementById('error-equipment');
+                            if (errEl) errEl.textContent = '';
+                        }
+                    }
+
+                    // Validate Meetings — at least one entry, all required fields completed
+                    const activeMeetings = meetings.map((m, i) => ({ m, i })).filter(({ m }) => m !== null);
+                    if (activeMeetings.length === 0) {
+                        alert('Please add at least one Meeting entry.');
+                        valid = false;
+                    } else {
+                        activeMeetings.forEach(({ i }) => {
+                            const meetFields = ['meetingNo','personName','relation','qualification'];
+                            const meetLabels = ['Meeting No','Person\'s Name','Relation to Company','Director Qualification'];
+                            meetFields.forEach((field, fi) => {
+                                const el = document.querySelector(`input[data-meeting="${i}"][data-field="${field}"]`);
+                                if (el && !el.value.trim()) {
+                                    el.classList.add('error');
+                                    alert(`Meeting ${i + 1}: ${meetLabels[fi]} is required.`);
+                                    valid = false;
+                                } else if (el) el.classList.remove('error');
+                            });
+                            const presentChecked = document.querySelector(`input[name="physicallyPresent_${i}"]:checked`);
+                            if (!presentChecked) {
+                                alert(`Meeting ${i + 1}: Please answer whether the person was Physically Present.`);
+                                valid = false;
+                            }
+                        });
+                    }
+
+                    // Validate Premises — at least one entry with address1 and country
+                    const activePremises = premises.map((p, i) => ({ p, i })).filter(({ p }) => p !== null);
+                    if (activePremises.length === 0) {
+                        alert('Please add at least one Premises entry.');
+                        valid = false;
+                    } else {
+                        activePremises.forEach(({ i }) => {
+                            const addr1El = document.querySelector(`input[data-premises="${i}"][data-field="address1"]`);
+                            const countryEl = document.querySelector(`select[data-premises="${i}"][data-field="country"]`);
+                            if (addr1El && !addr1El.value.trim()) {
+                                addr1El.classList.add('error');
+                                alert(`Premises ${i + 1}: Address Line 1 is required.`);
+                                valid = false;
+                            } else if (addr1El) addr1El.classList.remove('error');
+                            if (countryEl && !countryEl.value) {
+                                countryEl.classList.add('error');
+                                alert(`Premises ${i + 1}: Country is required.`);
+                                valid = false;
+                            } else if (countryEl) countryEl.classList.remove('error');
+                        });
+                    }
+
+                    // Validate BVI Employees — at least one entry with all required fields
+                    const activeBVIEmps = bviEmployees.map((e, i) => ({ e, i })).filter(({ e }) => e !== null);
+                    if (activeBVIEmps.length === 0) {
+                        alert('Please add at least one BVI Employee entry.');
+                        valid = false;
+                    } else {
+                        activeBVIEmps.forEach(({ i }) => {
+                            const empFields = ['empName','empQual','empExp'];
+                            const empLabels = ['Employee Name','Employee Qualification','Years of Relevant Experience'];
+                            empFields.forEach((field, fi) => {
+                                const el = document.querySelector(`input[data-bviemp="${i}"][data-field="${field}"]`);
+                                if (el && !el.value.trim()) {
+                                    el.classList.add('error');
+                                    alert(`BVI Employee ${i + 1}: ${empLabels[fi]} is required.`);
+                                    valid = false;
+                                } else if (el) el.classList.remove('error');
+                            });
+                        });
+                    }
+
+                } // end nonHoldingVisible
+            }
+
             // Validate Claim of Non-Residence fields if Declaration Type = 3
             if (document.getElementById('declarationType')?.value === '3') {
                 const cnrChecked = document.querySelectorAll('.cnr-activity:checked');
@@ -3289,29 +3500,156 @@
                 });
             }
 
+            // Validate Relevant Activity section (Type 1 only)
+            if (document.getElementById('declarationType')?.value === '1') {
+                const activeRAs = relevantActivities.map((ra, idx) => ({ ra, idx })).filter(({ ra }) => ra !== null);
+
+                if (activeRAs.length === 0) {
+                    alert('Please add at least one Relevant Activity.');
+                    valid = false;
+                } else {
+                    activeRAs.forEach(({ idx }) => {
+                        const activityNameEl = document.querySelector(`select[data-ra="${idx}"][data-field="activityName"]`);
+                        if (!activityNameEl || !activityNameEl.value) {
+                            activityNameEl?.classList.add('error');
+                            alert(`Relevant Activity ${idx + 1}: Please select a Relevant Activity Name.`);
+                            valid = false;
+                            return;
+                        } else {
+                            activityNameEl.classList.remove('error');
+                        }
+
+                        // Holding Business (value = 6) has its own conditional fields
+                        if (activityNameEl.value === '6') {
+                            const holdCurrEl = document.querySelector(`select[data-ra="${idx}"][data-field="holdingCurrency"]`);
+                            const holdGrossEl = document.querySelector(`input[data-ra="${idx}"][data-field="holdingGrossIncome"]`);
+                            const holdTypeEl  = document.querySelector(`input[data-ra="${idx}"][data-field="holdingIncomeType"]`);
+
+                            if (holdCurrEl && !holdCurrEl.value) {
+                                holdCurrEl.classList.add('error');
+                                alert(`Relevant Activity ${idx + 1} (Holding Business): Reporting Currency is required.`);
+                                valid = false;
+                            } else if (holdCurrEl) holdCurrEl.classList.remove('error');
+
+                            if (holdGrossEl && !holdGrossEl.value.trim()) {
+                                holdGrossEl.classList.add('error');
+                                alert(`Relevant Activity ${idx + 1} (Holding Business): Gross Income is required.`);
+                                valid = false;
+                            } else if (holdGrossEl) holdGrossEl.classList.remove('error');
+
+                            if (holdTypeEl && !holdTypeEl.value.trim()) {
+                                holdTypeEl.classList.add('error');
+                                alert(`Relevant Activity ${idx + 1} (Holding Business): Type of Gross Income is required.`);
+                                valid = false;
+                            } else if (holdTypeEl) holdTypeEl.classList.remove('error');
+
+                            const activelyManageVal = document.querySelector(`input[name="activelyManage_${idx}"]:checked`)?.value;
+                            if (!activelyManageVal) {
+                                alert(`Relevant Activity ${idx + 1} (Holding Business): Please answer whether the entity actively manages its equity participation.`);
+                                valid = false;
+                            } else if (activelyManageVal === 'YES') {
+                                const explanationEl = document.querySelector(`textarea[data-ra="${idx}"][data-field="activelyManageExplanation"]`);
+                                if (explanationEl && !explanationEl.value.trim()) {
+                                    explanationEl.classList.add('error');
+                                    alert(`Relevant Activity ${idx + 1} (Holding Business): Please explain how the entity actively manages its equity participation.`);
+                                    valid = false;
+                                } else if (explanationEl) explanationEl.classList.remove('error');
+
+                                const expCurrYesEl = document.getElementById(`holdingExpCurrencyYes_${idx}`);
+                                if (expCurrYesEl && !expCurrYesEl.value) {
+                                    expCurrYesEl.classList.add('error');
+                                    alert(`Relevant Activity ${idx + 1} (Holding Business): Expenditure Reporting Currency is required.`);
+                                    valid = false;
+                                } else if (expCurrYesEl) expCurrYesEl.classList.remove('error');
+
+                                const raTextFieldsYes = ['holdingTotalExpYes','holdingBviExpYes','holdingTotalEmp','holdingBviEmp','holdingEmpActivity'];
+                                const raLabelsYes     = ['Total Expenditure','BVI Expenditure','Total Employees','BVI Employees','Employees Engaged in Activity'];
+                                raTextFieldsYes.forEach((field, fi) => {
+                                    const el = document.querySelector(`input[data-ra="${idx}"][data-field="${field}"]`);
+                                    if (el && !el.value.trim()) {
+                                        el.classList.add('error');
+                                        alert(`Relevant Activity ${idx + 1} (Holding Business): ${raLabelsYes[fi]} is required.`);
+                                        valid = false;
+                                    } else if (el) el.classList.remove('error');
+                                });
+
+                                // At least one premises entry (yes branch)
+                                const premisesYes = document.querySelectorAll(`[data-hp^="${idx}_yes_"][data-field="addr1"]`);
+                                if (premisesYes.length === 0 || !premisesYes[0].value.trim()) {
+                                    alert(`Relevant Activity ${idx + 1} (Holding Business): At least one Premises entry with Address is required.`);
+                                    valid = false;
+                                }
+
+                            } else if (activelyManageVal === 'NO') {
+                                const statutoryVal = document.querySelector(`input[name="statutoryCompliance_${idx}"]:checked`)?.value;
+                                if (!statutoryVal) {
+                                    alert(`Relevant Activity ${idx + 1} (Holding Business): Please answer the Statutory Compliance question.`);
+                                    valid = false;
+                                }
+
+                                const expCurrNoEl = document.getElementById(`holdingExpCurrencyNo_${idx}`);
+                                if (expCurrNoEl && !expCurrNoEl.value) {
+                                    expCurrNoEl.classList.add('error');
+                                    alert(`Relevant Activity ${idx + 1} (Holding Business): Expenditure Reporting Currency is required.`);
+                                    valid = false;
+                                } else if (expCurrNoEl) expCurrNoEl.classList.remove('error');
+
+                                const raTextFieldsNo = ['holdingTotalExpNo','holdingBviExpNo'];
+                                const raLabelsNo     = ['Total Expenditure','BVI Expenditure'];
+                                raTextFieldsNo.forEach((field, fi) => {
+                                    const el = document.querySelector(`input[data-ra="${idx}"][data-field="${field}"]`);
+                                    if (el && !el.value.trim()) {
+                                        el.classList.add('error');
+                                        alert(`Relevant Activity ${idx + 1} (Holding Business): ${raLabelsNo[fi]} is required.`);
+                                        valid = false;
+                                    } else if (el) el.classList.remove('error');
+                                });
+
+                                // At least one premises entry (no branch)
+                                const premisesNo = document.querySelectorAll(`[data-hp^="${idx}_no_"][data-field="addr1"]`);
+                                if (premisesNo.length === 0 || !premisesNo[0].value.trim()) {
+                                    alert(`Relevant Activity ${idx + 1} (Holding Business): At least one Premises entry with Address is required.`);
+                                    valid = false;
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
             // Validate at least one BO with required fields
             let hasValidBO = false;
+            let boIncomplete = false;
             beneficialOwners.forEach((bo, idx) => {
                 if (bo !== null) {
-                    const firstName = document.querySelector(`input[data-bo="${idx}"][data-field="firstName"]`)?.value;
-                    const lastName = document.querySelector(`input[data-bo="${idx}"][data-field="lastName"]`)?.value;
-                    const dob = document.querySelector(`input[data-bo="${idx}"][data-field="dob"]`)?.value;
+                    const firstName   = document.querySelector(`input[data-bo="${idx}"][data-field="firstName"]`)?.value;
+                    const lastName    = document.querySelector(`input[data-bo="${idx}"][data-field="lastName"]`)?.value;
+                    const dob         = document.querySelector(`input[data-bo="${idx}"][data-field="dob"]`)?.value;
                     const nationality = document.querySelector(`select[data-bo="${idx}"][data-field="nationality"]`)?.value;
-                    const boType = document.querySelector(`select[data-bo="${idx}"][data-field="boType"]`)?.value;
-                    const startDate = document.querySelector(`input[data-bo="${idx}"][data-field="startDate"]`)?.value;
-                    const address = document.querySelector(`input[data-bo="${idx}"][data-field="address"]`)?.value;
-                    const city = document.querySelector(`input[data-bo="${idx}"][data-field="city"]`)?.value;
-                    const country = document.querySelector(`select[data-bo="${idx}"][data-field="country"]`)?.value;
-                    const taxResidence = document.querySelector(`select[data-bo="${idx}"][data-field="taxResidence"]`)?.value;
+                    const boType      = document.querySelector(`select[data-bo="${idx}"][data-field="boType"]`)?.value;
+                    const startDate   = document.querySelector(`input[data-bo="${idx}"][data-field="startDate"]`)?.value;
+                    const taxId       = document.querySelector(`input[data-bo="${idx}"][data-field="taxId"]`)?.value;
+                    const taxIdCountry= document.querySelector(`select[data-bo="${idx}"][data-field="taxIdCountry"]`)?.value;
+                    const address     = document.querySelector(`input[data-bo="${idx}"][data-field="address"]`)?.value;
+                    const city        = document.querySelector(`input[data-bo="${idx}"][data-field="city"]`)?.value;
+                    const country     = document.querySelector(`select[data-bo="${idx}"][data-field="country"]`)?.value;
+                    const taxResidence= document.querySelector(`select[data-bo="${idx}"][data-field="taxResidence"]`)?.value;
 
-                    if (firstName && lastName && dob && nationality && boType && startDate && address && city && country && taxResidence) {
+                    if (firstName && lastName && dob && nationality && boType && startDate && taxId && taxIdCountry && address && city && country && taxResidence) {
                         hasValidBO = true;
+                    } else if (firstName || lastName) {
+                        // Partially filled — flag it specifically
+                        boIncomplete = true;
                     }
                 }
             });
 
             if (!hasValidBO) {
-                alert('Please complete at least one beneficial owner with all required fields (First Name, Last Name, Date of Birth, Nationality, BO Type, Start Date, Address, City, Country, and Tax Residence).');
+                if (boIncomplete) {
+                    alert('Please complete all required fields for each beneficial owner (First Name, Last Name, Date of Birth, Nationality, BO Type, Start Date, Taxpayer Identification No., Issued By, Address, City, Country, and Tax Residence).');
+                } else {
+                    alert('Please complete at least one beneficial owner with all required fields.');
+                }
                 valid = false;
             }
 
