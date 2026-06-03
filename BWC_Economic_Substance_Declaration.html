@@ -1229,11 +1229,11 @@
                                 <label>Directed and managed in the BVI <span class="required">*</span></label>
                                 <div class="radio-group">
                                     <label class="radio-label">
-                                        <input type="radio" name="directedBVI" value="YES">
+                                        <input type="radio" name="directedBVI" value="YES" onchange="toggleDirectedBVIFields()">
                                         <span>YES</span>
                                     </label>
                                     <label class="radio-label">
-                                        <input type="radio" name="directedBVI" value="NO">
+                                        <input type="radio" name="directedBVI" value="NO" onchange="toggleDirectedBVIFields()">
                                         <span>NO</span>
                                     </label>
                                 </div>
@@ -1285,18 +1285,23 @@
                             </div>
                         </div>
 
-                        <!-- Meetings Section -->
+                        <!-- Direction and Management in the BVI — shown when directedBVI = YES -->
+                        <div id="directedBVISection" style="display:none;">
+                            <div class="subsection-title" style="margin-top: 24px;">Direction and Management in the BVI</div>
+                            <div id="directedBVIContainer"></div>
+                            <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="addDirectedBVIPerson()">+ Add Another</button>
+                            <span class="error-message" id="error-directedBVI" style="display:block; margin-top:6px;"></span>
+                        </div>
+
+                        <!-- Meetings Section — hidden for Distribution and Service Centre Business -->
+                        <div id="meetingsSection">
                         <div class="subsection-title" style="margin-top: 30px;">Meetings</div>
                         <div class="info-box">
                             <strong>Note:</strong> Attach evidence of Director Qualification(s) to the email submitting the completed declaration to Bethel Worldwide Corporation.
                         </div>
                         <div id="meetingsContainer"></div>
                         <button type="button" class="btn btn-primary" onclick="addMeeting()">+ Add Another Meeting</button>
-
-                        <!-- Premises Section -->
-                        <div class="subsection-title" style="margin-top: 30px;">Premises</div>
-                        <div id="premisesContainer"></div>
-                        <button type="button" class="btn btn-primary" onclick="addPremises()">+ Add Another Premises</button>
+                        </div><!-- end meetingsSection -->
 
                         <!-- Expenditure Section -->
                         <div class="subsection-title" style="margin-top: 30px;">Expenditure</div>
@@ -1498,49 +1503,15 @@
                             </div>
                         </div>
 
+                        <!-- BVI Employee Details — hidden for Distribution and Service Centre Business -->
+                        <div id="bviEmployeeDetailsSection">
                         <div class="subsection-title">BVI Employee Details</div>
                         <div class="info-box">
                             <strong>Note:</strong> Attach evidence of Employees' Qualification(s) to the email submitting the completed declaration to Bethel Worldwide Corporation.
                         </div>
                         <div id="bviEmployeesContainer"></div>
                         <button type="button" class="btn btn-primary" onclick="addBVIEmployee()">+ Add Another BVI Employee</button>
-
-                        <!-- High Risk IP Legal Entity Section -->
-                        <div class="subsection-title" style="margin-top: 30px;">High Risk IP Legal Entity</div>
-                        <div class="form-group">
-                            <label>Is the entity a High Risk intellectual property (IP) entity <span class="required">*</span></label>
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="highRiskIP" value="YES" onchange="toggleHighRiskIPFields()">
-                                    <span>YES</span>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="highRiskIP" value="NO" onchange="toggleHighRiskIPFields()">
-                                    <span>NO</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div id="highRiskIPFields" style="display: none;">
-                            <div class="form-group">
-                                <label>Does the legal entity conduct CIGA other than those outlined in Section 7(h) of the ESA? <span class="required">*</span></label>
-                                <div class="radio-group">
-                                    <label class="radio-label">
-                                        <input type="radio" name="conductCIGA" value="YES">
-                                        <span>YES</span>
-                                    </label>
-                                    <label class="radio-label">
-                                        <input type="radio" name="conductCIGA" value="NO">
-                                        <span>NO</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Identify the relevant IP asset which it holds <span class="required">*</span></label>
-                                <input type="text" id="relevantIPAsset" placeholder="Identify IP asset">
-                                <span class="error-message" id="error-relevantIPAsset"></span>
-                            </div>
-                        </div>
+                        </div><!-- end bviEmployeeDetailsSection -->
 
                         <!-- Outsourcing Section -->
                         <div class="subsection-title" style="margin-top: 30px;">Outsourcing</div>
@@ -1585,12 +1556,67 @@
                                 <input type="text" id="equipment" placeholder="Describe equipment" maxlength="300">
                                 <span class="error-message" id="error-equipment"></span>
                             </div>
+
+                            <!-- Add New Provider dynamic section -->
+                            <div class="subsection-title" style="margin-top: 24px;">Add New Provider</div>
+                            <div id="providersContainer"></div>
+                            <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="addProvider()">+ Add Another Provider</button>
+                            <span class="error-message" id="error-providers" style="display:block; margin-top:6px;"></span>
                         </div>
 
-                        <!-- CIGA Section -->
-                        <div class="subsection-title" style="margin-top: 30px;">CIGA</div>
-                        <div id="cigaContainer"></div>
-                        <button type="button" class="btn btn-primary" onclick="addCIGA()">+ Add Another CIGA</button>
+                        <!-- CIGA Section — shown when CIGA Outsourced = NO -->
+                        <div id="cigaSectionWrapper" style="display:none;">
+                            <div class="subsection-title" style="margin-top: 30px;">CIGA</div>
+                            <div id="cigaContainer"></div>
+                            <button type="button" class="btn btn-primary" onclick="addCIGA()">+ Add Another CIGA</button>
+                        </div>
+
+                        <!-- Premises Section -->
+                        <div class="subsection-title" style="margin-top: 30px;">Premises</div>
+                        <div id="premisesContainer"></div>
+                        <button type="button" class="btn btn-primary" onclick="addPremises()">+ Add Another Premises</button>
+
+                        <!-- High Risk IP Legal Entity + CIGA — hidden for Distribution and Service Centre Business -->
+                        <div id="highRiskIPSection">
+
+                        <!-- High Risk IP Legal Entity Section -->
+                        <div class="subsection-title" style="margin-top: 30px;">High Risk IP Legal Entity</div>
+                        <div class="form-group">
+                            <label>Is the entity a High Risk intellectual property (IP) entity <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="highRiskIP" value="YES" onchange="toggleHighRiskIPFields()">
+                                    <span>YES</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="highRiskIP" value="NO" onchange="toggleHighRiskIPFields()">
+                                    <span>NO</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="highRiskIPFields" style="display: none;">
+                            <div class="form-group">
+                                <label>Does the legal entity conduct CIGA other than those outlined in Section 7(h) of the ESA? <span class="required">*</span></label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="conductCIGA" value="YES">
+                                        <span>YES</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="conductCIGA" value="NO">
+                                        <span>NO</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Identify the relevant IP asset which it holds <span class="required">*</span></label>
+                                <input type="text" id="relevantIPAsset" placeholder="Identify IP asset">
+                                <span class="error-message" id="error-relevantIPAsset"></span>
+                            </div>
+                        </div>
+
+                        </div><!-- end highRiskIPSection -->
 
                         </div><!-- end nonHoldingBusinessSections -->
 
@@ -2468,10 +2494,21 @@
         function updateNonHoldingVisibility() {
             const allSelects = document.querySelectorAll('select[data-field="activityName"]');
             const selectedValues = Array.from(allSelects).map(s => s.value).filter(v => v !== '');
-            // Hide if at least one activity is selected and all selected are Holding Business (6)
+
+            // Hide non-Holding sections if all selected activities are Holding Business (6)
             const allHolding = selectedValues.length > 0 && selectedValues.every(v => v === '6');
             const wrapper = document.getElementById('nonHoldingBusinessSections');
             if (wrapper) wrapper.style.display = allHolding ? 'none' : 'block';
+
+            // Hide Meetings section if all selected non-Holding activities are Distribution and Service Centre (2)
+            const nonHoldingValues = selectedValues.filter(v => v !== '6');
+            const allDistribution = nonHoldingValues.length > 0 && nonHoldingValues.every(v => v === '2');
+            const meetingsSection = document.getElementById('meetingsSection');
+            if (meetingsSection) meetingsSection.style.display = allDistribution ? 'none' : 'block';
+            const bviEmpDetailsSection = document.getElementById('bviEmployeeDetailsSection');
+            if (bviEmpDetailsSection) bviEmpDetailsSection.style.display = allDistribution ? 'none' : 'block';
+            const highRiskIPSection = document.getElementById('highRiskIPSection');
+            if (highRiskIPSection) highRiskIPSection.style.display = allDistribution ? 'none' : 'block';
         }
 
         // Holding Business Premises
@@ -2669,6 +2706,67 @@
         }
 
         // Toggle High Risk IP fields
+        // Toggle Direction and Management in the BVI section
+        function toggleDirectedBVIFields() {
+            const selected = document.querySelector('input[name="directedBVI"]:checked')?.value;
+            const section = document.getElementById('directedBVISection');
+            section.style.display = selected === 'YES' ? 'block' : 'none';
+            if (selected === 'YES' && directedBVIPersons.filter(p => p !== null).length === 0) {
+                addDirectedBVIPerson();
+            }
+            if (selected !== 'YES') {
+                directedBVIPersons.length = 0;
+                document.getElementById('directedBVIContainer').innerHTML = '';
+                document.getElementById('error-directedBVI').textContent = '';
+            }
+        }
+
+        const directedBVIPersons = [];
+
+        function addDirectedBVIPerson() {
+            const index = directedBVIPersons.length;
+            directedBVIPersons.push({});
+            const container = document.getElementById('directedBVIContainer');
+            const div = document.createElement('div');
+            div.className = 'person-block';
+            div.id = `directedBVIPerson_${index}`;
+            div.innerHTML = `
+                <div class="person-header">
+                    <div class="person-title">Person ${index + 1}</div>
+                    ${index > 0 ? `<button type="button" class="btn btn-danger" onclick="removeDirectedBVIPerson(${index})">Remove</button>` : ''}
+                </div>
+                <div class="form-group">
+                    <label>Name <span class="required">*</span></label>
+                    <input type="text" data-dbvi="${index}" data-field="name" placeholder="Enter name" maxlength="200">
+                </div>
+                <div class="form-group">
+                    <label>Resident in the BVI <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="bviResident_${index}" value="YES">
+                            <span>YES</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="bviResident_${index}" value="NO">
+                            <span>NO</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Relation to the Entity <span class="required">*</span></label>
+                    <input type="text" data-dbvi="${index}" data-field="relation" placeholder="Enter relation to entity" maxlength="200">
+                </div>
+            `;
+            container.appendChild(div);
+            document.getElementById('error-directedBVI').textContent = '';
+        }
+
+        function removeDirectedBVIPerson(index) {
+            directedBVIPersons[index] = null;
+            document.getElementById(`directedBVIPerson_${index}`)?.remove();
+        }
+
+        // Toggle High Risk IP fields
         function toggleHighRiskIPFields() {
             const selected = document.querySelector('input[name="highRiskIP"]:checked')?.value;
             const fields = document.getElementById('highRiskIPFields');
@@ -2679,7 +2777,77 @@
         function toggleOutsourcingFields() {
             const selected = document.querySelector('input[name="cigaOutsourced"]:checked')?.value;
             const fields = document.getElementById('outsourcingFields');
+            const cigaWrapper = document.getElementById('cigaSectionWrapper');
             fields.style.display = selected === 'YES' ? 'block' : 'none';
+            cigaWrapper.style.display = selected === 'NO' ? 'block' : 'none';
+            if (selected === 'YES' && providers.filter(p => p !== null).length === 0) {
+                addProvider();
+            }
+            if (selected === 'NO' && cigas.filter(c => c !== null).length === 0) {
+                addCIGA();
+            }
+        }
+
+        // Providers
+        const providers = [];
+
+        function addProvider() {
+            const index = providers.length;
+            providers.push({});
+            const container = document.getElementById('providersContainer');
+            const div = document.createElement('div');
+            div.className = 'person-block';
+            div.id = `provider_${index}`;
+            div.innerHTML = `
+                <div class="person-header">
+                    <div class="person-title">Provider ${index + 1}</div>
+                    ${index > 0 ? `<button type="button" class="btn btn-danger" onclick="removeProvider(${index})">Remove</button>` : ''}
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Provider Name <span class="required">*</span></label>
+                        <input type="text" data-provider="${index}" data-field="providerName" placeholder="Enter provider name" maxlength="200">
+                    </div>
+                    <div class="form-group">
+                        <label>Provider Details <span class="required">*</span></label>
+                        <input type="text" data-provider="${index}" data-field="providerDetails" placeholder="Enter provider details" maxlength="300">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Number of Staff <span class="required">*</span></label>
+                        <input type="text" data-provider="${index}" data-field="numStaff" placeholder="Enter number" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label>Staff Hours <span class="required">*</span></label>
+                        <input type="text" data-provider="${index}" data-field="staffHours" placeholder="Enter hours" maxlength="20">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Monitor and Control <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="monitorControl_${index}" value="YES">
+                            <span>YES</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="monitorControl_${index}" value="NO">
+                            <span>NO</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Please provide an explanation of how the legal entity monitors and controls the activity carried out on its behalf by the third party <span class="required">*</span></label>
+                    <textarea data-provider="${index}" data-field="monitorExplanation" rows="4" placeholder="Enter explanation..."></textarea>
+                </div>
+            `;
+            container.appendChild(div);
+            document.getElementById('error-providers').textContent = '';
+        }
+
+        function removeProvider(index) {
+            providers[index] = null;
+            document.getElementById(`provider_${index}`)?.remove();
         }
 
         // Add CIGA
@@ -3183,104 +3351,166 @@
                         }
                     });
 
-                    // Radio groups compulsory for Type 1 (non-Holding path)
-                    const type1Radios = [
-                        { name: 'directedBVI',            label: 'Directed and managed in the BVI' },
-                        { name: 'minutesBVI',              label: 'Minutes kept in the BVI' },
-                        { name: 'quorumPhysicallyPresent', label: 'Quorum of Directors Physically Present in the Virgin Islands' },
-                        { name: 'highRiskIP',              label: 'Is the entity a High Risk IP entity' },
-                        { name: 'cigaOutsourced',          label: 'CIGA Outsourced' },
-                    ];
-                    type1Radios.forEach(group => {
-                        const checked = document.querySelector(`input[name="${group.name}"]:checked`);
-                        if (!checked) {
-                            alert(`Please answer: ${group.label}`);
-                            valid = false;
-                        }
-                    });
-
-                    // Conditional: High Risk IP = YES → relevantIPAsset and conductCIGA required
-                    const highRiskIPVal = document.querySelector('input[name="highRiskIP"]:checked')?.value;
-                    if (highRiskIPVal === 'YES') {
-                        const ipAssetEl = document.getElementById('relevantIPAsset');
-                        if (ipAssetEl && !ipAssetEl.value.trim()) {
-                            ipAssetEl.classList.add('error');
-                            const errEl = document.getElementById('error-relevantIPAsset');
-                            if (errEl) errEl.textContent = 'This field is required';
-                            valid = false;
-                        } else if (ipAssetEl) {
-                            ipAssetEl.classList.remove('error');
-                            const errEl = document.getElementById('error-relevantIPAsset');
-                            if (errEl) errEl.textContent = '';
-                        }
-                        const conductCIGAChecked = document.querySelector('input[name="conductCIGA"]:checked');
-                        if (!conductCIGAChecked) {
-                            alert('Please answer: Does the entity conduct CIGA other than those outlined in Section 7(h) of the ESA?');
-                            valid = false;
-                        }
-                    }
-
-                    // Conditional: CIGA Outsourced = YES → currency, expenditure and equipment required
-                    const cigaOutsourcedVal = document.querySelector('input[name="cigaOutsourced"]:checked')?.value;
-                    if (cigaOutsourcedVal === 'YES') {
-                        const outCurrEl = document.getElementById('outsourcingReportingCurrency');
-                        if (outCurrEl && !outCurrEl.value) {
-                            outCurrEl.classList.add('error');
-                            const errEl = document.getElementById('error-outsourcingReportingCurrency');
-                            if (errEl) errEl.textContent = 'This field is required';
-                            valid = false;
-                        } else if (outCurrEl) {
-                            outCurrEl.classList.remove('error');
-                            const errEl = document.getElementById('error-outsourcingReportingCurrency');
-                            if (errEl) errEl.textContent = '';
-                        }
-                        const outExpEl = document.getElementById('outsourcingExpenditure');
-                        if (outExpEl && !outExpEl.value.trim()) {
-                            outExpEl.classList.add('error');
-                            const errEl = document.getElementById('error-outsourcingExpenditure');
-                            if (errEl) errEl.textContent = 'This field is required';
-                            valid = false;
-                        } else if (outExpEl) {
-                            outExpEl.classList.remove('error');
-                            const errEl = document.getElementById('error-outsourcingExpenditure');
-                            if (errEl) errEl.textContent = '';
-                        }
-                        const equipEl = document.getElementById('equipment');
-                        if (equipEl && !equipEl.value.trim()) {
-                            equipEl.classList.add('error');
-                            const errEl = document.getElementById('error-equipment');
-                            if (errEl) errEl.textContent = 'This field is required';
-                            valid = false;
-                        } else if (equipEl) {
-                            equipEl.classList.remove('error');
-                            const errEl = document.getElementById('error-equipment');
-                            if (errEl) errEl.textContent = '';
-                        }
-                    }
-
-                    // Validate Meetings — at least one entry, all required fields completed
-                    const activeMeetings = meetings.map((m, i) => ({ m, i })).filter(({ m }) => m !== null);
-                    if (activeMeetings.length === 0) {
-                        alert('Please add at least one Meeting entry.');
-                        valid = false;
-                    } else {
-                        activeMeetings.forEach(({ i }) => {
-                            const meetFields = ['meetingNo','personName','relation','qualification'];
-                            const meetLabels = ['Meeting No','Person\'s Name','Relation to Company','Director Qualification'];
-                            meetFields.forEach((field, fi) => {
-                                const el = document.querySelector(`input[data-meeting="${i}"][data-field="${field}"]`);
-                                if (el && !el.value.trim()) {
-                                    el.classList.add('error');
-                                    alert(`Meeting ${i + 1}: ${meetLabels[fi]} is required.`);
-                                    valid = false;
-                                } else if (el) el.classList.remove('error');
-                            });
-                            const presentChecked = document.querySelector(`input[name="physicallyPresent_${i}"]:checked`);
-                            if (!presentChecked) {
-                                alert(`Meeting ${i + 1}: Please answer whether the person was Physically Present.`);
+                    // Validate High Risk IP and CIGA — skipped for Distribution and Service Centre Business
+                    const highRiskIPSectionEl = document.getElementById('highRiskIPSection');
+                    const highRiskIPRequired = highRiskIPSectionEl && highRiskIPSectionEl.style.display !== 'none';
+                    if (highRiskIPRequired) {
+                        const type1Radios = [
+                            { name: 'directedBVI',            label: 'Directed and managed in the BVI' },
+                            { name: 'minutesBVI',              label: 'Minutes kept in the BVI' },
+                            { name: 'quorumPhysicallyPresent', label: 'Quorum of Directors Physically Present in the Virgin Islands' },
+                            { name: 'highRiskIP',              label: 'Is the entity a High Risk IP entity' },
+                            { name: 'cigaOutsourced',          label: 'CIGA Outsourced' },
+                        ];
+                        type1Radios.forEach(group => {
+                            const checked = document.querySelector(`input[name="${group.name}"]:checked`);
+                            if (!checked) {
+                                alert(`Please answer: ${group.label}`);
                                 valid = false;
                             }
                         });
+
+                        // Validate Direction and Management in the BVI entries (when directedBVI = YES)
+                        if (document.querySelector('input[name="directedBVI"]:checked')?.value === 'YES') {
+                            const activeDBVI = directedBVIPersons.map((p, i) => ({ p, i })).filter(({ p }) => p !== null);
+                            if (activeDBVI.length === 0) {
+                                document.getElementById('error-directedBVI').textContent = 'Please add at least one person.';
+                                valid = false;
+                            } else {
+                                document.getElementById('error-directedBVI').textContent = '';
+                                activeDBVI.forEach(({ i }) => {
+                                    ['name','relation'].forEach(field => {
+                                        const el = document.querySelector(`input[data-dbvi="${i}"][data-field="${field}"]`);
+                                        const label = field === 'name' ? 'Name' : 'Relation to the Entity';
+                                        if (el && !el.value.trim()) {
+                                            el.classList.add('error');
+                                            alert(`Direction & Management Person ${i + 1}: ${label} is required.`);
+                                            valid = false;
+                                        } else if (el) el.classList.remove('error');
+                                    });
+                                    if (!document.querySelector(`input[name="bviResident_${i}"]:checked`)) {
+                                        alert(`Direction & Management Person ${i + 1}: Please answer Resident in the BVI.`);
+                                        valid = false;
+                                    }
+                                });
+                            }
+                        }
+
+                        // Conditional: High Risk IP = YES → relevantIPAsset and conductCIGA required
+                        const highRiskIPVal = document.querySelector('input[name="highRiskIP"]:checked')?.value;
+                        if (highRiskIPVal === 'YES') {
+                            const ipAssetEl = document.getElementById('relevantIPAsset');
+                            if (ipAssetEl && !ipAssetEl.value.trim()) {
+                                ipAssetEl.classList.add('error');
+                                const errEl = document.getElementById('error-relevantIPAsset');
+                                if (errEl) errEl.textContent = 'This field is required';
+                                valid = false;
+                            } else if (ipAssetEl) {
+                                ipAssetEl.classList.remove('error');
+                                const errEl = document.getElementById('error-relevantIPAsset');
+                                if (errEl) errEl.textContent = '';
+                            }
+                            const conductCIGAChecked = document.querySelector('input[name="conductCIGA"]:checked');
+                            if (!conductCIGAChecked) {
+                                alert('Please answer: Does the entity conduct CIGA other than those outlined in Section 7(h) of the ESA?');
+                                valid = false;
+                            }
+                        }
+
+                        // Conditional: CIGA Outsourced = YES → currency, expenditure and equipment required
+                        const cigaOutsourcedVal = document.querySelector('input[name="cigaOutsourced"]:checked')?.value;
+                        if (cigaOutsourcedVal === 'YES') {
+                            const outCurrEl = document.getElementById('outsourcingReportingCurrency');
+                            if (outCurrEl && !outCurrEl.value) {
+                                outCurrEl.classList.add('error');
+                                const errEl = document.getElementById('error-outsourcingReportingCurrency');
+                                if (errEl) errEl.textContent = 'This field is required';
+                                valid = false;
+                            } else if (outCurrEl) {
+                                outCurrEl.classList.remove('error');
+                                const errEl = document.getElementById('error-outsourcingReportingCurrency');
+                                if (errEl) errEl.textContent = '';
+                            }
+                            const outExpEl = document.getElementById('outsourcingExpenditure');
+                            if (outExpEl && !outExpEl.value.trim()) {
+                                outExpEl.classList.add('error');
+                                const errEl = document.getElementById('error-outsourcingExpenditure');
+                                if (errEl) errEl.textContent = 'This field is required';
+                                valid = false;
+                            } else if (outExpEl) {
+                                outExpEl.classList.remove('error');
+                                const errEl = document.getElementById('error-outsourcingExpenditure');
+                                if (errEl) errEl.textContent = '';
+                            }
+                            const equipEl = document.getElementById('equipment');
+                            if (equipEl && !equipEl.value.trim()) {
+                                equipEl.classList.add('error');
+                                const errEl = document.getElementById('error-equipment');
+                                if (errEl) errEl.textContent = 'This field is required';
+                                valid = false;
+                            } else if (equipEl) {
+                                equipEl.classList.remove('error');
+                                const errEl = document.getElementById('error-equipment');
+                                if (errEl) errEl.textContent = '';
+                            }
+
+                            // Validate Providers — at least one with all required fields
+                            const activeProviders = providers.map((p, i) => ({ p, i })).filter(({ p }) => p !== null);
+                            if (activeProviders.length === 0) {
+                                document.getElementById('error-providers').textContent = 'Please add at least one Provider.';
+                                valid = false;
+                            } else {
+                                document.getElementById('error-providers').textContent = '';
+                                activeProviders.forEach(({ i }) => {
+                                    const pFields = ['providerName','providerDetails','numStaff','staffHours','monitorExplanation'];
+                                    const pLabels = ['Provider Name','Provider Details','Number of Staff','Staff Hours','Monitor and Control Explanation'];
+                                    pFields.forEach((field, fi) => {
+                                        const el = field === 'monitorExplanation'
+                                            ? document.querySelector(`textarea[data-provider="${i}"][data-field="${field}"]`)
+                                            : document.querySelector(`input[data-provider="${i}"][data-field="${field}"]`);
+                                        if (el && !el.value.trim()) {
+                                            el.classList.add('error');
+                                            alert(`Provider ${i + 1}: ${pLabels[fi]} is required.`);
+                                            valid = false;
+                                        } else if (el) el.classList.remove('error');
+                                    });
+                                    const monitorChecked = document.querySelector(`input[name="monitorControl_${i}"]:checked`);
+                                    if (!monitorChecked) {
+                                        alert(`Provider ${i + 1}: Please answer the Monitor and Control question.`);
+                                        valid = false;
+                                    }
+                                });
+                            }
+                        }
+                    } // end highRiskIPRequired
+
+                    // Validate Meetings — skipped for Distribution and Service Centre Business only
+                    const meetingsSectionEl = document.getElementById('meetingsSection');
+                    const meetingsRequired = meetingsSectionEl && meetingsSectionEl.style.display !== 'none';
+                    if (meetingsRequired) {
+                        const activeMeetings = meetings.map((m, i) => ({ m, i })).filter(({ m }) => m !== null);
+                        if (activeMeetings.length === 0) {
+                            alert('Please add at least one Meeting entry.');
+                            valid = false;
+                        } else {
+                            activeMeetings.forEach(({ i }) => {
+                                const meetFields = ['meetingNo','personName','relation','qualification'];
+                                const meetLabels = ['Meeting No','Person\'s Name','Relation to Company','Director Qualification'];
+                                meetFields.forEach((field, fi) => {
+                                    const el = document.querySelector(`input[data-meeting="${i}"][data-field="${field}"]`);
+                                    if (el && !el.value.trim()) {
+                                        el.classList.add('error');
+                                        alert(`Meeting ${i + 1}: ${meetLabels[fi]} is required.`);
+                                        valid = false;
+                                    } else if (el) el.classList.remove('error');
+                                });
+                                const presentChecked = document.querySelector(`input[name="physicallyPresent_${i}"]:checked`);
+                                if (!presentChecked) {
+                                    alert(`Meeting ${i + 1}: Please answer whether the person was Physically Present.`);
+                                    valid = false;
+                                }
+                            });
+                        }
                     }
 
                     // Validate Premises — at least one entry with address1 and country
@@ -3305,24 +3535,28 @@
                         });
                     }
 
-                    // Validate BVI Employees — at least one entry with all required fields
-                    const activeBVIEmps = bviEmployees.map((e, i) => ({ e, i })).filter(({ e }) => e !== null);
-                    if (activeBVIEmps.length === 0) {
-                        alert('Please add at least one BVI Employee entry.');
-                        valid = false;
-                    } else {
-                        activeBVIEmps.forEach(({ i }) => {
-                            const empFields = ['empName','empQual','empExp'];
-                            const empLabels = ['Employee Name','Employee Qualification','Years of Relevant Experience'];
-                            empFields.forEach((field, fi) => {
-                                const el = document.querySelector(`input[data-bviemp="${i}"][data-field="${field}"]`);
-                                if (el && !el.value.trim()) {
-                                    el.classList.add('error');
-                                    alert(`BVI Employee ${i + 1}: ${empLabels[fi]} is required.`);
-                                    valid = false;
-                                } else if (el) el.classList.remove('error');
+                    // Validate BVI Employees — skipped for Distribution and Service Centre Business only
+                    const bviEmpDetailsSectionEl = document.getElementById('bviEmployeeDetailsSection');
+                    const bviEmpDetailsRequired = bviEmpDetailsSectionEl && bviEmpDetailsSectionEl.style.display !== 'none';
+                    if (bviEmpDetailsRequired) {
+                        const activeBVIEmps = bviEmployees.map((e, i) => ({ e, i })).filter(({ e }) => e !== null);
+                        if (activeBVIEmps.length === 0) {
+                            alert('Please add at least one BVI Employee entry.');
+                            valid = false;
+                        } else {
+                            activeBVIEmps.forEach(({ i }) => {
+                                const empFields = ['empName','empQual','empExp'];
+                                const empLabels = ['Employee Name','Employee Qualification','Years of Relevant Experience'];
+                                empFields.forEach((field, fi) => {
+                                    const el = document.querySelector(`input[data-bviemp="${i}"][data-field="${field}"]`);
+                                    if (el && !el.value.trim()) {
+                                        el.classList.add('error');
+                                        alert(`BVI Employee ${i + 1}: ${empLabels[fi]} is required.`);
+                                        valid = false;
+                                    } else if (el) el.classList.remove('error');
+                                });
                             });
-                        });
+                        }
                     }
 
                 } // end nonHoldingVisible
@@ -4207,7 +4441,26 @@
                 yPosition = addText('DIRECTION AND MANAGEMENT', margin, yPosition, pageWidth - 2 * margin);
                 yPosition += 3; doc.setFontSize(10); doc.setFont(undefined, 'normal');
                 const dirBVI = document.querySelector('input[name="directedBVI"]:checked')?.value;
-                if (dirBVI) yPosition = addText(`Directed and Managed in BVI: ${dirBVI}`, margin, yPosition, pageWidth - 2 * margin);
+                if (dirBVI) {
+                    yPosition = addText(`Directed and Managed in BVI: ${dirBVI}`, margin, yPosition, pageWidth - 2 * margin);
+                    if (dirBVI === 'YES') {
+                        const activeDBVI = directedBVIPersons.map((p, i) => ({ p, i })).filter(({ p }) => p !== null);
+                        if (activeDBVI.length > 0) {
+                            doc.setFont(undefined, 'bold');
+                            yPosition = addText('Direction and Management in the BVI:', margin, yPosition, pageWidth - 2 * margin);
+                            doc.setFont(undefined, 'normal');
+                            activeDBVI.forEach(({ i }) => {
+                                if (yPosition > pageHeight - 40) { doc.addPage(); yPosition = margin; }
+                                const pName     = document.querySelector(`input[data-dbvi="${i}"][data-field="name"]`)?.value || '';
+                                const pResident = document.querySelector(`input[name="bviResident_${i}"]:checked`)?.value || '';
+                                const pRelation = document.querySelector(`input[data-dbvi="${i}"][data-field="relation"]`)?.value || '';
+                                yPosition = addText(`  Person ${i + 1}: ${pName}`, margin, yPosition, pageWidth - 2 * margin);
+                                if (pResident) yPosition = addText(`    Resident in BVI: ${pResident}`, margin, yPosition, pageWidth - 2 * margin);
+                                if (pRelation) yPosition = addText(`    Relation to Entity: ${pRelation}`, margin, yPosition, pageWidth - 2 * margin);
+                            });
+                        }
+                    }
+                }
                 const minBVI = document.querySelector('input[name="minutesBVI"]:checked')?.value;
                 if (minBVI) yPosition = addText(`Minutes Kept in BVI: ${minBVI}`, margin, yPosition, pageWidth - 2 * margin);
                 const numMtgs = getValue('numBoardMeetings');
@@ -4329,6 +4582,30 @@
                         const equipment = getValue('equipment');
                         if (outCurr || outExp) yPosition = addText(`Currency: ${outCurr}   Expenditure: ${outExp}`, margin, yPosition, pageWidth - 2 * margin);
                         if (equipment) yPosition = addText(`Equipment: ${equipment}`, margin, yPosition, pageWidth - 2 * margin);
+
+                        // Providers
+                        const activeProviders = providers.map((p, i) => ({ p, i })).filter(({ p }) => p !== null);
+                        if (activeProviders.length > 0) {
+                            yPosition += 3;
+                            doc.setFont(undefined, 'bold');
+                            yPosition = addText('Providers:', margin, yPosition, pageWidth - 2 * margin);
+                            doc.setFont(undefined, 'normal');
+                            activeProviders.forEach(({ i }) => {
+                                if (yPosition > pageHeight - 60) { doc.addPage(); yPosition = margin; }
+                                const pName    = document.querySelector(`input[data-provider="${i}"][data-field="providerName"]`)?.value || '';
+                                const pDetails = document.querySelector(`input[data-provider="${i}"][data-field="providerDetails"]`)?.value || '';
+                                const pStaff   = document.querySelector(`input[data-provider="${i}"][data-field="numStaff"]`)?.value || '';
+                                const pHours   = document.querySelector(`input[data-provider="${i}"][data-field="staffHours"]`)?.value || '';
+                                const pMonitor = document.querySelector(`input[name="monitorControl_${i}"]:checked`)?.value || '';
+                                const pExplan  = document.querySelector(`textarea[data-provider="${i}"][data-field="monitorExplanation"]`)?.value || '';
+                                yPosition = addText(`  Provider ${i + 1}: ${pName}`, margin, yPosition, pageWidth - 2 * margin);
+                                if (pDetails) yPosition = addText(`    Details: ${pDetails}`, margin, yPosition, pageWidth - 2 * margin);
+                                if (pStaff || pHours) yPosition = addText(`    Staff: ${pStaff}   Hours: ${pHours}`, margin, yPosition, pageWidth - 2 * margin);
+                                if (pMonitor) yPosition = addText(`    Monitor and Control: ${pMonitor}`, margin, yPosition, pageWidth - 2 * margin);
+                                if (pExplan) yPosition = addText(`    Explanation: ${pExplan}`, margin, yPosition, pageWidth - 2 * margin);
+                                yPosition += 2;
+                            });
+                        }
                     }
                     yPosition += 5;
                 }
