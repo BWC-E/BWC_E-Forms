@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BVI ITA Economic Substance Period Change Request</title>
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --fill-bg:#fff9e0;
+    --fill-border:#c9a227;
+    --accent:#0b5394;
+  }
+  * { box-sizing: border-box; }
+  body{
+    font-family: Georgia, 'Times New Roman', serif;
+    color: var(--ink);
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 20px 20px 60px;
+    line-height: 1.55;
+    font-size: 15px;
+  }
+
+  /* ---- Screen-only instruction banner ---- */
+  .banner{
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eef5fb;
+    border: 1px solid #bcd7ec;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: 13.5px;
+    color: #1a1a1a;
+  }
+  .banner strong { color: var(--accent); }
+  .toolbar{
+    position: sticky;
+    top: 0;
+    background: #fff;
+    padding: 10px 0;
+    margin-bottom: 10px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    border-bottom: 1px solid #eee;
+    z-index: 10;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  button{
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button.secondary{
+    background: #fff;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  button:hover{ opacity:0.9; }
+  .status{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12.5px;
+    color: #666;
+  }
+
+  /* ---- Letterhead ---- */
+  .letterhead{
+    text-align:center;
+    padding: 14px;
+    border: 1px dashed #bbb;
+    border-radius: 6px;
+    margin-bottom: 24px;
+  }
+  .letterhead img{ max-height: 90px; max-width:100%; margin-bottom:8px; }
+  .letterhead .lh-hint{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #888;
+  }
+  .letterhead input[type=file]{ font-family: Arial, Helvetica, sans-serif; font-size: 12px; }
+
+  /* ---- Fillable fields ---- */
+  input.fill, textarea.fill{
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: var(--fill-bg);
+    border: 1px solid var(--fill-border);
+    border-radius: 3px;
+    padding: 1px 5px;
+  }
+  input.fill:focus, textarea.fill:focus{ outline: 2px solid var(--accent); }
+  input.fill{ min-width: 90px; }
+  input.fill.wide{ min-width: 220px; }
+  input.fill.date{ min-width: 130px; }
+  textarea.fill{
+    width: 100%;
+    display:block;
+    margin-top: 6px;
+    resize: vertical;
+    min-height: 70px;
+    line-height: 1.5;
+  }
+
+  p{ margin: 0 0 14px; }
+  .to-block{ margin-bottom: 14px; }
+  .signoff{ margin-top: 34px; }
+  .sig-line{
+    margin-top: 46px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid #333;
+    width: 260px;
+  }
+  .sig-caption{ font-size: 13px; color:#555; margin-bottom: 22px; }
+
+  @media print{
+    .banner, .toolbar{ display:none !important; }
+    body{ padding: 0; max-width: none; }
+    input.fill, textarea.fill{
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: var(--ink);
+    }
+    input.fill:focus, textarea.fill:focus{ outline: none; }
+    .letterhead{ border: none; }
+    .letterhead .lh-hint, .letterhead input[type=file]{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="banner">
+    <strong>For the Company to complete:</strong> Fill in the highlighted fields below (dates, company details, and the reason for the change). Optionally add your company letterhead/logo at the top. When done, click <strong>“Save as PDF”</strong> and return the signed PDF to your registered agent.
+  </div>
+
+  <div class="toolbar">
+    <button onclick="window.print()">Save as PDF / Print</button>
+    <button class="secondary" onclick="clearAll()">Clear form</button>
+    <span class="status">Nothing is sent anywhere — everything stays in this browser tab.</span>
+  </div>
+
+  <div class="letterhead">
+    <img id="logoImg" style="display:none;">
+    <div class="lh-hint">
+      Optional: upload your company letterhead/logo (shown here and when printed)<br>
+      <input type="file" accept="image/*" onchange="loadLogo(event)">
+    </div>
+  </div>
+
+  <p>Date: <input class="fill date" type="date"></p>
+
+  <div class="to-block">
+    To: Ms. Latoya James<br>
+    International Tax Authority (BVI ITA)<br>
+    Road Town, Tortola<br>
+    British Virgin Islands
+  </div>
+
+  <p><strong>Subject: Application to Change Economic Substance Financial Period End Date for
+  <input class="fill wide sync-company" type="text" placeholder="Company Name" oninput="syncField('sync-company', this.value)"></strong></p>
+
+  <p>Dear Sir/Madam,</p>
+
+  <p>Please accept this letter as a formal application submitted by the registered agent
+  Bethel Worldwide Corporation
+  on behalf of
+  <input class="fill wide sync-company" type="text" placeholder="Company Name" oninput="syncField('sync-company', this.value)">
+  (Company Number:
+  <input class="fill" type="text" placeholder="Registration No.">)
+  to change its Economic Substance financial period end date.</p>
+
+  <p>Currently, the Company's designated Economic Substance financial period is from
+  <input class="fill date" type="date"> to
+  <input class="fill date" type="date">.</p>
+
+  <p>We hereby request to change the Economic Substance financial period to
+  <input class="fill date" type="date"> to
+  <input class="fill date" type="date">.</p>
+
+  <p>This change is requested for the following reasons:</p>
+  <textarea class="fill" placeholder="Please describe the reason(s) for the requested change (e.g. to align the Economic Substance reporting period with the Company's actual financial/accounting year-end)."></textarea>
+
+  <p style="margin-top:18px;">Should you require any further information or documentation to process this application, please do not hesitate to contact the undersigned.</p>
+
+  <p class="signoff">Yours faithfully,</p>
+
+  <div class="sig-line"></div>
+  <div class="sig-caption">(Signature)</div>
+
+  <p>
+    <input class="fill wide" type="text" placeholder="Name"><br>
+    <input class="fill wide" type="text" placeholder="Director / Authorized Signatory"><br>
+    <input class="fill wide sync-company" type="text" placeholder="Company Name" oninput="syncField('sync-company', this.value)">
+  </p>
+
+<script>
+function syncField(cls, value){
+  document.querySelectorAll('.' + cls).forEach(el => { if (el.value !== value) el.value = value; });
+}
+function loadLogo(evt){
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('logoImg');
+    img.src = e.target.result;
+    img.style.display = 'inline-block';
+  };
+  reader.readAsDataURL(file);
+}
+function clearAll(){
+  if (!confirm('Clear all entered information?')) return;
+  document.querySelectorAll('input.fill').forEach(el => el.value = '');
+  document.getElementById('logoImg').style.display = 'none';
+  document.getElementById('logoImg').src = '';
+}
+</script>
+
+</body>
+</html>
