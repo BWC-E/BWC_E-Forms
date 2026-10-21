@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annual Financial Return Filing Status — Client Confirmation | Bethel Worldwide Corporation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Crimson Pro', Georgia, serif; background: #f3f4f6; color: #1f2937; font-size: 17px; line-height: 1.55; padding: 24px 12px 110px; }
+  .container { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+  .header { background: linear-gradient(135deg, #2d5986 0%, #1e3a5f 100%); color: #fff; text-align: center; padding: 36px 32px; border-bottom: 4px solid #d4af37; }
+  .header h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 28px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .header h2 { font-size: 19px; font-weight: 500; opacity: 0.95; }
+  .header p { font-size: 14px; opacity: 0.85; margin-top: 6px; font-style: italic; }
+  .form-content { padding: 32px 40px; }
+  .save-bar { background: #e0f2fe; border: 2px solid #0284c7; border-radius: 8px; padding: 14px 18px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .save-bar .status { font-size: 15px; color: #075985; }
+  .save-bar .status strong { display: block; font-size: 16px; }
+  .save-bar .last { font-size: 13px; color: #0369a1; font-style: italic; }
+  .progress { height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-top: 8px; width: 240px; max-width: 100%; }
+  .progress-fill { height: 100%; background: #d4af37; width: 0; transition: width 0.25s; }
+  .section { margin-bottom: 34px; }
+  .section-title { font-family: 'Playfair Display', Georgia, serif; font-size: 21px; color: #1e3a5f; text-transform: uppercase; border-bottom: 2px solid #d4af37; padding-bottom: 6px; margin-bottom: 18px; }
+  .intro { font-size: 15px; color: #4b5563; margin-bottom: 16px; }
+  .form-group { margin-bottom: 18px; }
+  label.field-label { display: block; font-weight: 600; margin-bottom: 6px; color: #1f2937; }
+  .required { color: #dc2626; }
+  input[type="text"], input[type="date"] { width: 100%; padding: 11px 12px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; font-family: inherit; }
+  input:focus { outline: none; border-color: #2d5986; }
+  input.error { border-color: #dc2626; background: #fef2f2; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .hint { font-size: 14px; color: #6b7280; margin-top: 4px; }
+  .option-card { border: 2px solid #d1d5db; border-radius: 8px; padding: 16px 18px; margin-bottom: 14px; cursor: pointer; transition: border-color 0.15s, background 0.15s; display: block; }
+  .option-card:hover { border-color: #2d5986; }
+  .option-card.selected { border-color: #1e3a5f; background: #f0f5fb; }
+  .option-card .opt-head { cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 700; color: #1e3a5f; }
+  .option-card p { font-size: 15.5px; margin-top: 8px; color: #374151; }
+  input[type="radio"], input[type="checkbox"] { width: 18px; height: 18px; accent-color: #1e3a5f; cursor: pointer; flex-shrink: 0; }
+  .sub-options { margin-top: 14px; padding: 14px 16px; background: #fff; border: 1px dashed #93a8c4; border-radius: 6px; display: none; }
+  .sub-options.visible { display: block; }
+  .check-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; cursor: pointer; font-size: 16px; }
+  .check-row input { margin-top: 4px; }
+  .info-box { background: #dbeafe; border: 1px solid #60a5fa; border-radius: 6px; padding: 12px 14px; font-size: 15px; margin-top: 10px; }
+  .info-box a { color: #1e3a5f; font-weight: 600; word-break: break-all; }
+  .warning-box { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 12px 14px; font-size: 15px; }
+  .note { font-size: 14.5px; font-style: italic; color: #6b7280; margin-top: 10px; }
+  .conditional { display: none; }
+  .conditional.visible { display: block; }
+  .deadline { margin-top: 10px; padding: 10px 14px; border-radius: 6px; font-size: 15px; display: none; }
+  .deadline.ok { display: block; background: #ecfdf5; border: 1px solid #10b981; color: #065f46; }
+  .deadline.warn { display: block; background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; }
+  .deadline.over { display: block; background: #fef2f2; border: 1px solid #dc2626; color: #991b1b; }
+  .sig-tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+  .sig-tabs button { padding: 8px 14px; border: 2px solid #d1d5db; background: #fff; border-radius: 6px; font-family: inherit; font-size: 15px; cursor: pointer; }
+  .sig-tabs button.active { border-color: #1e3a5f; background: #f0f5fb; color: #1e3a5f; font-weight: 700; }
+  #sigCanvas { width: 100%; height: 160px; border: 2px dashed #9ca3af; border-radius: 6px; background: #fff; touch-action: none; cursor: crosshair; display: block; }
+  .sig-actions { margin-top: 8px; display: flex; gap: 10px; align-items: center; }
+  #sigTypedPreview { font-family: 'Brush Script MT', 'Segoe Script', cursive; font-size: 32px; color: #1e3a5f; padding: 6px 4px; min-height: 52px; }
+  .btn { padding: 11px 22px; border: none; border-radius: 6px; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #1e3a5f; color: #fff; }
+  .btn-primary:hover { background: #16304e; }
+  .btn-gold { background: #d4af37; color: #1e3a5f; }
+  .btn-gold:hover { background: #b8962e; }
+  .btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
+  .btn-small { padding: 6px 12px; font-size: 14px; }
+  .action-bar { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 3px solid #d4af37; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); padding: 12px 16px; z-index: 50; }
+  .action-bar .inner { max-width: 900px; margin: 0 auto; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .action-bar .msg { margin-left: auto; font-size: 14px; color: #6b7280; }
+  .incomplete { display: none; background: #fef2f2; border: 1px solid #dc2626; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; }
+  .incomplete h4 { color: #991b1b; margin-bottom: 6px; font-family: 'Playfair Display', Georgia, serif; }
+  .incomplete ul { margin-left: 20px; font-size: 15px; }
+  .incomplete a { color: #1e3a5f; }
+  .generated { display: inline-block; padding: 8px 12px; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 6px; font-size: 15px; color: #6b7280; }
+  .generated.set { color: #1e3a5f; font-weight: 700; }
+  .refs { font-size: 14.5px; color: #4b5563; }
+  .refs li { margin-left: 20px; margin-bottom: 4px; }
+  .footer { background: #f3f4f6; border-top: 1px solid #e5e7eb; text-align: center; padding: 18px; font-size: 14px; color: #6b7280; }
+  .footer p { margin: 3px 0; }
+  @media (max-width: 700px) { .form-content { padding: 22px 18px; } .grid-2 { grid-template-columns: 1fr; } .header h1 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header" id="top">
+    <h1>Bethel Worldwide Corporation</h1>
+    <h2>BVI Business Company — Annual Financial Return Filing Status</h2>
+    <p>Client Confirmation Form · Pursuant to section 98A of the BVI Business Companies Act, Revised Edition 2020, as amended</p>
+  </div>
+
+  <div class="form-content">
+    <div class="save-bar">
+      <div class="status">
+        <strong>💾 Auto-save active</strong>
+        <span id="saveStatus">Your answers are saved on this device as you type.</span>
+        <div class="last" id="lastSaved"></div>
+      </div>
+      <div>
+        <div style="font-size:14px;color:#075985;"><span id="progressPct">0%</span> of required fields complete</div>
+        <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </div>
+
+    <div class="incomplete" id="incompletePanel">
+      <h4>A few things still need completing</h4>
+      <ul id="incompleteList"></ul>
+    </div>
+
+    <form id="afrForm" novalidate onsubmit="return false;">
+
+      <div class="section" id="sec-company">
+        <h3 class="section-title">1. Company Details</h3>
+        <div class="form-group">
+          <label class="field-label" for="companyName">Name of Company <span class="required">*</span></label>
+          <input type="text" id="companyName" data-required="Name of Company" maxlength="200">
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="field-label" for="companyNumber">BVI Company Number <span class="required">*</span></label>
+            <input type="text" id="companyNumber" data-required="BVI Company Number" maxlength="50">
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="fyeDate">Financial Year-End <span class="required">*</span></label>
+            <input type="date" id="fyeDate" data-required="Financial Year-End">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="field-label" for="fyRelates">Financial Year to Which This Confirmation Relates <span class="required">*</span></label>
+          <input type="text" id="fyRelates" data-required="Financial Year to Which This Confirmation Relates" placeholder="e.g. Year ended 31 December 2025" maxlength="100">
+          <div class="deadline" id="deadlineBox"></div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-status">
+        <h3 class="section-title">2. Annual Financial Return Filing Status</h3>
+        <p class="intro">Please select <strong>one</strong> of the following to confirm the Company's annual financial return filing status for the relevant financial year. <span class="required">*</span></p>
+
+        <div class="option-card" data-opt="opt1">
+          <label class="opt-head"><input type="radio" name="filingOption" value="opt1"> OPTION 1 — Filing with the BVI Inland Revenue Department</label>
+          <p>The Company files its annual tax return with the BVI Government's Inland Revenue Department, accompanied by its financial statements.</p>
+          <p>The Company therefore falls within the exemption under section 98A(5)(c) of the BVI Business Companies Act, as amended, and is not required to file a separate annual financial return with its registered agent under section 98A for the relevant year.</p>
+        </div>
+
+        <div class="option-card" data-opt="opt2">
+          <label class="opt-head"><input type="radio" name="filingOption" value="opt2"> OPTION 2 — Filing with the Registered Agent</label>
+          <p>The Company does not file its annual tax return with the BVI Inland Revenue Department accompanied by its financial statements and is therefore required to file its annual financial return with its BVI registered agent pursuant to section 98A of the BVI Business Companies Act, as amended, unless another statutory exemption applies.</p>
+          <div class="sub-options" id="opt2Sub">
+            <p style="margin:0 0 10px;font-weight:600;color:#1e3a5f;">Please indicate the status of the filing: <span class="required">*</span></p>
+            <label class="check-row"><input type="radio" name="opt2Status" value="filed"> <span>Annual financial return has been filed with the registered agent.</span></label>
+            <label class="check-row"><input type="radio" name="opt2Status" value="outstanding"> <span>Annual financial return has not yet been filed with the registered agent and remains outstanding.</span></label>
+            <label class="check-row"><input type="radio" name="opt2Status" value="confirm"> <span>Filing requirement or exemption requires further confirmation.</span></label>
+            <div class="info-box">
+              Please use the link below to complete the annual financial return and submit the completed form to the Company's registered agent.<br>
+              <a href="https://BWC-E.github.io/BWC_E-Forms/BWC_Annual_Financial_Return_Form.html" target="_blank" rel="noopener">https://BWC-E.github.io/BWC_E-Forms/BWC_Annual_Financial_Return_Form.html</a><br>
+              Please note that the annual filing fee is <strong>US$150.00</strong>.
+            </div>
+          </div>
+        </div>
+
+        <div class="option-card" data-opt="neither">
+          <label class="opt-head"><input type="radio" name="filingOption" value="neither"> Neither option accurately describes the Company's circumstances</label>
+          <p>Select this if Option 1 and Option 2 do not apply, and complete Section 3 below.</p>
+        </div>
+      </div>
+
+      <div class="section conditional" id="sec-exempt">
+        <h3 class="section-title">3. Other Statutory Exemptions</h3>
+        <p class="intro">As neither Option 1 nor Option 2 accurately describes the Company's circumstances, please indicate whether any of the following applies: <span class="required">*</span></p>
+        <label class="check-row"><input type="checkbox" class="exempt" id="exListed"> <span>The Company is listed on a recognised stock exchange.</span></label>
+        <label class="check-row"><input type="checkbox" class="exempt" id="exRegulated"> <span>The Company is regulated under BVI financial services legislation and provides financial statements to the BVI Financial Services Commission in accordance with the applicable regulatory requirements.</span></label>
+        <label class="check-row"><input type="checkbox" class="exempt" id="exLiquidation"> <span>The Company is in liquidation and the applicable statutory exemption is available.</span></label>
+        <label class="check-row"><input type="checkbox" class="exempt" id="exOther"> <span>Other circumstances (please specify below).</span></label>
+        <div class="form-group conditional" id="exOtherWrap" style="margin-left:28px;">
+          <input type="text" id="exOtherText" placeholder="Please specify" maxlength="500">
+        </div>
+        <label class="check-row"><input type="checkbox" id="exNone"> <span>None of the above.</span></label>
+        <p class="note">Note: The availability of an exemption should be confirmed against the applicable statutory provisions and the Company's particular circumstances.</p>
+      </div>
+
+      <div class="section" id="sec-confirm">
+        <h3 class="section-title"><span id="confirmNum">3</span>. Client Confirmation</h3>
+        <div class="warning-box" style="margin-bottom:18px;">
+          I/We confirm that the information provided in this form is true and accurate to the best of my/our knowledge and belief, and authorise the Company's registered agent to rely on this information for the purpose of determining the Company's annual financial return filing obligations.
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="field-label" for="signatoryName">Name of Authorised Signatory <span class="required">*</span></label>
+            <input type="text" id="signatoryName" data-required="Name of Authorised Signatory" maxlength="150">
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="capacity">Capacity <span class="required">*</span></label>
+            <input type="text" id="capacity" data-required="Capacity" placeholder="e.g. Director" maxlength="100">
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="signDate">Date <span class="required">*</span></label>
+            <input type="date" id="signDate" data-required="Date">
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="confirmCompany">Company <span class="required">*</span></label>
+            <input type="text" id="confirmCompany" data-required="Company (Client Confirmation)" maxlength="200">
+            <div class="hint">Filled in from Section 1 — edit if needed.</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">Signature <span class="required">*</span></label>
+          <div class="sig-tabs">
+            <button type="button" id="sigTabDraw" class="active">Draw</button>
+            <button type="button" id="sigTabType">Type</button>
+          </div>
+          <div id="sigDrawPane">
+            <canvas id="sigCanvas"></canvas>
+            <div class="sig-actions">
+              <button type="button" class="btn btn-secondary btn-small" id="sigClear">Clear signature</button>
+              <span class="hint" style="margin:0;">Sign with your mouse, trackpad or finger.</span>
+            </div>
+          </div>
+          <div id="sigTypePane" style="display:none;">
+            <input type="text" id="sigTyped" placeholder="Type your full name to sign" maxlength="150">
+            <div id="sigTypedPreview"></div>
+          </div>
+        </div>
+
+        <label class="check-row" style="margin-top:6px;"><input type="checkbox" id="confirmTick"> <span><strong>I confirm the statement above.</strong> <span class="required">*</span></span></label>
+
+        <div class="form-group" style="margin-top:16px;">
+          <label class="field-label">Generated (UTC)</label>
+          <div class="generated" id="generatedDisplay">Not yet generated</div>
+        </div>
+
+        <div class="warning-box" style="margin-top:8px;">
+          <strong>Important:</strong> Under section 98A, an annual financial return is generally due to the registered agent within nine months after the end of the relevant financial year, subject to any applicable extension. The client should ensure that the return is filed within the applicable deadline where required.
+        </div>
+      </div>
+
+      <div class="section">
+        <h3 class="section-title">Relevant Official References</h3>
+        <ul class="refs">
+          <li>BVI Business Companies (Amendment) Act, 2022 — section 17, introducing section 98A</li>
+          <li>BVI Financial Services Commission — Industry Circular 26 of 2025, Annual Return Filing Requirements and Exemptions</li>
+        </ul>
+      </div>
+    </form>
+  </div>
+
+  <div class="footer">
+    <p><strong>Bethel Worldwide Corporation</strong></p>
+    <p>Bethel House, P.O. Box 4749, Road Town, Tortola, VG1110, British Virgin Islands</p>
+    <p>Phone: (284) 494-0778 | Fax: (284) 494-0781</p>
+  </div>
+</div>
+
+<div class="action-bar">
+  <div class="inner">
+    <button type="button" class="btn btn-primary" id="btnDownload">⬇ Download PDF</button>
+    <button type="button" class="btn btn-gold" id="btnShare">↗ Share PDF</button>
+    <button type="button" class="btn btn-secondary" id="btnClear">Clear form</button>
+    <span class="msg" id="actionMsg"></span>
+  </div>
+</div>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'bwc_afr_filing_status_confirmation';
+  const $ = id => document.getElementById(id);
+  const form = $('afrForm');
+  let signatureData = null;
+  let sigMode = 'draw';
+  let restoring = false;
+
+  function radioVal(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : '';
+  }
+  function formatUtcNow() {
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const m = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    return `${d.getUTCDate()} ${m[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+  }
+  function fmtDate(iso) {
+    if (!iso) return '';
+    return new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  // ---------- conditional logic ----------
+  function updateConditionals() {
+    const opt = radioVal('filingOption');
+    document.querySelectorAll('.option-card').forEach(c => c.classList.toggle('selected', c.dataset.opt === opt));
+    $('opt2Sub').classList.toggle('visible', opt === 'opt2');
+    $('sec-exempt').classList.toggle('visible', opt === 'neither');
+    $('confirmNum').textContent = opt === 'neither' ? '4' : '3';
+    $('exOtherWrap').classList.toggle('visible', $('exOther').checked);
+  }
+  document.querySelectorAll('.exempt').forEach(cb => cb.addEventListener('change', () => { if (cb.checked) $('exNone').checked = false; }));
+  $('exNone').addEventListener('change', () => {
+    if ($('exNone').checked) { document.querySelectorAll('.exempt').forEach(cb => cb.checked = false); $('exOtherText').value = ''; }
+  });
+
+  document.querySelectorAll('.option-card').forEach(card => card.addEventListener('click', e => {
+    if (e.target.closest('input, label, a, .sub-options')) return;
+    const r = card.querySelector('input[name="filingOption"]');
+    if (r && !r.checked) { r.checked = true; onChange(); }
+  }));
+
+  let confirmCompanyTouched = false;
+  $('confirmCompany').addEventListener('input', () => { confirmCompanyTouched = $('confirmCompany').value.trim() !== ''; });
+  $('companyName').addEventListener('input', () => { if (!confirmCompanyTouched) $('confirmCompany').value = $('companyName').value; });
+
+  function updateDeadline() {
+    const box = $('deadlineBox');
+    const v = $('fyeDate').value;
+    if (!v) { box.className = 'deadline'; box.textContent = ''; return; }
+    const fye = new Date(v + 'T00:00:00');
+    const due = new Date(fye.getFullYear(), fye.getMonth() + 9, 1);
+    const lastDay = new Date(due.getFullYear(), due.getMonth() + 1, 0).getDate();
+    due.setDate(Math.min(fye.getDate(), lastDay));
+    const today = new Date(); today.setHours(0,0,0,0);
+    const days = Math.round((due - today) / 86400000);
+    const dueStr = due.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    const base = `Indicative section 98A deadline (9 months after year-end): ${dueStr}`;
+    if (days < 0) { box.className = 'deadline over'; box.textContent = `${base} — ${Math.abs(days)} day(s) ago, subject to any extension.`; }
+    else if (days <= 30) { box.className = 'deadline warn'; box.textContent = `${base} — ${days} day(s) remaining.`; }
+    else { box.className = 'deadline ok'; box.textContent = `${base} — ${days} day(s) remaining.`; }
+  }
+
+  // ---------- signature ----------
+  const canvas = $('sigCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false, hasInk = false;
+  function sizeCanvas() {
+    const r = canvas.getBoundingClientRect();
+    if (!r.width) return;
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = r.width * ratio; canvas.height = r.height * ratio;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1e3a5f';
+    if (signatureData) {
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, r.width, r.height);
+      img.src = signatureData;
+    }
+  }
+  function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return { x: p.clientX - r.left, y: p.clientY - r.top };
+  }
+  function start(e) { e.preventDefault(); drawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+  function move(e) { if (!drawing) return; e.preventDefault(); const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasInk = true; }
+  function end() { if (!drawing) return; drawing = false; if (hasInk) { signatureData = canvas.toDataURL('image/png'); onChange(); } }
+  canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', move, { passive: false }); canvas.addEventListener('touchend', end);
+  $('sigClear').addEventListener('click', () => { ctx.clearRect(0, 0, canvas.width, canvas.height); signatureData = null; hasInk = false; onChange(); });
+  function setSigMode(mode) {
+    sigMode = mode;
+    $('sigTabDraw').classList.toggle('active', mode === 'draw');
+    $('sigTabType').classList.toggle('active', mode === 'type');
+    $('sigDrawPane').style.display = mode === 'draw' ? '' : 'none';
+    $('sigTypePane').style.display = mode === 'type' ? '' : 'none';
+    if (mode === 'draw') sizeCanvas();
+    if (!restoring) onChange();
+  }
+  $('sigTabDraw').addEventListener('click', () => setSigMode('draw'));
+  $('sigTabType').addEventListener('click', () => setSigMode('type'));
+  $('sigTyped').addEventListener('input', () => { $('sigTypedPreview').textContent = $('sigTyped').value; });
+  window.addEventListener('resize', () => { if (sigMode === 'draw') sizeCanvas(); });
+
+  function hasSignature() { return sigMode === 'draw' ? !!signatureData : $('sigTyped').value.trim() !== ''; }
+  function typedSignatureImage() {
+    const txt = $('sigTyped').value.trim();
+    if (!txt) return null;
+    const c = document.createElement('canvas'); c.width = 900; c.height = 180;
+    const x = c.getContext('2d');
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, c.width, c.height);
+    x.fillStyle = '#1e3a5f'; x.font = "italic 84px 'Brush Script MT', 'Segoe Script', cursive"; x.textBaseline = 'middle';
+    x.fillText(txt, 20, 95);
+    return c.toDataURL('image/png');
+  }
+
+  // ---------- validation / progress ----------
+  function collectIssues() {
+    const issues = [];
+    document.querySelectorAll('[data-required]').forEach(el => {
+      const ok = el.value.trim() !== '';
+      el.classList.toggle('error', !ok);
+      if (!ok) issues.push({ label: el.dataset.required, anchor: el.id });
+    });
+    const opt = radioVal('filingOption');
+    if (!opt) issues.push({ label: 'Filing status option (Section 2)', anchor: 'sec-status' });
+    if (opt === 'opt2' && !radioVal('opt2Status')) issues.push({ label: 'Option 2 — status of the filing', anchor: 'sec-status' });
+    if (opt === 'neither') {
+      const any = [...document.querySelectorAll('.exempt')].some(c => c.checked) || $('exNone').checked;
+      if (!any) issues.push({ label: 'Other statutory exemptions (Section 3)', anchor: 'sec-exempt' });
+      if ($('exOther').checked && !$('exOtherText').value.trim()) issues.push({ label: 'Other circumstances — please specify', anchor: 'sec-exempt' });
+    }
+    if (!hasSignature()) issues.push({ label: 'Signature', anchor: 'sec-confirm' });
+    if (!$('confirmTick').checked) issues.push({ label: 'Confirmation tick', anchor: 'sec-confirm' });
+    return issues;
+  }
+  function totalRequired() {
+    let n = document.querySelectorAll('[data-required]').length + 3;
+    const opt = radioVal('filingOption');
+    if (opt === 'opt2') n += 1;
+    if (opt === 'neither') n += 1 + ($('exOther').checked ? 1 : 0);
+    return n;
+  }
+  function updateProgress() {
+    const issues = collectIssues();
+    if (!form.dataset.attempted) document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+    const total = totalRequired();
+    const pct = Math.max(0, Math.round(((total - issues.length) / total) * 100));
+    $('progressPct').textContent = pct + '%';
+    $('progressFill').style.width = pct + '%';
+    if (form.dataset.attempted) renderIssues(issues);
+    return issues;
+  }
+  function renderIssues(issues) {
+    const panel = $('incompletePanel');
+    if (!issues.length) { panel.style.display = 'none'; return; }
+    $('incompleteList').innerHTML = issues.map(i => `<li><a href="#${i.anchor}">${i.label}</a></li>`).join('');
+    panel.style.display = 'block';
+  }
+
+  // ---------- autosave ----------
+  function serialize() {
+    const data = { fields: {}, radios: {}, checks: {}, sigMode, signatureData, generated: $('generatedDisplay').textContent, confirmCompanyTouched, savedAt: new Date().toISOString() };
+    form.querySelectorAll('input[type="text"], input[type="date"]').forEach(el => { if (el.id) data.fields[el.id] = el.value; });
+    form.querySelectorAll('input[type="radio"]:checked').forEach(el => { data.radios[el.name] = el.value; });
+    form.querySelectorAll('input[type="checkbox"]').forEach(el => { if (el.id) data.checks[el.id] = el.checked; });
+    return data;
+  }
+  function save() {
+    if (restoring) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(serialize()));
+      $('lastSaved').textContent = 'Last saved: ' + new Date().toLocaleString();
+    } catch (e) {
+      $('saveStatus').textContent = 'Auto-save is unavailable in this browser — please complete the form in one sitting.';
+    }
+  }
+  function restore() {
+    let raw = null;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { return; }
+    if (!raw) return;
+    restoring = true;
+    try {
+      const d = JSON.parse(raw);
+      Object.entries(d.fields || {}).forEach(([id, v]) => { const el = $(id); if (el) el.value = v; });
+      Object.entries(d.radios || {}).forEach(([name, v]) => { const el = document.querySelector(`input[name="${name}"][value="${v}"]`); if (el) el.checked = true; });
+      Object.entries(d.checks || {}).forEach(([id, v]) => { const el = $(id); if (el) el.checked = !!v; });
+      confirmCompanyTouched = !!d.confirmCompanyTouched;
+      signatureData = d.signatureData || null;
+      setSigMode(d.sigMode || 'draw');
+      $('sigTypedPreview').textContent = $('sigTyped').value;
+      if (d.generated && d.generated !== 'Not yet generated') { $('generatedDisplay').textContent = d.generated; $('generatedDisplay').classList.add('set'); }
+      if (d.savedAt) $('lastSaved').textContent = 'Restored progress saved ' + new Date(d.savedAt).toLocaleString();
+    } catch (e) { /* ignore corrupt save */ }
+    restoring = false;
+  }
+  function onChange() { updateConditionals(); updateDeadline(); updateProgress(); save(); }
+  form.addEventListener('input', onChange);
+  form.addEventListener('change', onChange);
+
+  $('btnClear').addEventListener('click', () => {
+    if (!confirm('Clear everything entered in this form? This cannot be undone.')) return;
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    location.reload();
+  });
+
+  // ---------- PDF ----------
+  function buildPdf() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+    const M = 18, CW = W - 2 * M;
+    let y = 0;
+    const NAVY = [30, 58, 95], GOLD = [212, 175, 55], GREY = [90, 90, 90];
+
+    function header() {
+      doc.setFillColor(...NAVY); doc.rect(0, 0, W, 30, 'F');
+      doc.setFillColor(...GOLD); doc.rect(0, 30, W, 1.5, 'F');
+      doc.setTextColor(255, 255, 255); doc.setFont('times', 'bold'); doc.setFontSize(16);
+      doc.text('BETHEL WORLDWIDE CORPORATION', W / 2, 12, { align: 'center' });
+      doc.setFont('times', 'normal'); doc.setFontSize(11);
+      doc.text('Annual Financial Return Filing Status - Client Confirmation Form', W / 2, 19, { align: 'center' });
+      doc.setFontSize(8.5);
+      doc.text('Pursuant to section 98A of the BVI Business Companies Act, Revised Edition 2020, as amended', W / 2, 25, { align: 'center' });
+      doc.setTextColor(0, 0, 0);
+      y = 40;
+    }
+    function ensure(h) { if (y + h > H - 20) { doc.addPage(); header(); } }
+    function heading(t) {
+      ensure(14); y += 2;
+      doc.setFont('times', 'bold'); doc.setFontSize(12.5); doc.setTextColor(...NAVY);
+      doc.text(t.toUpperCase(), M, y);
+      doc.setDrawColor(...GOLD); doc.setLineWidth(0.6); doc.line(M, y + 1.8, W - M, y + 1.8);
+      doc.setTextColor(0, 0, 0); y += 8;
+    }
+    function para(t, o = {}) {
+      doc.setFont('times', o.bold ? 'bold' : (o.italic ? 'italic' : 'normal')); doc.setFontSize(o.size || 10.5);
+      const lines = doc.splitTextToSize(t, o.width || CW);
+      ensure(lines.length * 5);
+      doc.text(lines, o.x || M, y); y += lines.length * 5 + (o.after ?? 2);
+    }
+    function field(label, value) {
+      doc.setFontSize(10.5);
+      const lines = doc.splitTextToSize(value || '-', CW - 62);
+      ensure(lines.length * 5 + 2);
+      doc.setFont('times', 'bold'); doc.text(label, M, y);
+      doc.setFont('times', 'normal'); doc.text(lines, M + 62, y);
+      y += lines.length * 5 + 2;
+    }
+    function tick(checked, text, indent = 0) {
+      doc.setFontSize(10.5); doc.setFont('times', checked ? 'bold' : 'normal');
+      const lines = doc.splitTextToSize(text, CW - 8 - indent);
+      ensure(lines.length * 5 + 1);
+      doc.setDrawColor(60, 60, 60); doc.setLineWidth(0.3);
+      doc.rect(M + indent, y - 3.4, 3.8, 3.8);
+      if (checked) {
+        doc.setDrawColor(...NAVY); doc.setLineWidth(0.7);
+        doc.line(M + indent + 0.7, y - 1.5, M + indent + 1.6, y - 0.2);
+        doc.line(M + indent + 1.6, y - 0.2, M + indent + 3.3, y - 3.0);
+      }
+      doc.text(lines, M + indent + 6, y); y += lines.length * 5 + 1.5;
+    }
+
+    header();
+    const opt = radioVal('filingOption');
+    const s2 = radioVal('opt2Status');
+
+    heading('1. Company details');
+    field('Name of Company:', $('companyName').value);
+    field('BVI Company Number:', $('companyNumber').value);
+    field('Financial Year-End:', fmtDate($('fyeDate').value));
+    field('Financial Year Concerned:', $('fyRelates').value);
+
+    heading('2. Annual financial return filing status');
+    tick(opt === 'opt1', 'OPTION 1 - Filing with the BVI Inland Revenue Department');
+    para('The Company files its annual tax return with the BVI Inland Revenue Department, accompanied by its financial statements, and therefore falls within the exemption under section 98A(5)(c).', { x: M + 6, width: CW - 6, size: 9.5 });
+    tick(opt === 'opt2', 'OPTION 2 - Filing with the Registered Agent');
+    para('The Company does not file its annual tax return with the BVI Inland Revenue Department accompanied by its financial statements and is therefore required to file its annual financial return with its BVI registered agent under section 98A, unless another statutory exemption applies.', { x: M + 6, width: CW - 6, size: 9.5 });
+    if (opt === 'opt2') {
+      tick(s2 === 'filed', 'Annual financial return has been filed with the registered agent.', 8);
+      tick(s2 === 'outstanding', 'Annual financial return has not yet been filed with the registered agent and remains outstanding.', 8);
+      tick(s2 === 'confirm', 'Filing requirement or exemption requires further confirmation.', 8);
+      para('Annual filing fee: US$150.00', { x: M + 8, size: 9.5, italic: true });
+    }
+    tick(opt === 'neither', "Neither option accurately describes the Company's circumstances (see Section 3).");
+
+    let n = 3;
+    if (opt === 'neither') {
+      heading('3. Other statutory exemptions');
+      tick($('exListed').checked, 'The Company is listed on a recognised stock exchange.');
+      tick($('exRegulated').checked, 'The Company is regulated under BVI financial services legislation and provides financial statements to the BVI Financial Services Commission in accordance with the applicable regulatory requirements.');
+      tick($('exLiquidation').checked, 'The Company is in liquidation and the applicable statutory exemption is available.');
+      tick($('exOther').checked, 'Other circumstances' + ($('exOther').checked ? ': ' + $('exOtherText').value : '.'));
+      tick($('exNone').checked, 'None of the above.');
+      para("Note: The availability of an exemption should be confirmed against the applicable statutory provisions and the Company's particular circumstances.", { italic: true, size: 9 });
+      n = 4;
+    }
+
+    heading(n + '. Client confirmation');
+    para("I/We confirm that the information provided in this form is true and accurate to the best of my/our knowledge and belief, and authorise the Company's registered agent to rely on this information for the purpose of determining the Company's annual financial return filing obligations.", { after: 4 });
+    field('Name of Authorised Signatory:', $('signatoryName').value);
+    field('Capacity:', $('capacity').value);
+    field('Date:', fmtDate($('signDate').value));
+    field('Company:', $('confirmCompany').value);
+
+    const sigImg = sigMode === 'draw' ? signatureData : typedSignatureImage();
+    ensure(30);
+    doc.setFont('times', 'bold'); doc.setFontSize(10.5); doc.text('Signature:', M, y);
+    if (sigImg) {
+      const props = doc.getImageProperties(sigImg);
+      const w = 60, h = Math.min(24, (props.height / props.width) * w);
+      doc.addImage(sigImg, 'PNG', M + 62, y - 6, w, h);
+      doc.setDrawColor(150, 150, 150); doc.setLineWidth(0.2); doc.line(M + 62, y - 6 + h + 1, M + 62 + w, y - 6 + h + 1);
+      y += h + 2;
+    } else { y += 6; }
+
+    const stamp = formatUtcNow();
+    field('Generated (UTC):', stamp);
+    y += 2;
+    para('Important: Under section 98A, an annual financial return is generally due to the registered agent within nine months after the end of the relevant financial year, subject to any applicable extension.', { italic: true, size: 9 });
+
+    const pages = doc.internal.getNumberOfPages();
+    for (let p = 1; p <= pages; p++) {
+      doc.setPage(p);
+      doc.setDrawColor(...GOLD); doc.setLineWidth(0.4); doc.line(M, H - 15, W - M, H - 15);
+      doc.setFont('times', 'normal'); doc.setFontSize(8); doc.setTextColor(...GREY);
+      doc.text('Bethel Worldwide Corporation - Bethel House, P.O. Box 4749, Road Town, Tortola, VG1110, British Virgin Islands', W / 2, H - 10.5, { align: 'center' });
+      doc.text(`Page ${p} of ${pages}`, W / 2, H - 6.5, { align: 'center' });
+    }
+
+    $('generatedDisplay').textContent = stamp;
+    $('generatedDisplay').classList.add('set');
+    save();
+    return doc;
+  }
+  function fileName() {
+    const name = ($('companyName').value || 'Company').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '');
+    const fy = ($('fyRelates').value || '').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '');
+    return `AFR_Filing_Status_Confirmation_${name}${fy ? '_' + fy : ''}.pdf`;
+  }
+  function readyOrExplain() {
+    form.dataset.attempted = '1';
+    const issues = updateProgress();
+    if (issues.length) {
+      renderIssues(issues);
+      $('incompletePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      $('actionMsg').textContent = 'Please complete the highlighted items first.';
+      return false;
+    }
+    $('incompletePanel').style.display = 'none';
+    return true;
+  }
+
+  $('btnDownload').addEventListener('click', () => {
+    if (!readyOrExplain()) return;
+    buildPdf().save(fileName());
+    $('actionMsg').textContent = 'PDF downloaded.';
+  });
+
+  $('btnShare').addEventListener('click', async () => {
+    if (!readyOrExplain()) return;
+    const doc = buildPdf();
+    const file = new File([doc.output('blob')], fileName(), { type: 'application/pdf' });
+    const title = 'Annual Financial Return Filing Status - ' + ($('companyName').value || 'Client Confirmation');
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title, text: 'Completed Annual Financial Return Filing Status confirmation form.' });
+        $('actionMsg').textContent = 'Shared.';
+      } catch (e) { if (e.name !== 'AbortError') $('actionMsg').textContent = 'Sharing was not completed.'; }
+      return;
+    }
+    doc.save(fileName());
+    const subject = encodeURIComponent(title);
+    const body = encodeURIComponent('Please find attached the completed Annual Financial Return Filing Status - Client Confirmation Form.\n\n(The PDF has been downloaded to your device - please attach it to this email.)');
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    $('actionMsg').textContent = 'PDF downloaded — attach it to the email draft that opened.';
+  });
+
+  // ---------- init ----------
+  restore();
+  if (sigMode === 'draw') sizeCanvas();
+  updateConditionals();
+  updateDeadline();
+  updateProgress();
+})();
+</script>
+</body>
+</html>
