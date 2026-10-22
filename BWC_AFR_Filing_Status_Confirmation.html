@@ -151,7 +151,6 @@
             <p style="margin:0 0 10px;font-weight:600;color:#1e3a5f;">Please indicate the status of the filing: <span class="required">*</span></p>
             <label class="check-row"><input type="radio" name="opt2Status" value="filed"> <span>Annual financial return has been filed with the registered agent.</span></label>
             <label class="check-row"><input type="radio" name="opt2Status" value="outstanding"> <span>Annual financial return has not yet been filed with the registered agent and remains outstanding.</span></label>
-            <label class="check-row"><input type="radio" name="opt2Status" value="confirm"> <span>Filing requirement or exemption requires further confirmation.</span></label>
             <div class="info-box">
               Please use the link below to complete the annual financial return and submit the completed form to the Company's registered agent.<br>
               <a href="https://BWC-E.github.io/BWC_E-Forms/BWC_Annual_Financial_Return_Form.html" target="_blank" rel="noopener">https://BWC-E.github.io/BWC_E-Forms/BWC_Annual_Financial_Return_Form.html</a><br>
@@ -176,7 +175,6 @@
         <div class="form-group conditional" id="exOtherWrap" style="margin-left:28px;">
           <input type="text" id="exOtherText" placeholder="Please specify" maxlength="500">
         </div>
-        <label class="check-row"><input type="checkbox" id="exNone"> <span>None of the above.</span></label>
         <p class="note">Note: The availability of an exemption should be confirmed against the applicable statutory provisions and the Company's particular circumstances.</p>
       </div>
 
@@ -226,7 +224,7 @@
 
         <label class="check-row" style="margin-top:6px;"><input type="checkbox" id="confirmTick"> <span><strong>I confirm the statement above.</strong> <span class="required">*</span></span></label>
 
-        <div class="form-group" style="margin-top:16px;">
+        <div class="form-group" id="generatedGroup" style="margin-top:16px; display:none;">
           <label class="field-label">Generated (UTC)</label>
           <div class="generated" id="generatedDisplay">Not yet generated</div>
         </div>
@@ -265,6 +263,8 @@
 <script>
 (function () {
   const STORAGE_KEY = 'bwc_afr_filing_status_confirmation';
+  // Generated (UTC) timestamp — switched off for now. Set to true to show it on the form and print it on the PDF.
+  const SHOW_GENERATED = false;
   const $ = id => document.getElementById(id);
   const form = $('afrForm');
   let signatureData = null;
@@ -295,15 +295,28 @@
     $('confirmNum').textContent = opt === 'neither' ? '4' : '3';
     $('exOtherWrap').classList.toggle('visible', $('exOther').checked);
   }
-  document.querySelectorAll('.exempt').forEach(cb => cb.addEventListener('change', () => { if (cb.checked) $('exNone').checked = false; }));
-  $('exNone').addEventListener('change', () => {
-    if ($('exNone').checked) { document.querySelectorAll('.exempt').forEach(cb => cb.checked = false); $('exOtherText').value = ''; }
-  });
 
+  // Radio buttons: selecting an already-selected option again clears it.
+  const lastChecked = {};
+  function syncLastChecked() {
+    document.querySelectorAll('input[type="radio"]').forEach(r => { if (r.checked) lastChecked[r.name] = r; });
+  }
+  function toggleRadio(r) {
+    if (lastChecked[r.name] === r) { r.checked = false; lastChecked[r.name] = null; }
+    else { r.checked = true; lastChecked[r.name] = r; }
+    onChange();
+  }
+  form.addEventListener('click', e => {
+    const r = e.target.closest('input[type="radio"]');
+    if (!r) return;
+    if (lastChecked[r.name] === r) { r.checked = false; lastChecked[r.name] = null; onChange(); }
+    else { lastChecked[r.name] = r; }
+  });
+  // Clicking anywhere on an option card (outside its controls) also selects / deselects it.
   document.querySelectorAll('.option-card').forEach(card => card.addEventListener('click', e => {
     if (e.target.closest('input, label, a, .sub-options')) return;
     const r = card.querySelector('input[name="filingOption"]');
-    if (r && !r.checked) { r.checked = true; onChange(); }
+    if (r) toggleRadio(r);
   }));
 
   let confirmCompanyTouched = false;
@@ -393,7 +406,7 @@
     if (!opt) issues.push({ label: 'Filing status option (Section 2)', anchor: 'sec-status' });
     if (opt === 'opt2' && !radioVal('opt2Status')) issues.push({ label: 'Option 2 — status of the filing', anchor: 'sec-status' });
     if (opt === 'neither') {
-      const any = [...document.querySelectorAll('.exempt')].some(c => c.checked) || $('exNone').checked;
+      const any = [...document.querySelectorAll('.exempt')].some(c => c.checked);
       if (!any) issues.push({ label: 'Other statutory exemptions (Section 3)', anchor: 'sec-exempt' });
       if ($('exOther').checked && !$('exOtherText').value.trim()) issues.push({ label: 'Other circumstances — please specify', anchor: 'sec-exempt' });
     }
@@ -546,7 +559,6 @@
     if (opt === 'opt2') {
       tick(s2 === 'filed', 'Annual financial return has been filed with the registered agent.', 8);
       tick(s2 === 'outstanding', 'Annual financial return has not yet been filed with the registered agent and remains outstanding.', 8);
-      tick(s2 === 'confirm', 'Filing requirement or exemption requires further confirmation.', 8);
       para('Annual filing fee: US$150.00', { x: M + 8, size: 9.5, italic: true });
     }
     tick(opt === 'neither', "Neither option accurately describes the Company's circumstances (see Section 3).");
@@ -558,7 +570,6 @@
       tick($('exRegulated').checked, 'The Company is regulated under BVI financial services legislation and provides financial statements to the BVI Financial Services Commission in accordance with the applicable regulatory requirements.');
       tick($('exLiquidation').checked, 'The Company is in liquidation and the applicable statutory exemption is available.');
       tick($('exOther').checked, 'Other circumstances' + ($('exOther').checked ? ': ' + $('exOtherText').value : '.'));
-      tick($('exNone').checked, 'None of the above.');
       para("Note: The availability of an exemption should be confirmed against the applicable statutory provisions and the Company's particular circumstances.", { italic: true, size: 9 });
       n = 4;
     }
@@ -582,7 +593,7 @@
     } else { y += 6; }
 
     const stamp = formatUtcNow();
-    field('Generated (UTC):', stamp);
+    if (SHOW_GENERATED) field('Generated (UTC):', stamp);
     y += 2;
     para('Important: Under section 98A, an annual financial return is generally due to the registered agent within nine months after the end of the relevant financial year, subject to any applicable extension.', { italic: true, size: 9 });
 
@@ -644,7 +655,9 @@
   });
 
   // ---------- init ----------
+  if (SHOW_GENERATED) $('generatedGroup').style.display = '';
   restore();
+  syncLastChecked();
   if (sigMode === 'draw') sizeCanvas();
   updateConditionals();
   updateDeadline();
