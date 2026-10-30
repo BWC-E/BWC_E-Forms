@@ -30,6 +30,11 @@
   label.field-label { display: block; font-weight: 600; margin-bottom: 6px; color: #1f2937; }
   .required { color: #dc2626; }
   input[type="text"], input[type="date"] { width: 100%; padding: 11px 12px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; font-family: inherit; }
+  .dm-row { display: flex; align-items: center; gap: 8px; }
+  select.dm { width: 110px; padding: 11px 12px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; font-family: inherit; background: #fff; cursor: pointer; }
+  select.dm:focus { outline: none; border-color: #2d5986; }
+  select.dm.error { border-color: #dc2626; background: #fef2f2; }
+  .dm-sep { font-size: 20px; color: #6b7280; }
   input:focus { outline: none; border-color: #2d5986; }
   input.error { border-color: #dc2626; background: #fef2f2; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
@@ -123,15 +128,15 @@
             <input type="text" id="companyNumber" data-required="BVI Company Number" maxlength="50">
           </div>
           <div class="form-group">
-            <label class="field-label" for="fyeDate">Financial Year-End <span class="required">*</span></label>
-            <input type="date" id="fyeDate" data-required="Financial Year-End">
+            <label class="field-label" for="fyeDay">Financial Year-End (dd / mm) <span class="required">*</span></label>
+            <div class="dm-row">
+              <select id="fyeDay" class="dm" data-required="Financial Year-End — day" aria-label="Financial year-end day"><option value="">dd</option></select>
+              <span class="dm-sep">/</span>
+              <select id="fyeMonth" class="dm" data-required="Financial Year-End — month" aria-label="Financial year-end month"><option value="">mm</option></select>
+            </div>
           </div>
         </div>
-        <div class="form-group">
-          <label class="field-label" for="fyRelates">Financial Year to Which This Confirmation Relates <span class="required">*</span></label>
-          <input type="text" id="fyRelates" data-required="Financial Year to Which This Confirmation Relates" placeholder="e.g. Year ended 31 December 2025" maxlength="100">
-          <div class="deadline" id="deadlineBox"></div>
-        </div>
+        <div class="deadline" id="deadlineBox" style="margin-top:0;"></div>
       </div>
 
       <div class="section" id="sec-status">
@@ -323,22 +328,30 @@
   $('confirmCompany').addEventListener('input', () => { confirmCompanyTouched = $('confirmCompany').value.trim() !== ''; });
   $('companyName').addEventListener('input', () => { if (!confirmCompanyTouched) $('confirmCompany').value = $('companyName').value; });
 
+  // ---------- Financial year-end (dd/mm) ----------
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const MAX_DAY = [31,29,31,30,31,30,31,31,30,31,30,31];
+  for (let i = 1; i <= 31; i++) { const o = document.createElement('option'); o.value = String(i).padStart(2,'0'); o.textContent = o.value; $('fyeDay').appendChild(o); }
+  for (let i = 1; i <= 12; i++) { const o = document.createElement('option'); o.value = String(i).padStart(2,'0'); o.textContent = `${o.value} (${MONTHS[i-1].slice(0,3)})`; $('fyeMonth').appendChild(o); }
+  function fyeValid() {
+    const d = parseInt($('fyeDay').value, 10), m = parseInt($('fyeMonth').value, 10);
+    return !!(d && m && d <= MAX_DAY[m - 1]);
+  }
+  function fyeText() { return ($('fyeDay').value && $('fyeMonth').value) ? `${$('fyeDay').value}/${$('fyeMonth').value}` : ''; }
+
   function updateDeadline() {
     const box = $('deadlineBox');
-    const v = $('fyeDate').value;
-    if (!v) { box.className = 'deadline'; box.textContent = ''; return; }
-    const fye = new Date(v + 'T00:00:00');
-    const due = new Date(fye.getFullYear(), fye.getMonth() + 9, 1);
-    const lastDay = new Date(due.getFullYear(), due.getMonth() + 1, 0).getDate();
-    due.setDate(Math.min(fye.getDate(), lastDay));
-    const today = new Date(); today.setHours(0,0,0,0);
-    const days = Math.round((due - today) / 86400000);
-    const dueStr = due.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    const base = `Indicative section 98A deadline (9 months after year-end): ${dueStr}`;
-    if (days < 0) { box.className = 'deadline over'; box.textContent = `${base} — ${Math.abs(days)} day(s) ago, subject to any extension.`; }
-    else if (days <= 30) { box.className = 'deadline warn'; box.textContent = `${base} — ${days} day(s) remaining.`; }
-    else { box.className = 'deadline ok'; box.textContent = `${base} — ${days} day(s) remaining.`; }
+    if (!fyeValid()) { box.className = 'deadline'; box.textContent = ''; return; }
+    const d = parseInt($('fyeDay').value, 10), m = parseInt($('fyeMonth').value, 10);
+    // 9 months after the year-end, clamped to the last day of the due month (e.g. 31 May -> 28/29 Feb).
+    const dueMonth = (m - 1 + 9) % 12;
+    const dueStr = (dueMonth === 1 && d >= 29)
+      ? '28 February (29 February in leap years)'
+      : `${Math.min(d, MAX_DAY[dueMonth])} ${MONTHS[dueMonth]}`;
+    box.className = 'deadline ok';
+    box.textContent = `Indicative section 98A deadline: ${dueStr} each year — 9 months after a ${d} ${MONTHS[m - 1]} year-end, subject to any applicable extension.`;
   }
+
 
   // ---------- signature ----------
   const canvas = $('sigCanvas');
@@ -402,6 +415,10 @@
       el.classList.toggle('error', !ok);
       if (!ok) issues.push({ label: el.dataset.required, anchor: el.id });
     });
+    if ($('fyeDay').value && $('fyeMonth').value && !fyeValid()) {
+      $('fyeDay').classList.add('error');
+      issues.push({ label: 'Financial Year-End — that day does not exist in the selected month', anchor: 'fyeDay' });
+    }
     const opt = radioVal('filingOption');
     if (!opt) issues.push({ label: 'Filing status option (Section 2)', anchor: 'sec-status' });
     if (opt === 'opt2' && !radioVal('opt2Status')) issues.push({ label: 'Option 2 — status of the filing', anchor: 'sec-status' });
@@ -441,7 +458,7 @@
   // ---------- autosave ----------
   function serialize() {
     const data = { fields: {}, radios: {}, checks: {}, sigMode, signatureData, generated: $('generatedDisplay').textContent, confirmCompanyTouched, savedAt: new Date().toISOString() };
-    form.querySelectorAll('input[type="text"], input[type="date"]').forEach(el => { if (el.id) data.fields[el.id] = el.value; });
+    form.querySelectorAll('input[type="text"], input[type="date"], select').forEach(el => { if (el.id) data.fields[el.id] = el.value; });
     form.querySelectorAll('input[type="radio"]:checked').forEach(el => { data.radios[el.name] = el.value; });
     form.querySelectorAll('input[type="checkbox"]').forEach(el => { if (el.id) data.checks[el.id] = el.checked; });
     return data;
@@ -463,6 +480,12 @@
     try {
       const d = JSON.parse(raw);
       Object.entries(d.fields || {}).forEach(([id, v]) => { const el = $(id); if (el) el.value = v; });
+      // Carry over progress saved by the earlier version of this form (full date / free-text year)
+      const f = d.fields || {};
+      if (f.fyeDate && !f.fyeDay && /^\d{4}-\d{2}-\d{2}$/.test(f.fyeDate)) {
+        $('fyeMonth').value = f.fyeDate.slice(5, 7);
+        $('fyeDay').value = f.fyeDate.slice(8, 10);
+      }
       Object.entries(d.radios || {}).forEach(([name, v]) => { const el = document.querySelector(`input[name="${name}"][value="${v}"]`); if (el) el.checked = true; });
       Object.entries(d.checks || {}).forEach(([id, v]) => { const el = $(id); if (el) el.checked = !!v; });
       confirmCompanyTouched = !!d.confirmCompanyTouched;
@@ -548,8 +571,7 @@
     heading('1. Company details');
     field('Name of Company:', $('companyName').value);
     field('BVI Company Number:', $('companyNumber').value);
-    field('Financial Year-End:', fmtDate($('fyeDate').value));
-    field('Financial Year Concerned:', $('fyRelates').value);
+    field('Financial Year-End (dd/mm):', fyeText());
 
     heading('2. Annual financial return filing status');
     tick(opt === 'opt1', 'OPTION 1 - Filing with the BVI Inland Revenue Department');
@@ -613,8 +635,7 @@
   }
   function fileName() {
     const name = ($('companyName').value || 'Company').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '');
-    const fy = ($('fyRelates').value || '').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '');
-    return `AFR_Filing_Status_Confirmation_${name}${fy ? '_' + fy : ''}.pdf`;
+    return `AFR_Filing_Status_Confirmation_${name}.pdf`;
   }
   function readyOrExplain() {
     form.dataset.attempted = '1';
