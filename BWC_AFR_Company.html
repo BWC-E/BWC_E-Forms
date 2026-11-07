@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annual Financial Return - Company | Bethel Worldwide Corporation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Crimson+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { min-height: 100vh; background: linear-gradient(135deg, #1e3a5f 0%, #2d5986 100%); padding: 40px 20px 120px; font-family: 'Crimson Pro', Georgia, serif; color: #1f2937; }
+  .container { max-width: 940px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #2d5986 0%, #1e3a5f 100%); padding: 40px; color: #fff; text-align: center; border-bottom: 4px solid #d4af37; }
+  .header h1 { font-size: 32px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-family: 'Playfair Display', Georgia, serif; margin-bottom: 10px; }
+  .header h2 { font-size: 22px; font-weight: 500; opacity: 0.95; }
+  .header p { font-size: 14px; opacity: 0.85; margin-top: 8px; font-style: italic; }
+  .form-content { padding: 36px 40px; }
+  .save-bar { background: #e0f2fe; border: 2px solid #0284c7; border-radius: 8px; padding: 14px 18px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 15px; color: #075985; }
+  .save-bar strong { display: block; font-size: 16px; }
+  .save-bar .last { font-size: 13px; color: #0369a1; font-style: italic; }
+  .section { margin-bottom: 36px; }
+  .section-title { font-size: 20px; color: #1e3a5f; margin-bottom: 18px; border-bottom: 2px solid #d4af37; padding-bottom: 8px; font-family: 'Playfair Display', Georgia, serif; text-transform: uppercase; }
+  .form-group { margin-bottom: 18px; }
+  label.fl { display: block; margin-bottom: 6px; font-weight: 600; color: #333; font-size: 15px; }
+  .required { color: #dc2626; }
+  input[type="text"], input[type="number"], input[type="date"], select { width: 100%; padding: 11px 12px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; font-family: inherit; background: #fff; transition: border-color 0.2s; }
+  input:focus, select:focus { outline: none; border-color: #2d5986; }
+  input.error, select.error { border-color: #dc2626; background: #fef2f2; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .hint { font-size: 13.5px; color: #6b7280; margin-top: 4px; }
+  .info-box { background: #dbeafe; padding: 12px 15px; border-radius: 6px; border: 1px solid #60a5fa; font-size: 14.5px; margin-bottom: 18px; }
+  .note-box { background: #fef3c7; padding: 12px 15px; border-radius: 6px; border: 1px solid #fbbf24; font-size: 14.5px; margin-bottom: 18px; }
+  .warn-box { background: #fef2f2; padding: 12px 15px; border-radius: 6px; border: 1px solid #dc2626; font-size: 14.5px; color: #991b1b; margin-top: 12px; display: none; }
+  .warn-box.show { display: block; }
+
+  /* financial blocks */
+  .category { border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+  .category-head { background: #f0f5fb; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: #1e3a5f; font-size: 16.5px; }
+  .category-head .sub { font-weight: 600; font-size: 15px; color: #2d5986; }
+  .category-body { padding: 12px 14px 4px; }
+  .group-title { font-size: 18px; color: #2d5986; margin: 22px 0 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+  .line { display: grid; grid-template-columns: 1fr 200px; gap: 12px; align-items: start; margin-bottom: 12px; }
+  .line .lbl { padding-top: 10px; font-size: 16px; }
+  .line .extras { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; align-items: center; }
+  .line .extras input.desc { flex: 1; min-width: 200px; padding: 8px 10px; font-size: 15px; }
+  .line .extras input.count { width: 110px; padding: 8px 10px; font-size: 15px; }
+  .line .extras .cnt-lbl { font-size: 13.5px; color: #6b7280; }
+  .money { position: relative; }
+  .money::before { content: attr(data-symbol); position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #6b7280; font-weight: 600; pointer-events: none; font-size: 14px; }
+  .money input { padding-left: 48px; text-align: right; }
+  .inst { margin: -4px 0 12px 18px; padding: 10px 12px; border-left: 3px solid #d4af37; background: #fafaf7; border-radius: 0 6px 6px 0; }
+  .inst-title { font-size: 14px; font-weight: 700; color: #1e3a5f; margin-bottom: 8px; }
+  .inst-row { display: grid; grid-template-columns: 1fr 220px 34px; gap: 8px; margin-bottom: 8px; }
+  .inst-row input, .inst-row select { padding: 8px 10px; font-size: 15px; }
+  .btn-x { border: 1px solid #dc2626; background: #fff; color: #dc2626; border-radius: 6px; cursor: pointer; font-size: 16px; }
+  .btn-add { border: 1px dashed #2d5986; background: #fff; color: #2d5986; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 14.5px; font-weight: 600; }
+  .total-row { background: #f3f4f6; padding: 13px 15px; border-radius: 6px; margin: 10px 0 14px; font-weight: 700; display: grid; grid-template-columns: 1fr 220px; gap: 12px; align-items: center; color: #1e3a5f; }
+  .total-row.subtotal { background: #f9fafb; font-weight: 600; padding: 9px 15px; }
+  .total-row.key { background: #e0f2fe; }
+  .total-row .v { text-align: right; font-size: 17px; }
+  .total-row .v.neg { color: #b91c1c; }
+
+  /* signature */
+  .signature-container { border: 2px solid #d1d5db; border-radius: 6px; padding: 18px; background: #f9fafb; margin-top: 8px; }
+  .signature-tabs { display: flex; gap: 10px; margin-bottom: 16px; border-bottom: 2px solid #e5e7eb; }
+  .signature-tab { padding: 8px 18px; cursor: pointer; border: none; background: none; font-size: 15px; font-weight: 600; color: #6b7280; border-bottom: 3px solid transparent; font-family: inherit; }
+  .signature-tab.active { color: #2d5986; border-bottom-color: #2d5986; }
+  .signature-panel { display: none; }
+  .signature-panel.active { display: block; }
+  #signatureCanvas { border: 2px dashed #d1d5db; border-radius: 4px; cursor: crosshair; background: #fff; display: block; width: 100%; max-width: 600px; touch-action: none; }
+  .canvas-controls { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .signature-preview { margin-top: 14px; padding: 14px; background: #fff; border: 2px solid #059669; border-radius: 6px; display: none; }
+  .signature-preview.show { display: block; }
+  .signature-preview img { max-width: 300px; max-height: 120px; display: block; margin-top: 8px; }
+  .agreement-box { background: #fef3c7; border: 1px solid #fbbf24; border-radius: 6px; padding: 14px 16px; margin-top: 16px; }
+  .agreement-box label { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; margin-top: 6px; cursor: pointer; }
+  input[type="checkbox"] { width: 18px; height: 18px; margin-top: 3px; accent-color: #1e3a5f; flex-shrink: 0; }
+
+  .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; font-family: inherit; }
+  .btn-primary { background: #2d5986; color: #fff; }
+  .btn-primary:hover { background: #1e3a5f; }
+  .btn-gold { background: #d4af37; color: #1e3a5f; }
+  .btn-gold:hover { background: #b8962e; }
+  .btn-secondary { background: #6b7280; color: #fff; }
+  .btn-light { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
+  .file-upload-label { display: inline-block; padding: 9px 18px; background: #2d5986; color: #fff; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 15px; }
+  #signatureUpload { display: none; }
+
+  .incomplete { display: none; background: #fef2f2; border: 1px solid #dc2626; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; }
+  .incomplete h4 { color: #991b1b; margin-bottom: 6px; font-family: 'Playfair Display', Georgia, serif; }
+  .incomplete ul { margin-left: 20px; font-size: 15px; }
+  .incomplete a { color: #1e3a5f; }
+  .footnotes { font-size: 13.5px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 12px; }
+  .footnotes p { margin-bottom: 4px; }
+  .footer { background: #f3f4f6; padding: 20px; text-align: center; font-size: 13.5px; color: #666; border-top: 1px solid #e5e7eb; }
+  .footer p { margin: 4px 0; }
+  .action-bar { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 3px solid #d4af37; box-shadow: 0 -4px 16px rgba(0,0,0,0.12); padding: 12px 16px; z-index: 50; }
+  .action-bar .inner { max-width: 940px; margin: 0 auto; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .action-bar .msg { margin-left: auto; font-size: 14px; color: #6b7280; }
+  .generated { display: inline-block; padding: 8px 12px; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 6px; font-size: 15px; color: #6b7280; }
+  @media (max-width: 720px) {
+    .form-content { padding: 22px 16px; } .grid-2 { grid-template-columns: 1fr; }
+    .line, .total-row { grid-template-columns: 1fr; } .inst-row { grid-template-columns: 1fr; }
+    .header h1 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Bethel Worldwide Corporation</h1>
+    <h2>Annual Financial Return — Company</h2>
+    <p>Prepared in the format of Annex I to the BVI Financial Services Commission's Annual Financial Return guidance</p>
+  </div>
+
+  <div class="form-content">
+    <div class="save-bar">
+      <div>
+        <strong>💾 Auto-save active</strong>
+        <span id="saveStatus">Your answers are saved on this device as you type.</span>
+        <div class="last" id="lastSaved"></div>
+      </div>
+    </div>
+
+    <div class="incomplete" id="incompletePanel">
+      <h4>A few things still need completing</h4>
+      <ul id="incompleteList"></ul>
+    </div>
+
+    <form id="afrForm" novalidate onsubmit="return false;">
+
+      <div class="section" id="sec-entity">
+        <h3 class="section-title">Company Information</h3>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="fl" for="entityName">Company Name <span class="required">*</span></label>
+            <input type="text" id="entityName" data-required="Company Name" maxlength="200">
+          </div>
+          <div class="form-group">
+            <label class="fl" for="entityNumber">BVI Company Number <span class="required">*</span></label>
+            <input type="text" id="entityNumber" data-required="BVI Company Number" maxlength="50" placeholder="e.g. 1234567">
+          </div>
+          <div class="form-group">
+            <label class="fl" for="yearEnd">Financial Year Ending <span class="required">*</span></label>
+            <input type="date" id="yearEnd" data-required="Financial Year Ending">
+            <div class="hint">The last day of the financial year this return covers.</div>
+          </div>
+          <div class="form-group">
+            <label class="fl" for="currencySelect">Reporting Currency <span class="required">*</span></label>
+            <select id="currencySelect" data-required="Reporting Currency"></select>
+            <div class="hint">All monetary figures in this return use this currency.</div>
+          </div>
+          <div class="form-group">
+            <label class="fl" for="accStandard">Accounting Standard Used <span class="required">*</span></label>
+            <select id="accStandard" data-required="Accounting Standard Used">
+              <option value="">Select…</option>
+              <option>IFRS</option>
+              <option>IFRS for SMEs</option>
+              <option>UK GAAP</option>
+              <option>US GAAP</option>
+              <option value="Other">Other (please specify)</option>
+            </select>
+            <div class="hint">The standard used to calculate the valuations in this return.</div>
+          </div>
+          <div class="form-group" id="accStandardOtherWrap" style="display:none;">
+            <label class="fl" for="accStandardOther">Please specify the standard <span class="required">*</span></label>
+            <input type="text" id="accStandardOther" maxlength="120">
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-bs">
+        <h3 class="section-title">Balance Sheet / Statement of Financial Position</h3>
+        <div class="info-box">Enter amounts in the reporting currency. Leave a line blank if it does not apply. Losses and negative balances can be entered with a minus sign. Where a line asks for a <strong>number of items</strong>, enter how many separate items make up that amount.</div>
+        <div id="bsMount"></div>
+      </div>
+
+      <div class="section" id="sec-is">
+        <h3 class="section-title">Income Statement</h3>
+        <div id="isMount"></div>
+      </div>
+
+      <div class="section" id="sec-auth">
+        <h3 class="section-title">Authorisation</h3>
+        <div class="info-box"><strong>For and on behalf of:</strong> <span id="entityNameDisplay">Your Company Name</span></div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="fl" for="signatoryName">Director's Name <span class="required">*</span></label>
+            <input type="text" id="signatoryName" data-required="Director's Name" maxlength="150">
+          </div>
+          <div class="form-group">
+            <label class="fl" for="signatoryCapacity">Capacity <span class="required">*</span></label>
+            <input type="text" id="signatoryCapacity" data-required="Capacity" maxlength="150" placeholder="e.g. Director">
+          </div>
+          <div class="form-group">
+            <label class="fl" for="signDate">Date <span class="required">*</span></label>
+            <input type="date" id="signDate" data-required="Date">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="fl">Digital Signature <span class="required">*</span></label>
+          <div class="signature-container">
+            <div class="signature-tabs">
+              <button type="button" class="signature-tab active" data-tab="draw">✍️ Draw Signature</button>
+              <button type="button" class="signature-tab" data-tab="upload">📤 Upload Image</button>
+            </div>
+            <div id="drawPanel" class="signature-panel active">
+              <p class="hint" style="margin-bottom:8px;">Draw your signature in the box below with your mouse, trackpad or finger.</p>
+              <canvas id="signatureCanvas" width="600" height="200"></canvas>
+              <div class="canvas-controls">
+                <button type="button" class="btn btn-light" id="sigClear">Clear</button>
+                <button type="button" class="btn btn-primary" id="sigUse">Use this signature</button>
+              </div>
+            </div>
+            <div id="uploadPanel" class="signature-panel">
+              <p class="hint" style="margin-bottom:8px;">Upload an image of your signature (PNG or JPG). A clear image on a white background works best.</p>
+              <input type="file" id="signatureUpload" accept="image/png,image/jpeg">
+              <label for="signatureUpload" class="file-upload-label">📁 Choose File</label>
+            </div>
+            <div id="signaturePreview" class="signature-preview">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="color:#059669;font-weight:700;">✓ Signature captured</span>
+                <button type="button" class="btn btn-light" id="sigChange" style="padding:5px 12px;font-size:14px;">Change</button>
+              </div>
+              <img id="signatureImage" src="" alt="Your signature">
+            </div>
+          </div>
+        </div>
+
+        <div class="agreement-box">
+          <strong>Electronic Signature Agreement</strong>
+          <label><input type="checkbox" id="signatureAgreement"> <span>I agree that my digital signature above is the legal equivalent of my manual/handwritten signature and I consent to be legally bound by this electronic signature. <span class="required">*</span></span></label>
+        </div>
+
+        <div class="form-group" id="generatedGroup" style="margin-top:16px; display:none;">
+          <label class="fl">Generated (UTC)</label>
+          <div class="generated" id="generatedDisplay">Not yet generated</div>
+        </div>
+
+        <div class="note-box" style="margin-top:18px;"><strong>Note:</strong> After downloading the PDF, please return it to Bethel Worldwide Corporation via email.</div>
+
+        <div class="footnotes">
+          <p><sup>i</sup> The accounting standard selected above is stated on the return as the basis used to calculate valuations.</p>
+          <p><sup>ii</sup> Numbers shown in brackets next to each type of loan or receivable represent the number of items in that category.</p>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="footer">
+    <p>&copy; <span id="currentYear"></span> Bethel Worldwide Corporation. All rights reserved.</p>
+    <p>For assistance, please contact your Bethel Worldwide Corporation representative.</p>
+  </div>
+</div>
+
+<div class="action-bar">
+  <div class="inner">
+    <button type="button" class="btn btn-primary" id="btnDownload">⬇ Download PDF</button>
+    <button type="button" class="btn btn-gold" id="btnShare">↗ Share PDF</button>
+    <button type="button" class="btn btn-light" id="btnClear">Clear form</button>
+    <span class="msg" id="actionMsg"></span>
+  </div>
+</div>
+
+<script>
+(function () {
+'use strict';
+// =====================================================================
+//  FORM DEFINITION (differs between the Company and LP versions)
+// =====================================================================
+const CONFIG = {
+  storageKey: 'bwc_afr_company_v1',
+  filePrefix: 'BWC_AFR_Company',
+  entityWord: 'Company',
+  namePlaceholder: 'Your Company Name',
+  signatoryLabel: "Director's Name",
+  pdfBandSubtitle: 'Annual Financial Return - Company (FSC Annex I format)',
+  pdfBsTitle: 'BALANCE SHEET / STATEMENT OF FINANCIAL POSITION',
+  balanceSheet: [
+    { kind: 'heading', title: 'Assets' },
+    { kind: 'category', id: 'catCash', roman: 'i', title: 'Cash and cash equivalents', lines: [
+      { id: 'cash', label: 'Cash', inst: 'Banks where the cash is held' },
+      { id: 'cashEquiv', label: 'Cash equivalents', inst: 'Institutions / funds holding the cash equivalents' } ] },
+    { kind: 'category', id: 'catLoans', roman: 'ii', title: 'Loans and receivables', lines: [
+      { id: 'loanRelated', label: 'Related party loans', count: true },
+      { id: 'loanThird', label: 'Third party loans', count: true },
+      { id: 'loanOther', label: 'Other', count: true, desc: true } ] },
+    { kind: 'category', id: 'catInv', roman: 'iii', title: 'Investments and other financial assets', lines: [
+      { id: 'invShares', label: 'Shares' },
+      { id: 'invBonds', label: 'Bonds' },
+      { id: 'invFunds', label: 'Mutual funds' },
+      { id: 'invReits', label: 'Real Estate Investment Trusts (REITs)' },
+      { id: 'invDeriv', label: 'Derivatives' },
+      { id: 'invVirtual', label: 'Virtual assets', hint: 'A negative value can be entered with a minus sign.' },
+      { id: 'invOther', label: 'Other', desc: true } ] },
+    { kind: 'category', id: 'catTang', roman: 'iv', title: 'Tangible fixed assets', lines: [
+      { id: 'tanProperty', label: 'Property (land and building)' },
+      { id: 'tanPlant', label: 'Plant and machinery' },
+      { id: 'tanVehicles', label: 'Vehicles' },
+      { id: 'tanFurniture', label: 'Furniture and fixtures' },
+      { id: 'tanEquip', label: 'Equipment (computers, printers, etc.)' },
+      { id: 'tanOther', label: 'Other', desc: true } ] },
+    { kind: 'category', id: 'catIntang', roman: 'v', title: 'Intangible assets', lines: [
+      { id: 'intIP', label: 'Intellectual property (patents, copyrights, trademarks)' },
+      { id: 'intGoodwill', label: 'Goodwill' },
+      { id: 'intSoftware', label: 'Software' },
+      { id: 'intOther', label: 'Other', desc: true } ] },
+    { kind: 'category', id: 'catOtherA', roman: 'vi', title: 'Other assets', lines: [
+      { id: 'oaInventory', label: 'Inventory / stock' },
+      { id: 'oaDeferredTax', label: 'Deferred tax assets' },
+      { id: 'oaOther', label: 'Other', desc: true } ] },
+    { kind: 'calc', id: 'totalAssets', label: 'TOTAL ASSETS', key: true,
+      fn: c => c.g.catCash + c.g.catLoans + c.g.catInv + c.g.catTang + c.g.catIntang + c.g.catOtherA },
+    { kind: 'group', id: 'grpLiab', title: 'Liabilities', lines: [
+      { id: 'liabPayable', label: 'Accounts payable' },
+      { id: 'liabLongTerm', label: 'Long-term debts' },
+      { id: 'liabOther', label: 'Other liabilities', desc: true } ] },
+    { kind: 'calc', id: 'totalLiab', label: 'TOTAL LIABILITIES', key: true, fn: c => c.g.grpLiab },
+    { kind: 'calc', id: 'equity', label: "SHAREHOLDERS' EQUITY", key: true,
+      fn: c => c.c.totalAssets - c.c.totalLiab, note: "Calculated automatically as Total Assets less Total Liabilities." }
+  ],
+  incomeStatement: [
+    { kind: 'group', id: 'grpRevenue', title: 'Revenue', totalLabel: 'Total revenue', lines: [
+      { id: 'revRevenue', label: 'Revenue' },
+      { id: 'revSales', label: 'Sales' },
+      { id: 'revIncome', label: 'Income' } ] },
+    { kind: 'group', id: 'grpCos', title: 'Cost of sales', lines: [
+      { id: 'costOfSales', label: 'Cost of sales' } ] },
+    { kind: 'calc', id: 'grossProfit', label: 'GROSS PROFIT', key: true,
+      fn: c => c.g.grpRevenue - c.g.grpCos, note: 'Calculated automatically as Total revenue less Cost of sales.' },
+    { kind: 'group', id: 'grpOpex', title: 'Expenses', totalLabel: 'Total operating expenses', lines: [
+      { id: 'expEquipment', label: 'Operating expenses - Equipment' },
+      { id: 'expCogs', label: 'Operating expenses - Cost of goods sold' },
+      { id: 'expCommission', label: 'Operating expenses - Sales commission' },
+      { id: 'expSalaries', label: 'Operating expenses - Salaries and wages' } ] },
+    { kind: 'group', id: 'grpOtherExp', title: '', lines: [
+      { id: 'expOther', label: 'Other expenses', desc: true },
+      { id: 'expTax', label: 'Income tax expense' } ] },
+    { kind: 'calc', id: 'totalExpenses', label: 'TOTAL EXPENSES', key: true, fn: c => c.g.grpOpex + c.g.grpOtherExp },
+    { kind: 'calc', id: 'netIncome', label: 'NET INCOME', key: true,
+      fn: c => c.c.grossProfit - c.c.totalExpenses, note: 'Calculated automatically as Gross profit less Total expenses.' }
+  ]
+};
+
+// Generated (UTC) timestamp — switched off for now. Set to true to show it on the form and PDF.
+const SHOW_GENERATED = false;
+
+const COUNTRIES = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Anguilla", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Bermuda", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Cayman Islands", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turks and Caicos Islands", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"];
+const CURRENCIES = [
+{code:'AED',symbol:'AED',name:'UAE Dirham'},
+{code:'AFN',symbol:'AFN',name:'Afghan Afghani'},
+{code:'ALL',symbol:'ALL',name:'Albanian Lek'},
+{code:'AMD',symbol:'AMD',name:'Armenian Dram'},
+{code:'ANG',symbol:'ANG',name:'Netherlands Antillean Guilder'},
+{code:'AOA',symbol:'AOA',name:'Angolan Kwanza'},
+{code:'ARS',symbol:'ARS',name:'Argentine Peso'},
+{code:'AUD',symbol:'A$',name:'Australian Dollar'},
+{code:'AWG',symbol:'AWG',name:'Aruban Florin'},
+{code:'AZN',symbol:'AZN',name:'Azerbaijani Manat'},
+{code:'BAM',symbol:'BAM',name:'Bosnia-Herzegovina Convertible Mark'},
+{code:'BBD',symbol:'BBD',name:'Barbadian Dollar'},
+{code:'BDT',symbol:'BDT',name:'Bangladeshi Taka'},
+{code:'BGN',symbol:'BGN',name:'Bulgarian Lev'},
+{code:'BHD',symbol:'BHD',name:'Bahraini Dinar'},
+{code:'BIF',symbol:'BIF',name:'Burundian Franc'},
+{code:'BMD',symbol:'BMD',name:'Bermudian Dollar'},
+{code:'BND',symbol:'BND',name:'Brunei Dollar'},
+{code:'BOB',symbol:'BOB',name:'Bolivian Boliviano'},
+{code:'BRL',symbol:'R$',name:'Brazilian Real'},
+{code:'BSD',symbol:'BSD',name:'Bahamian Dollar'},
+{code:'BTN',symbol:'BTN',name:'Bhutanese Ngultrum'},
+{code:'BWP',symbol:'BWP',name:'Botswana Pula'},
+{code:'BYN',symbol:'BYN',name:'Belarusian Ruble'},
+{code:'BZD',symbol:'BZD',name:'Belize Dollar'},
+{code:'CAD',symbol:'CA$',name:'Canadian Dollar'},
+{code:'CDF',symbol:'CDF',name:'Congolese Franc'},
+{code:'CHF',symbol:'CHF',name:'Swiss Franc'},
+{code:'CLP',symbol:'CLP',name:'Chilean Peso'},
+{code:'CNY',symbol:'CN¥',name:'Chinese Yuan'},
+{code:'COP',symbol:'COP',name:'Colombian Peso'},
+{code:'CRC',symbol:'CRC',name:'Costa Rican Colón'},
+{code:'CUP',symbol:'CUP',name:'Cuban Peso'},
+{code:'CVE',symbol:'CVE',name:'Cape Verdean Escudo'},
+{code:'CZK',symbol:'CZK',name:'Czech Koruna'},
+{code:'DJF',symbol:'DJF',name:'Djiboutian Franc'},
+{code:'DKK',symbol:'DKK',name:'Danish Krone'},
+{code:'DOP',symbol:'DOP',name:'Dominican Peso'},
+{code:'DZD',symbol:'DZD',name:'Algerian Dinar'},
+{code:'EGP',symbol:'EGP',name:'Egyptian Pound'},
+{code:'ERN',symbol:'ERN',name:'Eritrean Nakfa'},
+{code:'ETB',symbol:'ETB',name:'Ethiopian Birr'},
+{code:'EUR',symbol:'€',name:'Euro'},
+{code:'FJD',symbol:'FJD',name:'Fijian Dollar'},
+{code:'FKP',symbol:'FKP',name:'Falkland Islands Pound'},
+{code:'GBP',symbol:'£',name:'British Pound Sterling'},
+{code:'GEL',symbol:'GEL',name:'Georgian Lari'},
+{code:'GHS',symbol:'GHS',name:'Ghanaian Cedi'},
+{code:'GIP',symbol:'GIP',name:'Gibraltar Pound'},
+{code:'GMD',symbol:'GMD',name:'Gambian Dalasi'},
+{code:'GNF',symbol:'GNF',name:'Guinean Franc'},
+{code:'GTQ',symbol:'GTQ',name:'Guatemalan Quetzal'},
+{code:'GYD',symbol:'GYD',name:'Guyanese Dollar'},
+{code:'HKD',symbol:'HK$',name:'Hong Kong Dollar'},
+{code:'HNL',symbol:'HNL',name:'Honduran Lempira'},
+{code:'HTG',symbol:'HTG',name:'Haitian Gourde'},
+{code:'HUF',symbol:'HUF',name:'Hungarian Forint'},
+{code:'IDR',symbol:'IDR',name:'Indonesian Rupiah'},
+{code:'ILS',symbol:'₪',name:'Israeli New Shekel'},
+{code:'INR',symbol:'₹',name:'Indian Rupee'},
+{code:'IQD',symbol:'IQD',name:'Iraqi Dinar'},
+{code:'IRR',symbol:'IRR',name:'Iranian Rial'},
+{code:'ISK',symbol:'ISK',name:'Icelandic Króna'},
+{code:'JMD',symbol:'JMD',name:'Jamaican Dollar'},
+{code:'JOD',symbol:'JOD',name:'Jordanian Dinar'},
+{code:'JPY',symbol:'¥',name:'Japanese Yen'},
+{code:'KES',symbol:'KES',name:'Kenyan Shilling'},
+{code:'KGS',symbol:'KGS',name:'Kyrgystani Som'},
+{code:'KHR',symbol:'KHR',name:'Cambodian Riel'},
+{code:'KMF',symbol:'KMF',name:'Comorian Franc'},
+{code:'KPW',symbol:'KPW',name:'North Korean Won'},
+{code:'KRW',symbol:'₩',name:'South Korean Won'},
+{code:'KWD',symbol:'KWD',name:'Kuwaiti Dinar'},
+{code:'KYD',symbol:'KYD',name:'Cayman Islands Dollar'},
+{code:'KZT',symbol:'KZT',name:'Kazakhstani Tenge'},
+{code:'LAK',symbol:'LAK',name:'Laotian Kip'},
+{code:'LBP',symbol:'LBP',name:'Lebanese Pound'},
+{code:'LKR',symbol:'LKR',name:'Sri Lankan Rupee'},
+{code:'LRD',symbol:'LRD',name:'Liberian Dollar'},
+{code:'LSL',symbol:'LSL',name:'Lesotho Loti'},
+{code:'LYD',symbol:'LYD',name:'Libyan Dinar'},
+{code:'MAD',symbol:'MAD',name:'Moroccan Dirham'},
+{code:'MDL',symbol:'MDL',name:'Moldovan Leu'},
+{code:'MGA',symbol:'MGA',name:'Malagasy Ariary'},
+{code:'MKD',symbol:'MKD',name:'Macedonian Denar'},
+{code:'MMK',symbol:'MMK',name:'Myanmar Kyat'},
+{code:'MNT',symbol:'MNT',name:'Mongolian Tugrik'},
+{code:'MOP',symbol:'MOP',name:'Macanese Pataca'},
+{code:'MRU',symbol:'MRU',name:'Mauritanian Ouguiya'},
+{code:'MUR',symbol:'MUR',name:'Mauritian Rupee'},
+{code:'MVR',symbol:'MVR',name:'Maldivian Rufiyaa'},
+{code:'MWK',symbol:'MWK',name:'Malawian Kwacha'},
+{code:'MXN',symbol:'MX$',name:'Mexican Peso'},
+{code:'MYR',symbol:'MYR',name:'Malaysian Ringgit'},
+{code:'MZN',symbol:'MZN',name:'Mozambican Metical'},
+{code:'NAD',symbol:'NAD',name:'Namibian Dollar'},
+{code:'NGN',symbol:'₦',name:'Nigerian Naira'},
+{code:'NIO',symbol:'NIO',name:'Nicaraguan Córdoba'},
+{code:'NOK',symbol:'NOK',name:'Norwegian Krone'},
+{code:'NPR',symbol:'NPR',name:'Nepalese Rupee'},
+{code:'NZD',symbol:'NZ$',name:'New Zealand Dollar'},
+{code:'OMR',symbol:'OMR',name:'Omani Rial'},
+{code:'PAB',symbol:'PAB',name:'Panamanian Balboa'},
+{code:'PEN',symbol:'PEN',name:'Peruvian Sol'},
+{code:'PGK',symbol:'PGK',name:'Papua New Guinean Kina'},
+{code:'PHP',symbol:'₱',name:'Philippine Peso'},
+{code:'PKR',symbol:'PKR',name:'Pakistani Rupee'},
+{code:'PLN',symbol:'PLN',name:'Polish Zloty'},
+{code:'PYG',symbol:'PYG',name:'Paraguayan Guarani'},
+{code:'QAR',symbol:'QAR',name:'Qatari Riyal'},
+{code:'RON',symbol:'RON',name:'Romanian Leu'},
+{code:'RSD',symbol:'RSD',name:'Serbian Dinar'},
+{code:'RUB',symbol:'RUB',name:'Russian Ruble'},
+{code:'RWF',symbol:'RWF',name:'Rwandan Franc'},
+{code:'SAR',symbol:'SAR',name:'Saudi Riyal'},
+{code:'SBD',symbol:'SBD',name:'Solomon Islands Dollar'},
+{code:'SCR',symbol:'SCR',name:'Seychellois Rupee'},
+{code:'SDG',symbol:'SDG',name:'Sudanese Pound'},
+{code:'SEK',symbol:'SEK',name:'Swedish Krona'},
+{code:'SGD',symbol:'S$',name:'Singapore Dollar'},
+{code:'SHP',symbol:'SHP',name:'Saint Helena Pound'},
+{code:'SLE',symbol:'SLE',name:'Sierra Leonean Leone'},
+{code:'SOS',symbol:'SOS',name:'Somali Shilling'},
+{code:'SRD',symbol:'SRD',name:'Surinamese Dollar'},
+{code:'STN',symbol:'STN',name:'São Tomé & Príncipe Dobra'},
+{code:'SVC',symbol:'SVC',name:'Salvadoran Colón'},
+{code:'SYP',symbol:'SYP',name:'Syrian Pound'},
+{code:'SZL',symbol:'SZL',name:'Swazi Lilangeni'},
+{code:'THB',symbol:'฿',name:'Thai Baht'},
+{code:'TJS',symbol:'TJS',name:'Tajikistani Somoni'},
+{code:'TMT',symbol:'TMT',name:'Turkmenistani Manat'},
+{code:'TND',symbol:'TND',name:'Tunisian Dinar'},
+{code:'TOP',symbol:'TOP',name:'Tongan Paʻanga'},
+{code:'TRY',symbol:'TRY',name:'Turkish Lira'},
+{code:'TTD',symbol:'TTD',name:'Trinidad & Tobago Dollar'},
+{code:'TWD',symbol:'NT$',name:'New Taiwan Dollar'},
+{code:'TZS',symbol:'TZS',name:'Tanzanian Shilling'},
+{code:'UAH',symbol:'UAH',name:'Ukrainian Hryvnia'},
+{code:'UGX',symbol:'UGX',name:'Ugandan Shilling'},
+{code:'USD',symbol:'US$',name:'US Dollar'},
+{code:'UYU',symbol:'UYU',name:'Uruguayan Peso'},
+{code:'UZS',symbol:'UZS',name:'Uzbekistani Som'},
+{code:'VES',symbol:'VES',name:'Venezuelan Bolívar'},
+{code:'VND',symbol:'₫',name:'Vietnamese Dong'},
+{code:'VUV',symbol:'VUV',name:'Vanuatu Vatu'},
+{code:'WST',symbol:'WST',name:'Samoan Tala'},
+{code:'XAF',symbol:'XAF',name:'Central African CFA Franc'},
+{code:'XCD',symbol:'EC$',name:'East Caribbean Dollar'},
+{code:'XOF',symbol:'XOF',name:'West African CFA Franc'},
+{code:'XPF',symbol:'XPF',name:'CFP Franc'},
+{code:'YER',symbol:'YER',name:'Yemeni Rial'},
+{code:'ZAR',symbol:'ZAR',name:'South African Rand'},
+{code:'ZMW',symbol:'ZMW',name:'Zambian Kwacha'},
+{code:'ZWL',symbol:'ZWL',name:'Zimbabwean Dollar'}
+];
+
+const $ = id => document.getElementById(id);
+const form = $('afrForm');
+const STORAGE_KEY = CONFIG.storageKey;
+let restoring = false;
+let signatureDataURL = null;
+let currency = CURRENCIES.find(c => c.code === 'USD');
+const insts = {};   // lineId -> [{name, country}]
+
+$('currentYear').textContent = new Date().getFullYear();
+
+// ---------------------------------------------------------------------
+//  Helpers
+// ---------------------------------------------------------------------
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function num(id) { const el = $(id); if (!el) return 0; const v = parseFloat(el.value); return isFinite(v) ? v : 0; }
+function fmtScreen(v) {
+  const s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (v < 0 ? '-' : '') + currency.symbol + ' ' + s;
+}
+function fmtPdf(v) {
+  if (!v) return '-';
+  const s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return v < 0 ? '(' + s + ')' : s;
+}
+function ordinalDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso + 'T00:00:00'), n = d.getDate();
+  const sfx = (n % 100 >= 11 && n % 100 <= 13) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
+  return `${n}${sfx} ${d.toLocaleDateString('en-GB', { month: 'long' })} ${d.getFullYear()}`;
+}
+function longDate(iso) { return iso ? new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : ''; }
+function formatUtcNow() {
+  const d = new Date(), pad = n => String(n).padStart(2, '0');
+  const m = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return `${d.getUTCDate()} ${m[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+}
+
+// ---------------------------------------------------------------------
+//  Rendering the financial sections from CONFIG
+// ---------------------------------------------------------------------
+function lineHtml(ln) {
+  let extras = '';
+  if (ln.desc || ln.count) {
+    extras = '<div class="extras">';
+    if (ln.desc) extras += `<input type="text" class="desc" id="${ln.id}_desc" placeholder="Please describe" maxlength="200">`;
+    if (ln.count) extras += `<span class="cnt-lbl">Number of items</span><input type="number" class="count" id="${ln.id}_count" min="0" step="1" placeholder="0">`;
+    extras += '</div>';
+  }
+  let html = `<div class="line"><div><div class="lbl">${esc(ln.label)}</div>${ln.hint ? `<div class="hint">${esc(ln.hint)}</div>` : ''}${extras}</div>
+    <div class="money" data-symbol="US$"><input type="number" step="0.01" id="${ln.id}" placeholder="0.00"></div></div>`;
+  if (ln.inst) {
+    html += `<div class="inst" data-inst="${ln.id}"><div class="inst-title">${esc(ln.inst)}</div>
+      <div class="inst-rows" id="${ln.id}_inst"></div>
+      <button type="button" class="btn-add" data-add-inst="${ln.id}">+ Add institution</button></div>`;
+  }
+  return html;
+}
+function blockHtml(b) {
+  if (b.kind === 'category') {
+    return `<div class="category"><div class="category-head"><span>(${b.roman})&nbsp; ${esc(b.title)}</span><span class="sub" id="${b.id}_total"></span></div>
+      <div class="category-body">${b.lines.map(lineHtml).join('')}</div></div>`;
+  }
+  if (b.kind === 'group') {
+    return (b.title ? `<div class="group-title">${esc(b.title)}</div>` : '') + b.lines.map(lineHtml).join('') +
+      (b.totalLabel ? `<div class="total-row subtotal"><span>${esc(b.totalLabel)}</span><span class="v" id="${b.id}_total"></span></div>` : '');
+  }
+  if (b.kind === 'heading') return `<div class="group-title">${esc(b.title)}</div>`;
+  if (b.kind === 'calc') return `<div class="total-row${b.key ? ' key' : ''}"><span>${esc(b.label)}</span><span class="v" id="${b.id}"></span></div>` + (b.note ? `<div class="hint" style="margin:-8px 0 14px;">${esc(b.note)}</div>` : '');
+  if (b.kind === 'check') return `<div class="warn-box" id="${b.id}"></div>`;
+  return '';
+}
+$('bsMount').innerHTML = CONFIG.balanceSheet.map(blockHtml).join('');
+$('isMount').innerHTML = CONFIG.incomeStatement.map(blockHtml).join('');
+
+// Institution rows
+function countryOptions(sel) {
+  return '<option value="">Country…</option>' + COUNTRIES.map(c => `<option${c === sel ? ' selected' : ''}>${esc(c)}</option>`).join('');
+}
+function renderInst(lineId) {
+  const wrap = $(lineId + '_inst');
+  const rows = insts[lineId] || [];
+  wrap.innerHTML = rows.map((r, i) => `<div class="inst-row">
+      <input type="text" data-inst-line="${lineId}" data-inst-i="${i}" data-inst-f="name" placeholder="Bank / institution name" maxlength="150" value="${esc(r.name || '')}">
+      <select data-inst-line="${lineId}" data-inst-i="${i}" data-inst-f="country">${countryOptions(r.country)}</select>
+      <button type="button" class="btn-x" data-del-inst="${lineId}" data-i="${i}" title="Remove">×</button></div>`).join('');
+}
+document.querySelectorAll('[data-inst]').forEach(el => { insts[el.dataset.inst] = insts[el.dataset.inst] || []; });
+form.addEventListener('click', e => {
+  const add = e.target.closest('[data-add-inst]');
+  if (add) { const id = add.dataset.addInst; insts[id].push({ name: '', country: '' }); renderInst(id); onChange(); const r = $(id + '_inst').lastElementChild; if (r) r.querySelector('input').focus(); return; }
+  const del = e.target.closest('[data-del-inst]');
+  if (del) { insts[del.dataset.delInst].splice(+del.dataset.i, 1); renderInst(del.dataset.delInst); onChange(); }
+});
+function syncInstFromDom(e) {
+  const t = e.target;
+  if (t.dataset && t.dataset.instLine) { insts[t.dataset.instLine][+t.dataset.instI][t.dataset.instF] = t.value; }
+}
+
+// Currency picker
+(function () {
+  const sel = $('currencySelect');
+  sel.innerHTML = '<option value="">Select…</option>' + CURRENCIES.map(c => `<option value="${c.code}">${c.code} — ${esc(c.name)}</option>`).join('');
+  sel.value = 'USD';
+})();
+function applyCurrency() {
+  currency = CURRENCIES.find(c => c.code === $('currencySelect').value) || CURRENCIES.find(c => c.code === 'USD');
+  document.querySelectorAll('.money').forEach(el => el.setAttribute('data-symbol', currency.symbol));
+}
+
+// ---------------------------------------------------------------------
+//  Calculations
+// ---------------------------------------------------------------------
+function lineSum(lines) { return lines.reduce((a, l) => a + num(l.id), 0); }
+function computeAll() {
+  const ctx = { v: num, g: {}, c: {} };
+  const run = blocks => blocks.forEach(b => {
+    if (b.kind === 'category' || b.kind === 'group') ctx.g[b.id] = lineSum(b.lines);
+    if (b.kind === 'calc') ctx.c[b.id] = b.fn(ctx);
+  });
+  run(CONFIG.balanceSheet); run(CONFIG.incomeStatement);
+  return ctx;
+}
+function paintTotals() {
+  const ctx = computeAll();
+  const paint = blocks => blocks.forEach(b => {
+    if (b.kind === 'category' || (b.kind === 'group' && b.totalLabel)) {
+      const el = $(b.id + '_total'); el.textContent = (b.kind === 'category' ? 'Subtotal: ' : '') + fmtScreen(ctx.g[b.id]);
+    }
+    if (b.kind === 'calc') { const el = $(b.id); el.textContent = fmtScreen(ctx.c[b.id]); el.classList.toggle('neg', ctx.c[b.id] < 0); }
+    if (b.kind === 'check') { const msg = b.fn(ctx, fmtScreen); const el = $(b.id); el.textContent = msg || ''; el.classList.toggle('show', !!msg); }
+  });
+  paint(CONFIG.balanceSheet); paint(CONFIG.incomeStatement);
+  return ctx;
+}
+
+// ---------------------------------------------------------------------
+//  Signature (draw or upload)
+// ---------------------------------------------------------------------
+const canvas = $('signatureCanvas'), sctx = canvas.getContext('2d');
+let drawing = false, lastX = 0, lastY = 0, inked = false;
+sctx.strokeStyle = '#1e3a5f'; sctx.lineWidth = 2.4; sctx.lineCap = 'round'; sctx.lineJoin = 'round';
+function cpos(e) {
+  const r = canvas.getBoundingClientRect(), p = e.touches ? e.touches[0] : e;
+  return { x: (p.clientX - r.left) * (canvas.width / r.width), y: (p.clientY - r.top) * (canvas.height / r.height) };
+}
+function sStart(e) { e.preventDefault(); drawing = true; const p = cpos(e); lastX = p.x; lastY = p.y; }
+function sMove(e) { if (!drawing) return; e.preventDefault(); const p = cpos(e); sctx.beginPath(); sctx.moveTo(lastX, lastY); sctx.lineTo(p.x, p.y); sctx.stroke(); lastX = p.x; lastY = p.y; inked = true; }
+function sEnd() { drawing = false; }
+canvas.addEventListener('mousedown', sStart); canvas.addEventListener('mousemove', sMove); window.addEventListener('mouseup', sEnd);
+canvas.addEventListener('touchstart', sStart, { passive: false }); canvas.addEventListener('touchmove', sMove, { passive: false }); canvas.addEventListener('touchend', sEnd);
+function clearCanvas() { sctx.clearRect(0, 0, canvas.width, canvas.height); inked = false; }
+$('sigClear').addEventListener('click', clearCanvas);
+$('sigUse').addEventListener('click', () => {
+  if (!inked) { $('actionMsg').textContent = 'Please draw your signature first.'; return; }
+  setSignature(canvas.toDataURL('image/png'));
+});
+$('signatureUpload').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  if (!/^image\/(png|jpeg)$/.test(f.type)) { $('actionMsg').textContent = 'Please choose a PNG or JPG image.'; return; }
+  const rd = new FileReader(); rd.onload = ev => setSignature(ev.target.result); rd.readAsDataURL(f);
+});
+function setSignature(url) {
+  signatureDataURL = url;
+  $('signatureImage').src = url || '';
+  $('signaturePreview').classList.toggle('show', !!url);
+  if (!restoring) onChange();
+}
+$('sigChange').addEventListener('click', () => { setSignature(null); clearCanvas(); $('signatureUpload').value = ''; });
+document.querySelectorAll('.signature-tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.signature-tab').forEach(x => x.classList.toggle('active', x === t));
+  $('drawPanel').classList.toggle('active', t.dataset.tab === 'draw');
+  $('uploadPanel').classList.toggle('active', t.dataset.tab === 'upload');
+}));
+
+// ---------------------------------------------------------------------
+//  Validation
+// ---------------------------------------------------------------------
+function collectIssues() {
+  const issues = [];
+  document.querySelectorAll('[data-required]').forEach(el => {
+    const ok = el.value.trim() !== '';
+    el.classList.toggle('error', !ok);
+    if (!ok) issues.push({ label: el.dataset.required, anchor: el.id });
+  });
+  const other = $('accStandard').value === 'Other';
+  if (other && !$('accStandardOther').value.trim()) { $('accStandardOther').classList.add('error'); issues.push({ label: 'Accounting standard — please specify', anchor: 'accStandardOther' }); }
+  else $('accStandardOther').classList.remove('error');
+  // "Other" lines with an amount need a description
+  [...CONFIG.balanceSheet, ...CONFIG.incomeStatement].forEach(b => (b.lines || []).forEach(l => {
+    if (l.desc) {
+      const d = $(l.id + '_desc'), need = num(l.id) !== 0 && !d.value.trim();
+      d.classList.toggle('error', need);
+      const where = (b.title && b.title !== l.label) ? `${b.title} — ${l.label}` : l.label;
+      if (need) issues.push({ label: `${where}: please describe what this amount is`, anchor: l.id + '_desc' });
+    }
+  }));
+  if (!signatureDataURL) issues.push({ label: 'Digital signature (draw and click "Use this signature", or upload an image)', anchor: 'sec-auth' });
+  if (!$('signatureAgreement').checked) issues.push({ label: 'Electronic signature agreement', anchor: 'sec-auth' });
+  return issues;
+}
+function renderIssues(issues) {
+  const panel = $('incompletePanel');
+  if (!issues.length) { panel.style.display = 'none'; return; }
+  $('incompleteList').innerHTML = issues.map(i => `<li><a href="#${i.anchor}">${esc(i.label)}</a></li>`).join('');
+  panel.style.display = 'block';
+}
+function refreshValidation() {
+  const issues = collectIssues();
+  if (!form.dataset.attempted) document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+  else renderIssues(issues);
+  return issues;
+}
+
+// ---------------------------------------------------------------------
+//  Autosave
+// ---------------------------------------------------------------------
+function serialize() {
+  const d = { fields: {}, checks: {}, insts, signature: signatureDataURL, savedAt: new Date().toISOString() };
+  form.querySelectorAll('input[id], select[id]').forEach(el => {
+    if (el.type === 'file') return;
+    if (el.type === 'checkbox') d.checks[el.id] = el.checked; else d.fields[el.id] = el.value;
+  });
+  return d;
+}
+function save() {
+  if (restoring) return;
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(serialize())); $('lastSaved').textContent = 'Last saved: ' + new Date().toLocaleString(); }
+  catch (e) { $('saveStatus').textContent = 'Auto-save is unavailable in this browser — please complete the form in one sitting.'; }
+}
+function restore() {
+  let raw = null;
+  try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { return; }
+  if (!raw) return;
+  restoring = true;
+  try {
+    const d = JSON.parse(raw);
+    Object.entries(d.insts || {}).forEach(([k, rows]) => { if (insts[k]) { insts[k] = rows; renderInst(k); } });
+    Object.entries(d.fields || {}).forEach(([id, v]) => { const el = $(id); if (el && el.type !== 'file') el.value = v; });
+    Object.entries(d.checks || {}).forEach(([id, v]) => { const el = $(id); if (el) el.checked = !!v; });
+    if (d.signature) setSignature(d.signature);
+    if (d.savedAt) $('lastSaved').textContent = 'Restored progress saved ' + new Date(d.savedAt).toLocaleString();
+  } catch (e) { /* ignore corrupt save */ }
+  restoring = false;
+}
+function onChange(e) {
+  if (e) syncInstFromDom(e);
+  $('accStandardOtherWrap').style.display = $('accStandard').value === 'Other' ? '' : 'none';
+  $('entityNameDisplay').textContent = $('entityName').value.trim() || CONFIG.namePlaceholder;
+  applyCurrency();
+  paintTotals();
+  refreshValidation();
+  save();
+}
+form.addEventListener('input', onChange);
+form.addEventListener('change', onChange);
+$('btnClear').addEventListener('click', () => {
+  if (!confirm('Clear everything entered in this form? This cannot be undone.')) return;
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  location.reload();
+});
+
+// ---------------------------------------------------------------------
+//  PDF
+// ---------------------------------------------------------------------
+function buildPdf() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+  const M = 16, RIGHT = W - M, CAT_W = 46, DX = M + CAT_W + 2;
+  const NAVY = [30, 58, 95], GOLD = [212, 175, 55], GREY = [100, 100, 100];
+  const ctx = computeAll();
+  const code = currency.code;
+  let y = 0;
+
+  function band() {
+    doc.setFillColor(...NAVY); doc.rect(0, 0, W, 20, 'F');
+    doc.setFillColor(...GOLD); doc.rect(0, 20, W, 1.2, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('times', 'bold'); doc.setFontSize(14);
+    doc.text('BETHEL WORLDWIDE CORPORATION', W / 2, 9.5, { align: 'center' });
+    doc.setFont('times', 'normal'); doc.setFontSize(9.5);
+    doc.text(CONFIG.pdfBandSubtitle, W / 2, 15.5, { align: 'center' });
+    doc.setTextColor(0, 0, 0); y = 30;
+  }
+  function ensure(h) { if (y + h > H - 22) { doc.addPage(); band(); } }
+  function rule(weight, colour) { doc.setDrawColor(...(colour || [180, 180, 180])); doc.setLineWidth(weight || 0.2); doc.line(M, y, RIGHT, y); }
+  function sectionHead(t) {
+    ensure(16); y += 3;
+    doc.setFont('times', 'bold'); doc.setFontSize(12); doc.setTextColor(...NAVY);
+    doc.text(t, M, y); y += 2; rule(0.6, GOLD); y += 5; doc.setTextColor(0, 0, 0);
+  }
+  function tableHead() {
+    ensure(10);
+    doc.setFillColor(240, 245, 251); doc.rect(M, y - 4.5, RIGHT - M, 7, 'F');
+    doc.setFont('times', 'bold'); doc.setFontSize(10);
+    doc.text('Category', M + 1.5, y); doc.text('Details', DX, y); doc.text(`Value (${code})`, RIGHT - 1.5, y, { align: 'right' });
+    y += 6;
+  }
+  function detailRow(label, value, opts = {}) {
+    doc.setFont('times', opts.bold ? 'bold' : (opts.italic ? 'italic' : 'normal')); doc.setFontSize(opts.size || 10);
+    const x = opts.x || DX;
+    const lines = doc.splitTextToSize(label, RIGHT - 34 - x);
+    ensure(lines.length * 4.4 + 1);
+    doc.text(lines, x, y);
+    if (value !== undefined && value !== null) doc.text(String(value), RIGHT - 1.5, y, { align: 'right' });
+    y += lines.length * 4.4 + (opts.after ?? 1.2);
+  }
+  function lineLabel(l) {
+    let s = l.label;
+    if (l.desc) { const d = ($(l.id + '_desc').value || '').trim(); if (d) s += ': ' + d; }
+    if (l.count) { const c = ($(l.id + '_count').value || '').trim(); if (c !== '') s += ` (${c})`; }
+    return s;
+  }
+  function pdfLine(l, x) {
+    detailRow(lineLabel(l), fmtPdf(num(l.id)), { x });
+    if (l.inst) {
+      (insts[l.id] || []).filter(r => (r.name || '').trim()).forEach(r => {
+        detailRow('- ' + r.name.trim() + (r.country ? ` (${r.country})` : ''), null, { x: (x || DX) + 4, size: 9.5, after: 0.8 });
+      });
+    }
+  }
+  function totalRow(label, value, opts = {}) {
+    ensure(9); y += 1;
+    if (opts.key) { doc.setFillColor(224, 242, 254); doc.rect(M, y - 4.6, RIGHT - M, 7, 'F'); }
+    else rule(0.3, [120, 120, 120]);
+    if (!opts.key) y += 4.2;
+    doc.setFont('times', 'bold'); doc.setFontSize(opts.size || 10.5);
+    doc.text(label, M + 1.5, y); doc.text(fmtPdf(value), RIGHT - 1.5, y, { align: 'right' });
+    y += 6;
+  }
+  function renderBlocks(blocks, withTable) {
+    blocks.forEach(b => {
+      if (b.kind === 'category') {
+        const est = 10 + b.lines.reduce((a, l) => a + 5.6 + (l.inst ? (insts[l.id] || []).filter(r => (r.name || '').trim()).length * 5.2 : 0), 0);
+        ensure(Math.min(est, 150));
+        const catStartY = y, catPage = doc.internal.getCurrentPageInfo().pageNumber;
+        doc.setFont('times', 'bold'); doc.setFontSize(10);
+        const catLines = doc.splitTextToSize(`(${b.roman})  ${b.title}`, CAT_W - 2);
+        doc.text(catLines, M + 1.5, y);
+        const minY = y + catLines.length * 4.4;
+        b.lines.forEach(l => pdfLine(l));
+        if (doc.internal.getCurrentPageInfo().pageNumber === catPage) y = Math.max(y, minY);
+        detailRow(`Subtotal - ${b.title}`, fmtPdf(ctx.g[b.id]), { italic: true, after: 2.5 });
+        doc.setDrawColor(225, 225, 225); doc.setLineWidth(0.15); doc.line(M, y - 1.5, RIGHT, y - 1.5); y += 1.5;
+      } else if (b.kind === 'heading') {
+        ensure(10); y += 2; doc.setFont('times', 'bold'); doc.setFontSize(10.5); doc.setTextColor(...NAVY);
+        doc.text(b.title.toUpperCase(), M + 1.5, y); doc.setTextColor(0, 0, 0); y += 5.5;
+      } else if (b.kind === 'group') {
+        if (b.title) { ensure(Math.min(14 + b.lines.length * 5.6 + (b.totalLabel ? 10 : 0), 70)); y += 2; doc.setFont('times', 'bold'); doc.setFontSize(10.5); doc.setTextColor(...NAVY); doc.text(b.title.toUpperCase(), M + 1.5, y); doc.setTextColor(0, 0, 0); y += 5.5; }
+        b.lines.forEach(l => pdfLine(l, M + 6));
+        if (b.totalLabel) totalRow(b.totalLabel, ctx.g[b.id], { size: 10 });
+      } else if (b.kind === 'calc') {
+        totalRow(b.label, ctx.c[b.id], { key: b.key });
+      } else if (b.kind === 'check') {
+        const msg = b.fn(ctx, v => code + ' ' + fmtPdf(v));
+        if (msg) detailRow('Note: ' + msg, null, { x: M + 1.5, italic: true, size: 9 });
+      }
+    });
+  }
+
+  band();
+  // Title block — mirrors the FSC example layout
+  const name = $('entityName').value.trim(), number = $('entityNumber').value.trim();
+  doc.setFont('times', 'bold'); doc.setFontSize(13);
+  const title = doc.splitTextToSize(`ANNUAL FINANCIAL RETURN FOR ${name.toUpperCase()} (${number}) (i)`, W - 2 * M);
+  doc.text(title, W / 2, y, { align: 'center' }); y += title.length * 5.5;
+  doc.setFontSize(11.5); doc.text('FINANCIAL INFORMATION FOR YEAR ENDING', W / 2, y, { align: 'center' }); y += 5.5;
+  doc.setFont('times', 'normal'); doc.text(`(${ordinalDate($('yearEnd').value)})`, W / 2, y, { align: 'center' }); y += 4;
+
+  sectionHead(CONFIG.pdfBsTitle);
+  tableHead();
+  renderBlocks(CONFIG.balanceSheet, true);
+
+  sectionHead('INCOME STATEMENT');
+  ensure(8); doc.setFont('times', 'bold'); doc.setFontSize(10); doc.text(`Value (${code})`, RIGHT - 1.5, y, { align: 'right' }); y += 5;
+  renderBlocks(CONFIG.incomeStatement, false);
+
+  // Authorisation (kept together on one page)
+  ensure(75);
+  sectionHead('AUTHORISATION');
+  detailRow('For and on behalf of:', null, { x: M + 1.5, bold: true, after: 0 });
+  doc.setFont('times', 'normal'); doc.text(name, M + 50, y - 4.4 - 0); y += 1;
+  const fld = (l, v) => { ensure(6); doc.setFont('times', 'bold'); doc.setFontSize(10); doc.text(l, M + 1.5, y); doc.setFont('times', 'normal'); doc.text(doc.splitTextToSize(v || '-', RIGHT - M - 52), M + 50, y); y += 5.5; };
+  fld(CONFIG.signatoryLabel + ':', $('signatoryName').value.trim());
+  fld('Capacity:', $('signatoryCapacity').value.trim());
+  fld('Date:', longDate($('signDate').value));
+  ensure(30);
+  doc.setFont('times', 'bold'); doc.text('Signature:', M + 1.5, y);
+  if (signatureDataURL) {
+    const fmt = /^data:image\/jpe?g/i.test(signatureDataURL) ? 'JPEG' : 'PNG';
+    const p = doc.getImageProperties(signatureDataURL);
+    const w = 60, h = Math.min(24, (p.height / p.width) * w);
+    doc.addImage(signatureDataURL, fmt, M + 50, y - 5, w, h);
+    doc.setDrawColor(150, 150, 150); doc.setLineWidth(0.2); doc.line(M + 50, y - 5 + h + 1, M + 110, y - 5 + h + 1);
+    y += h + 3;
+  } else y += 8;
+  ensure(8); doc.setFont('times', 'italic'); doc.setFontSize(9);
+  doc.text(doc.splitTextToSize('Signed electronically. The signatory agreed that this digital signature is the legal equivalent of a handwritten signature.', RIGHT - M - 3), M + 1.5, y); y += 7;
+
+  const stamp = formatUtcNow();
+  if (SHOW_GENERATED) fld('Generated (UTC):', stamp);
+
+  // Footnotes
+  const std = $('accStandard').value === 'Other' ? $('accStandardOther').value.trim() : $('accStandard').value;
+  ensure(14); y += 2; rule(0.2); y += 4.5;
+  doc.setFont('times', 'normal'); doc.setFontSize(8.5); doc.setTextColor(...GREY);
+  doc.text(`(i)  ${std} used to calculate valuations within this return.`, M + 1.5, y); y += 4;
+  doc.text(doc.splitTextToSize('(ii)  Numbers included in brackets next to each type of loan or receivable represent the number of items in each identified category.', RIGHT - M - 3), M + 1.5, y);
+  doc.setTextColor(0, 0, 0);
+
+  const pages = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= pages; p++) {
+    doc.setPage(p);
+    doc.setDrawColor(...GOLD); doc.setLineWidth(0.4); doc.line(M, H - 14, RIGHT, H - 14);
+    doc.setFont('times', 'normal'); doc.setFontSize(8); doc.setTextColor(...GREY);
+    doc.text(`Annual Financial Return - ${name} (${number}) - year ending ${longDate($('yearEnd').value)}`, M, H - 9.5);
+    doc.text(`Page ${p} of ${pages}`, RIGHT, H - 9.5, { align: 'right' });
+    doc.text('Bethel Worldwide Corporation', M, H - 5.5);
+  }
+  if (SHOW_GENERATED) { $('generatedDisplay').textContent = stamp; }
+  save();
+  return doc;
+}
+function fileName() {
+  const clean = s => (s || '').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '');
+  const yr = ($('yearEnd').value || '').slice(0, 4);
+  return `${CONFIG.filePrefix}_${clean($('entityName').value) || 'Entity'}${yr ? '_FYE' + yr : ''}.pdf`;
+}
+function readyOrExplain() {
+  form.dataset.attempted = '1';
+  const issues = collectIssues();
+  renderIssues(issues);
+  if (issues.length) {
+    $('incompletePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('actionMsg').textContent = 'Please complete the items listed at the top first.';
+    return false;
+  }
+  return true;
+}
+$('btnDownload').addEventListener('click', () => {
+  if (!readyOrExplain()) return;
+  buildPdf().save(fileName());
+  $('actionMsg').textContent = 'PDF downloaded.';
+});
+$('btnShare').addEventListener('click', async () => {
+  if (!readyOrExplain()) return;
+  const doc = buildPdf();
+  const file = new File([doc.output('blob')], fileName(), { type: 'application/pdf' });
+  const title = 'Annual Financial Return - ' + ($('entityName').value.trim() || CONFIG.entityWord);
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title, text: 'Completed Annual Financial Return.' }); $('actionMsg').textContent = 'Shared.'; }
+    catch (e) { if (e.name !== 'AbortError') $('actionMsg').textContent = 'Sharing was not completed.'; }
+    return;
+  }
+  doc.save(fileName());
+  window.location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent('Please find attached the completed Annual Financial Return.\n\n(The PDF has been downloaded to your device - please attach it to this email.)')}`;
+  $('actionMsg').textContent = 'PDF downloaded — attach it to the email draft that opened.';
+});
+
+// ---------------------------------------------------------------------
+//  Init
+// ---------------------------------------------------------------------
+if (SHOW_GENERATED) $('generatedGroup').style.display = '';
+restore();
+onChange();
+})();
+</script>
+</body>
+</html>
