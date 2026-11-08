@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Listen to Audio</title>
+  <title>Watch Guidance Video</title>
 </head>
-<body style="font-family: Arial; text-align: center; padding: 50px;">
+<body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
 
-  <h2>Listen to the Recording</h2>
+  <h2>BVI 2027 Annual Financial Returns Guidance</h2>
 
-  <audio controls style="width: 100%; max-width: 450px;">
-    <source src="BVI_Annual_Financial_ReturnsGuidance_Copy_Compressed.mp4" type="audio/mp4">
-    Your browser does not support audio playback.
-  </audio>
+  <video controls style="width: 100%; max-width: 650px; border-radius: 8px;">
+    <source src="BVI_Annual_Financial_ReturnsGuidance_Copy_Compressed.mp4" type="video/mp4">
+    Your browser does not support video playback.
+  </video>
 
 </body>
 </html>
